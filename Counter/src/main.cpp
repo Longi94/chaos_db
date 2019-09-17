@@ -5,13 +5,15 @@
 #include <limits>
 
 using namespace std;
+using namespace std::this_thread;
+using namespace std::chrono;
 
 int main()
 {
     for (int i = 0; i < numeric_limits<int>::max(); ++i)
     {
         cout << i << endl;
-        this_thread::sleep_for(chrono::milliseconds(1000));
+        sleep_for(milliseconds(1000));
     }
     return 0;
 }
