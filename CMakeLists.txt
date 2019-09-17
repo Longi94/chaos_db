@@ -7,3 +7,4 @@ project ("ChaosDB")
 
 # Include sub-projects.
 add_subdirectory ("ChaosDB")
+add_subdirectory ("Counter")
