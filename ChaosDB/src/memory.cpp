@@ -15,11 +15,14 @@ namespace chaos
     {
         int attach_to_process(const int pid)
         {
+            cout << "ptrace attaching to " << pid << "..." << endl;
             errno = 0;
 
             if (!ptrace(PTRACE_ATTACH, pid, 0, 0))
             {
                 waitpid(pid, nullptr, 0);
+
+                cout << "ptrace attached to " << pid << endl;
                 return 0;
             }
 
@@ -29,6 +32,7 @@ namespace chaos
 
         int detach_from_process(const int pid)
         {
+            cout << "ptrace detaching from " << pid << "..." << endl;
             errno = 0;
 
             if (ptrace(PTRACE_DETACH, pid, 0, 0))
@@ -37,6 +41,7 @@ namespace chaos
                 return -1;
             }
 
+            cout << "ptrace detached from " << pid << endl;
             return 0;
         }
 
