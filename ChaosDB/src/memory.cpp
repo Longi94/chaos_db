@@ -7,6 +7,10 @@
 #include <cstring>
 #include <fcntl.h>
 
+extern "C" {
+#include "pmparser.h"
+}
+
 using namespace std;
 
 namespace chaos
@@ -60,6 +64,38 @@ namespace chaos
         void write_byte(const int fd, void* buf, const off_t address)
         {
             pwrite(fd, buf, 1, address);
+        }
+
+        heap_stack* get_heap_and_stack_spaces(const int pid)
+        {
+            procmaps_iterator* maps = pmparser_parse(pid);
+
+            if (maps == nullptr)
+            {
+                cout << "cannot parse the memory map of " << pid << endl;
+                return nullptr;
+            }
+
+            //iterate over areas
+            procmaps_struct* map;
+            heap_stack* result = static_cast<heap_stack*>(malloc(sizeof(heap_stack)));
+
+            while ((map = pmparser_next(maps)) != nullptr)
+            {
+                if (strcmp(map->pathname, "[heap]") == 0)
+                {
+                    result->heap_start = reinterpret_cast<off_t>(map->addr_start);
+                    result->heap_end = reinterpret_cast<off_t>(map->addr_end);
+                } else if (strcmp(map->pathname, "[stack]") == 0)
+                {
+                    result->stack_start = reinterpret_cast<off_t>(map->addr_start);
+                    result->stack_end = reinterpret_cast<off_t>(map->addr_end);
+                }
+            }
+
+            pmparser_free(maps);
+
+            return result;
         }
     }
 }

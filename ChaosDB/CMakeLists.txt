@@ -4,7 +4,7 @@ set(SOURCE_FILES
     src/injector.cpp
     src/flipper.cpp
     src/memory.cpp
-    src/parser.cpp)
+    src/pmparser.c)
 
 include_directories(include)
 

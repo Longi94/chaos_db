@@ -6,9 +6,9 @@ using namespace std;
 
 int main(const int argc, char* argv[])
 {
-    if (argc < 2)
+    if (argc < 1)
     {
-        cout << "Usage: injector [pid] [address]" << endl;
+        cout << "Usage: injector pid [address]" << endl;
         return 0;
     }
 
@@ -16,7 +16,12 @@ int main(const int argc, char* argv[])
     srand(time(nullptr));
 
     const int pid = strtol(argv[1], nullptr, 0);
-    const long offset = strtol(argv[2], nullptr, 16);
+
+    long offset = -1;
+    if (argc >= 3)
+    {
+        offset = strtol(argv[2], nullptr, 16);
+    }
 
     chaos::flipper::flip_random_bit(pid, offset);
 
