@@ -1,5 +1,6 @@
 #include "flipper.hpp"
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -10,6 +11,9 @@ int main(const int argc, char* argv[])
         cout << "Usage: injector [pid] [address]" << endl;
         return 0;
     }
+
+    // Init random
+    srand(time(nullptr));
 
     const int pid = strtol(argv[1], nullptr, 0);
     const long offset = strtol(argv[2], nullptr, 16);

@@ -4,6 +4,8 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <random>
+#include <bitset>
 
 using namespace std;
 using namespace std::this_thread;
@@ -26,7 +28,11 @@ namespace chaos
 
             memory::read_byte(fd, byte, offset);
 
-            cout << "Read byte: " << static_cast<int16_t>(byte[0]) << endl;
+            cout << "Read byte: " << bitset<8>(byte[0]) << endl;
+
+            // Flip a random bit
+            byte[0] ^= 1 << rand() % 7;
+            cout << "Flipped byte: " << bitset<8>(byte[0]) << endl;
 
             memory::detach_from_process(pid);
             delete[] byte;
