@@ -9,6 +9,7 @@ namespace chaos
         int attach_to_process(int pid);
         int open_mem(int pid);
         void read_byte(int fd, void* buf, off_t address);
+        void write_byte(int fd, void* buf, off_t address);
     }
 }
 

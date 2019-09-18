@@ -56,5 +56,10 @@ namespace chaos
         {
             pread(fd, buf, 1, address);
         }
+
+        void write_byte(const int fd, void* buf, const off_t address)
+        {
+            pwrite(fd, buf, 1, address);
+        }
     }
 }

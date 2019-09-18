@@ -6,6 +6,7 @@
 #include <iostream>
 #include <random>
 #include <bitset>
+#include <fcntl.h>
 
 using namespace std;
 using namespace std::this_thread;
@@ -33,6 +34,10 @@ namespace chaos
             // Flip a random bit
             byte[0] ^= 1 << rand() % 7;
             cout << "Flipped byte: " << bitset<8>(byte[0]) << endl;
+
+            memory::write_byte(fd, byte, offset);
+
+            close(fd);
 
             memory::detach_from_process(pid);
             delete[] byte;
