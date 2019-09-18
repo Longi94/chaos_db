@@ -1,9 +1,12 @@
-﻿# CMakeList.txt : CMake project for ChaosDB, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
+
+set(SOURCE_FILES
+    src/injector.cpp
+    src/flipper.cpp
+    src/memory.cpp
+    src/parser.cpp)
+
+include_directories(include)
 
 # Add source to this project's executable.
-add_executable (ChaosDB "ChaosDB.cpp" "ChaosDB.h")
-
-# TODO: Add tests and install targets if needed.
+add_executable (injector ${SOURCE_FILES})
