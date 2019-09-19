@@ -56,14 +56,40 @@ namespace chaos
             return open(file, O_RDWR);
         }
 
-        void read_byte(const int fd, void* buf, const off_t address)
+        int read_byte(const int fd, void* buf, const off_t address)
         {
-            pread(fd, buf, 1, address);
+            const ssize_t bytes_read = pread(fd, buf, 1, address);
+
+            if (bytes_read < 0)
+            {
+                cout << "Error while reading bytes: " << strerror(errno) << endl;
+                return -1;
+            }
+            if (bytes_read == 0)
+            {
+                cout << "Read 0 bytes" << endl;
+                return -1;
+            }
+
+            return 0;
         }
 
-        void write_byte(const int fd, void* buf, const off_t address)
+        int write_byte(const int fd, void* buf, const off_t address)
         {
-            pwrite(fd, buf, 1, address);
+            const ssize_t bytes_written = pwrite(fd, buf, 1, address);
+
+            if (bytes_written < 0)
+            {
+                cout << "Error while writing bytes: " << strerror(errno) << endl;
+                return -1;
+            }
+            if (bytes_written == 0)
+            {
+                cout << "Read 0 bytes" << endl;
+                return -1;
+            }
+
+            return 0;
         }
 
         heap_stack* get_heap_and_stack_spaces(const int pid)

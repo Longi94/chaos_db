@@ -16,8 +16,8 @@ namespace chaos
         int detach_from_process(int pid);
         int attach_to_process(int pid);
         int open_mem(int pid);
-        void read_byte(int fd, void* buf, off_t address);
-        void write_byte(int fd, void* buf, off_t address);
+        int read_byte(int fd, void* buf, off_t address);
+        int write_byte(int fd, void* buf, off_t address);
         heap_stack* get_heap_and_stack_spaces(int pid);
     }
 }

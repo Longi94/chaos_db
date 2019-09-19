@@ -1,16 +1,12 @@
 #include "flipper.hpp"
 #include "memory.hpp"
 #include <cstdint>
-#include <chrono>
-#include <thread>
 #include <iostream>
 #include <random>
 #include <bitset>
 #include <fcntl.h>
 
 using namespace std;
-using namespace std::this_thread;
-using namespace std::chrono;
 
 namespace chaos
 {
@@ -60,7 +56,10 @@ namespace chaos
 
             const auto fd = memory::open_mem(pid);
 
-            memory::read_byte(fd, byte, addr);
+            if (memory::read_byte(fd, byte, addr))
+            {
+                return -1;
+            }
 
             cout << "Read byte: " << bitset<8>(byte[0]) << endl;
 
@@ -68,7 +67,10 @@ namespace chaos
             byte[0] ^= 1 << rand() % 7;
             cout << "Flipped byte: " << bitset<8>(byte[0]) << endl;
 
-            //memory::write_byte(fd, byte, offset);
+            if (memory::write_byte(fd, byte, offset))
+            {
+                return -1;
+            }
 
             close(fd);
 
