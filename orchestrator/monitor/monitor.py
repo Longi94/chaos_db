@@ -34,3 +34,7 @@ class ProcessMonitor(object):
 
     def evaluate_result(self):
         raise NotImplementedError()
+
+    def print_result(self):
+        print('Process return code: {}'.format(self.return_code))
+        print('Process run time: {} seconds'.format(self.end_time - self.start_time))

@@ -36,3 +36,5 @@ if __name__ == '__main__':
 
         monitor.end()
         runner.clean()
+
+    monitor.print_result()
