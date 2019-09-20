@@ -47,6 +47,8 @@ namespace chaos
                     {
                         addr = memory_info->heap_start + rand_i;
                     }
+
+                    delete memory_info;
                 }
             }
 
@@ -67,7 +69,7 @@ namespace chaos
             byte[0] ^= 1 << rand() % 7;
             cout << "Flipped byte: " << bitset<8>(byte[0]) << endl;
 
-            if (memory::write_byte(fd, byte, offset))
+            if (memory::write_byte(fd, byte, addr))
             {
                 return -1;
             }
