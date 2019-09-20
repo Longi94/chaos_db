@@ -21,11 +21,14 @@ class ProcessMonitor(object):
         self.query = query
         self.start_time = time()
 
-    def set_inject_time(self, inject_time):
+    def set_inject_time(self, inject_time=None):
         """
         :type inject_time: float
         """
-        self.inject_time = inject_time
+        if inject_time is None:
+            self.inject_time = time()
+        else:
+            self.inject_time = inject_time
 
     def end(self):
         self.end_time = time()

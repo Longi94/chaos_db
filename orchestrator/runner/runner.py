@@ -15,8 +15,6 @@ class SqlRunner(object):
 
         :param query: number of the query (1-22)
         :type query: int
-        :return: process id running the query or process id of the db service
-        :rtype: int
         """
         raise NotImplementedError()
 

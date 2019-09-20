@@ -33,7 +33,5 @@ class SQLiteRunner(SqlRunner):
             with open(os.path.join(result_dir, 'q{}.out'.format(query)), 'w') as stdout:
                 self.process = subprocess.Popen(command, stdout=stdout, stdin=stdin)
 
-        return self.process.pid
-
     def clean(self):
         pass
