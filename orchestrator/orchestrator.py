@@ -2,6 +2,7 @@ import argparse
 import logging
 import tempfile
 import random
+import pandas as pd
 from time import sleep
 from db import *
 from monitor import get_monitor
@@ -21,6 +22,7 @@ if __name__ == '__main__':
                         help='The expected run time of the query, the time of the bit flip injection (which is random) '
                              'depends on this. Required if --flip is set.')
     parser.add_argument('-f', '--flip', action='store_true', default=False)
+    parser.add_argument('-o', '--output', type=str, required=True, help='Output CSV to save results to.')
     args = parser.parse_args()
 
     if args.flip and args.mean_runtime is None:
@@ -31,28 +33,35 @@ if __name__ == '__main__':
 
     log.info('DB type: ' + args.database)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        log.info('Temp dir: ' + temp_dir)
-        runner = get_runner(args.database, temp_dir)
-        monitor = get_monitor(args.database, temp_dir)
+    results = []
 
-        runner.init_db()
-        try:
-            runner.run_tpch(args.tpc_h)
-            monitor.start(runner.process, args.tpc_h)
+    for i in range(args.iterations):
+        log.info('Iteration ' + str(i))
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log.info('Temp dir: ' + temp_dir)
+            runner = get_runner(args.database, temp_dir)
+            monitor = get_monitor(args.database, temp_dir)
 
-            if args.flip:
-                inject_delay = random.uniform(0.0, args.mean_runtime * 0.75)
-                log.info('Will inject bit-flip in {} seconds'.format(inject_delay))
-                sleep(inject_delay)
-                monitor.set_inject_time()
-                inject_bit_flip(runner.process.pid)
+            runner.init_db()
+            try:
+                runner.run_tpch(args.tpc_h)
+                monitor.start(runner.process, args.tpc_h)
 
-            runner.process.wait()
-        except Exception as e:
-            log.error('Error while running query', exc_info=e)
+                if args.flip:
+                    inject_delay = random.uniform(0.0, args.mean_runtime * 0.75)
+                    log.info('Will inject bit-flip in {} seconds'.format(inject_delay))
+                    sleep(inject_delay)
+                    monitor.set_inject_time()
+                    inject_bit_flip(runner.process.pid)
 
-        monitor.end()
-        runner.clean()
+                runner.process.wait()
+            except Exception as e:
+                log.error('Error while running query', exc_info=e)
 
-    monitor.print_result()
+            monitor.end()
+            runner.clean()
+
+        results.append(monitor.to_dict())
+
+    df = pd.DataFrame(results)
+    df.to_csv(args.output, index=False)
