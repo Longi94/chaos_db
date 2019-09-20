@@ -612,3 +612,5 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 /tpc-h.sqlite
+
+!answers/q*.out
