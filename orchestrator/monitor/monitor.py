@@ -3,7 +3,8 @@ from subprocess import Popen
 
 
 class ProcessMonitor(object):
-    def __init__(self):
+    def __init__(self, directory):
+        self.directory = directory
         self.process = None
         self.query = None
         self.start_time = None

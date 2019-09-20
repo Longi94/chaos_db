@@ -3,13 +3,12 @@ from .monitor import ProcessMonitor
 from .sqlite import SQLiteMonitor
 
 
-def get_monitor(db):
+def get_monitor(db, directory):
     """
-    :param db:
-    :type db: str 
-    :return: 
+    :type db: str
+    :type directory: str
     :rtype: ProcessMonitor
     """
     if db == DB_SQLITE:
-        return SQLiteMonitor()
+        return SQLiteMonitor(directory)
     return None

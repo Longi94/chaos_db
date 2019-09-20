@@ -1,5 +1,6 @@
 import argparse
 import logging
+import tempfile
 from db import *
 from monitor import get_monitor
 from runner import get_runner
@@ -20,15 +21,18 @@ if __name__ == '__main__':
 
     log.info('DB type: ' + args.database)
 
-    runner = get_runner(args.database)
-    monitor = get_monitor(args.database)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        log.info('Temp dir: ' + temp_dir)
+        runner = get_runner(args.database, temp_dir)
+        monitor = get_monitor(args.database, temp_dir)
 
-    runner.init_db()
-    try:
-        runner.run_tpch(args.tpc_h)
-        monitor.start(runner.process, args.tpc_h)
-        runner.process.wait()
-    except:
-        pass
-    monitor.end()
-    runner.clean()
+        runner.init_db()
+        try:
+            runner.run_tpch(args.tpc_h)
+            monitor.start(runner.process, args.tpc_h)
+            runner.process.wait()
+        except Exception as e:
+            log.error('Error while running query', exc_info=e)
+
+        monitor.end()
+        runner.clean()

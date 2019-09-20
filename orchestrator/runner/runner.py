@@ -1,5 +1,7 @@
 class SqlRunner(object):
-    process = None
+    def __init__(self, directory):
+        self.directory = directory
+        self.process = None
 
     def init_db(self):
         """

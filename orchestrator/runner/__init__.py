@@ -3,7 +3,7 @@ from .runner import SqlRunner
 from .sqlite import SQLiteRunner
 
 
-def get_runner(db):
+def get_runner(db, dir):
     """
     :param db:
     :type db: str 
@@ -11,5 +11,5 @@ def get_runner(db):
     :rtype: SqlRunner
     """
     if db == DB_SQLITE:
-        return SQLiteRunner()
+        return SQLiteRunner(dir)
     return None
