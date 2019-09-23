@@ -6,7 +6,10 @@ set(SOURCE_FILES
     src/memory.cpp
     src/pmparser.c)
 
+add_subdirectory (cxxopts)
+
 include_directories(include)
+include_directories("cxxopts/include")
 
 # Add source to this project's executable.
 add_executable (injector ${SOURCE_FILES})

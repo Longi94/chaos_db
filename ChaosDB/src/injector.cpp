@@ -1,26 +1,42 @@
 #include "flipper.hpp"
-#include <iostream>
+#include "cxxopts.hpp"
 #include <random>
 
 using namespace std;
 
-int main(const int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    if (argc < 2)
+    cxxopts::Options options("injector", "Inject bit flips into a child process.");
+    options
+        .allow_unrecognised_options()
+        .add_options()
+        ("h,help", "Print help")
+        ("a,address", "The address to inject a bit flip into", cxxopts::value<long>())
+        ("p,pid", "The child process id", cxxopts::value<int>());
+
+    auto args = options.parse(argc, argv);
+
+    if (args.count("help"))
     {
-        cout << "Usage: injector pid [address]" << endl;
-        return 0;
+        cout << options.help({""}) << endl;
+        exit(0);
+    }
+
+    if (args.count("pid") == 0)
+    {
+        cout << "Missing pid argument." << endl;
+        exit(1);
     }
 
     // Init random
     srand(time(nullptr));
 
-    const int pid = strtol(argv[1], nullptr, 0);
+    const int pid = args["pid"].as<int>();
 
     long offset = -1;
-    if (argc >= 3)
+    if (args.count("address"))
     {
-        offset = strtol(argv[2], nullptr, 16);
+        offset = args["address"].as<long>();
     }
 
     chaos::flipper::flip_random_bit(pid, offset);
