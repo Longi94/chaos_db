@@ -1,5 +1,6 @@
 #include "flipper.hpp"
 #include "cxxopts.hpp"
+#include <iostream>
 #include <random>
 
 using namespace std;
