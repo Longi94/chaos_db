@@ -1,0 +1,4 @@
+root = true
+
+[{Makefile,**.mk}]
+indent_style = tab
