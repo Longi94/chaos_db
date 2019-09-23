@@ -4,6 +4,7 @@ set(SOURCE_FILES
     src/injector.cpp
     src/flipper.cpp
     src/memory.cpp
+    src/process.cpp
     src/pmparser.c)
 
 add_subdirectory (cxxopts)

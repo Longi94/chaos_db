@@ -1,5 +1,6 @@
 #include "flipper.hpp"
 #include "memory.hpp"
+#include "process.hpp"
 #include <cstdint>
 #include <iostream>
 #include <random>
@@ -14,7 +15,7 @@ namespace chaos
     {
         int flip_random_bit(const int pid, const off_t offset)
         {
-            if (memory::attach_to_process(pid))
+            if (process::attach(pid))
             {
                 return -1;
             }
@@ -76,7 +77,7 @@ namespace chaos
 
             close(fd);
 
-            memory::detach_from_process(pid);
+            process::detach(pid);
             delete[] byte;
             return 0;
         }
