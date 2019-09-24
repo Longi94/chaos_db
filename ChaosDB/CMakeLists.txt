@@ -5,6 +5,7 @@ set(SOURCE_FILES
     src/flipper.cpp
     src/memory.cpp
     src/process.cpp
+    src/args.cpp
     src/pmparser.c)
 
 add_subdirectory (cxxopts)

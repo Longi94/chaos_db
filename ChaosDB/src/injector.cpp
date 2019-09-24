@@ -1,3 +1,4 @@
+#include "args.hpp"
 #include "flipper.hpp"
 #include "cxxopts.hpp"
 #include <iostream>
