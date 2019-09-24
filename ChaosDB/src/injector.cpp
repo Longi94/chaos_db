@@ -13,7 +13,7 @@ using namespace chaos;
 
 int main(int argc, char* argv[])
 {
-    cxxopts::Options options("injector", "Inject bit flips into a child process.");
+    cxxopts::Options options("injector", "Inject bit flips into a child process. Example usage: injector -o q1.out -i queries/sqlite/1.sql -m 5000 -c /usr/bin/sqlite3 tpc-h.sqlite");
     options
         .allow_unrecognised_options()
         .add_options()
@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>());
 
+    // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
     char** argv_copy = argv;
 
@@ -45,14 +46,13 @@ int main(int argc, char* argv[])
     const auto output = args["output"].as<string>();
     const auto input = args["input"].as<string>();
 
+    // Find where -c or --command is to find the arguments after that, those will be passed to the child process
     const auto arg_end = argv + argc;
     char** command_option = find(argv, arg_end, string("-c"));
-
     if (command_option == arg_end)
     {
         command_option = find(argv, arg_end, string("--command"));
     }
-
     char** command_args = command_option + 1;
 
     const pid_t pid = process::execute(path, output, input, command_args);
