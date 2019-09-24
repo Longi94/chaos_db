@@ -9,10 +9,10 @@ debug:
 	mkdir -p build/debug && \
 	cd build/debug && \
 	cmake -DCMAKE_BUILD_TYPE=Debug ../.. && \
-	make
+	cmake --build . --target injector
 
 release:
 	mkdir -p build/release && \
 	cd build/release && \
 	cmake -DCMAKE_BUILD_TYPE=Release ../.. && \
-	make
+	cmake --build . --target injector
