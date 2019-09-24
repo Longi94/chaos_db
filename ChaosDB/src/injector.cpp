@@ -1,10 +1,12 @@
 #include "args.hpp"
 #include "flipper.hpp"
+#include "process.hpp"
 #include "cxxopts.hpp"
 #include <iostream>
 #include <random>
 
 using namespace std;
+using namespace chaos;
 
 int main(int argc, char* argv[])
 {
@@ -13,10 +15,15 @@ int main(int argc, char* argv[])
         .allow_unrecognised_options()
         .add_options()
         ("h,help", "Print help")
-        ("a,address", "The address to inject a bit flip into", cxxopts::value<long>())
-        ("p,pid", "The child process id", cxxopts::value<int>());
+        ("c,command",
+         "The command the child process should run. This should be the last option as anything after this will be interpreted as the command.",
+         cxxopts::value<string>())
+        ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>());
 
-    auto args = options.parse(argc, argv);
+    int argc_copy = argc;
+    char** argv_copy = argv;
+
+    auto args = options.parse(argc_copy, argv_copy);
 
     if (args.count("help"))
     {
@@ -24,24 +31,27 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
-    if (args.count("pid") == 0)
-    {
-        cout << "Missing pid argument." << endl;
-        exit(1);
-    }
+    args::check_required(args, {"command", "output"});
 
     // Init random
     srand(time(nullptr));
 
-    const int pid = args["pid"].as<int>();
+    const auto path = args["command"].as<string>();
+    const auto output = args["output"].as<string>();
 
-    long offset = -1;
-    if (args.count("address"))
+    const auto arg_end = argv + argc;
+    char** command_option = find(argv, arg_end, string("-c"));
+
+    if (command_option == arg_end)
     {
-        offset = args["address"].as<long>();
+        command_option = find(argv, arg_end, string("--command"));
     }
 
-    chaos::flipper::flip_random_bit(pid, offset);
+    char** command_args = command_option + 1;
+
+    process::execute(path, output, command_args);
+
+    //flipper::flip_random_bit(pid, offset);
 
     return 0;
 }

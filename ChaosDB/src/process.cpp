@@ -4,6 +4,8 @@
 #include <cerrno>
 #include <iostream>
 #include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -41,6 +43,39 @@ namespace chaos
 
             cout << "ptrace detached from " << pid << endl;
             return 0;
+        }
+
+        pid_t execute(string path, string output, char** arguments)
+        {
+            cout << "Forking to run:";
+            for (char** p = arguments; *p != nullptr; p++)
+            {
+                cout << " " << *p;
+            }
+            cout << endl;
+
+            const pid_t pid = fork();
+
+            switch (pid)
+            {
+            case -1:
+                return -1;
+            case 0:
+                {
+                    // redirect stdout to file
+                    const int fd = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                    dup2(fd, 1);
+                    close(fd);
+
+                    execv(path.c_str(), arguments);
+                    perror("execl");
+                    exit(1);
+                    return 0;
+                }
+            default:
+                cout << "Child process id from parent: " << pid << endl;
+                return pid;
+            }
         }
     }
 }
