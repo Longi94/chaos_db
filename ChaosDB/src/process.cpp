@@ -9,11 +9,13 @@
 
 using namespace std;
 
+constexpr int excl_fail = 127;
+
 namespace chaos
 {
     namespace process
     {
-        int attach(const int pid)
+        int attach(const pid_t pid)
         {
             cout << "ptrace attaching to " << pid << "..." << endl;
             errno = 0;
@@ -30,7 +32,7 @@ namespace chaos
             return -1;
         }
 
-        int detach(const int pid)
+        int detach(const pid_t pid)
         {
             cout << "ptrace detaching from " << pid << "..." << endl;
             errno = 0;
@@ -77,13 +79,27 @@ namespace chaos
 
                     execv(path.c_str(), arguments);
                     perror("execl");
-                    exit(1);
+                    exit(excl_fail);
                     return 0;
                 }
             default:
                 cout << "Child process id from parent: " << pid << endl;
                 return pid;
             }
+        }
+
+        int wait_exit_code(const pid_t pid)
+        {
+            int status;
+            waitpid(pid, &status, 0);
+
+            if (!WIFEXITED(status))
+            {
+                // child process abnormally terminated
+                return excl_fail;
+            }
+
+            return WEXITSTATUS(status);
         }
     }
 }

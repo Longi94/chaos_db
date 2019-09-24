@@ -65,8 +65,7 @@ int main(int argc, char* argv[])
         flipper::flip_random_bit(pid, -1);
     }
 
-    int status = 0;
-    waitpid(pid, &status, 0);
+    const int status = process::wait_exit_code(pid);
 
     cout << "Child process return code: " << status << endl;
 

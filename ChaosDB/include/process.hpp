@@ -16,14 +16,14 @@ namespace chaos
          * @param pid process id
          * @return 0 if successful, -1 if there was an error
          */
-        int detach(int pid);
+        int detach(pid_t pid);
 
         /**
          * Detach from a process using ptrace.
          * @param pid process id
          * @return 0 if successful, -1 if there was an error
          */
-        int attach(int pid);
+        int attach(pid_t pid);
 
         /**
          * Execute a command by creating a child process with fork().
@@ -34,5 +34,12 @@ namespace chaos
          * @return the process id of the child process
          */
         pid_t execute(string path, string output, string input, char** arguments);
+
+        /**
+         * Wait for a process (using waitpid) and return the exit code.
+         * @param pid process id
+         * @return exit code of the process
+         */
+        int wait_exit_code(pid_t pid);
     }
 }
