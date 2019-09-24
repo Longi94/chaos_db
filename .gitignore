@@ -614,5 +614,6 @@ _deps
 /tpc-h.sqlite
 
 !answers/q*.out
+!answers/sqlite/q*.out
 results.csv
 !/Makefile

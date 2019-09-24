@@ -1,38 +1,24 @@
 from time import time
-from subprocess import Popen
 
 
 class ProcessMonitor(object):
-    def __init__(self, directory):
+    def __init__(self, directory, inject_delay):
         self.directory = directory
-        self.process = None
         self.query = None
         self.start_time = None
         self.end_time = None
-        self.inject_time = None
+        self.inject_delay = inject_delay
         self.return_code = None
 
-    def start(self, process, query):
+    def start(self, query):
         """
-        :type process: Popen
         :type query: int
         """
-        self.process = process
         self.query = query
         self.start_time = time()
 
-    def set_inject_time(self, inject_time=None):
-        """
-        :type inject_time: float
-        """
-        if inject_time is None:
-            self.inject_time = time()
-        else:
-            self.inject_time = inject_time
-
     def end(self):
         self.end_time = time()
-        self.return_code = self.process.returncode
         self.evaluate_result()
 
     def evaluate_result(self):
@@ -46,5 +32,5 @@ class ProcessMonitor(object):
         return {
             'runtime': self.end_time - self.start_time,
             'return_code': self.return_code,
-            'inject_delay': self.inject_time - self.start_time
+            'inject_delay': self.inject_delay
         }

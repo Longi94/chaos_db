@@ -1,6 +1,7 @@
 class SqlRunner(object):
-    def __init__(self, directory):
+    def __init__(self, directory, inject_delay):
         self.directory = directory
+        self.inject_delay = inject_delay
         self.process = None
 
     def init_db(self):
