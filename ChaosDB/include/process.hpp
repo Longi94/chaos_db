@@ -1,7 +1,9 @@
 #pragma once
 #include <unistd.h>
-#include <vector>
 #include <string>
+
+constexpr auto pipe_read = 0;
+constexpr auto pipe_write = 1;
 
 using namespace std;
 
@@ -11,6 +13,6 @@ namespace chaos
     {
         int detach(int pid);
         int attach(int pid);
-        pid_t execute(string command, string output, char** arguments);
+        pid_t execute(string command, string output, string input, char** arguments);
     }
 }

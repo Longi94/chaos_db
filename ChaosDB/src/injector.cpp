@@ -4,6 +4,7 @@
 #include "cxxopts.hpp"
 #include <iostream>
 #include <random>
+#include <sys/wait.h>
 
 using namespace std;
 using namespace chaos;
@@ -18,7 +19,8 @@ int main(int argc, char* argv[])
         ("c,command",
          "The command the child process should run. This should be the last option as anything after this will be interpreted as the command.",
          cxxopts::value<string>())
-        ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>());
+        ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
+        ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""));
 
     int argc_copy = argc;
     char** argv_copy = argv;
@@ -38,6 +40,7 @@ int main(int argc, char* argv[])
 
     const auto path = args["command"].as<string>();
     const auto output = args["output"].as<string>();
+    const auto input = args["input"].as<string>();
 
     const auto arg_end = argv + argc;
     char** command_option = find(argv, arg_end, string("-c"));
@@ -49,7 +52,12 @@ int main(int argc, char* argv[])
 
     char** command_args = command_option + 1;
 
-    process::execute(path, output, command_args);
+    const pid_t pid = process::execute(path, output, input, command_args);
+
+    int status = 0;
+    waitpid(pid, &status, 0);
+
+    cout << "Child process return code: " << status << endl;
 
     //flipper::flip_random_bit(pid, offset);
 

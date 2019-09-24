@@ -45,7 +45,7 @@ namespace chaos
             return 0;
         }
 
-        pid_t execute(string path, string output, char** arguments)
+        pid_t execute(string path, string output, string input, char** arguments)
         {
             cout << "Forking to run:";
             for (char** p = arguments; *p != nullptr; p++)
@@ -63,9 +63,17 @@ namespace chaos
             case 0:
                 {
                     // redirect stdout to file
-                    const int fd = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                    dup2(fd, 1);
-                    close(fd);
+                    const int fdout = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                    dup2(fdout, pipe_write);
+                    close(fdout);
+
+                    // pipe file into stdin
+                    if (!input.empty())
+                    {
+                        const int fdin = open(input.c_str(), O_RDONLY);
+                        dup2(fdin, pipe_read);
+                        close(fdin);
+                    }
 
                     execv(path.c_str(), arguments);
                     perror("execl");
