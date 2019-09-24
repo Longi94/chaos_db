@@ -5,6 +5,8 @@
 #include <iostream>
 #include <random>
 #include <sys/wait.h>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 using namespace chaos;
@@ -20,7 +22,8 @@ int main(int argc, char* argv[])
          "The command the child process should run. This should be the last option as anything after this will be interpreted as the command.",
          cxxopts::value<string>())
         ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
-        ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""));
+        ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
+        ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>());
 
     int argc_copy = argc;
     char** argv_copy = argv;
@@ -54,12 +57,18 @@ int main(int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, command_args);
 
+    if (args.count("milliseconds"))
+    {
+        const auto ms = args["milliseconds"].as<unsigned long>();
+        cout << "Flip random bit in " << ms << " milliseconds..." << endl;
+        this_thread::sleep_for(chrono::milliseconds(ms));
+        flipper::flip_random_bit(pid, -1);
+    }
+
     int status = 0;
     waitpid(pid, &status, 0);
 
     cout << "Child process return code: " << status << endl;
-
-    //flipper::flip_random_bit(pid, offset);
 
     return 0;
 }
