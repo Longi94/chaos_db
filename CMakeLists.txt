@@ -4,8 +4,7 @@
 cmake_minimum_required (VERSION 3.8)
 set(CMAKE_CXX_STANDARD 11)
 
-project ("ChaosDB")
+project ("chaos_db")
 
 # Include sub-projects.
-add_subdirectory ("ChaosDB")
-add_subdirectory ("Counter")
+add_subdirectory ("injector")
