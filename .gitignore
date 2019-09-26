@@ -611,8 +611,9 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
-/tpc-h.sqlite
 
+*.sqlite
+*.db
 !databases/*/answers/q*.out
 results.csv
 databases/tpch/*/

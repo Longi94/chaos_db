@@ -1,6 +1,5 @@
 import os
 import logging
-import subprocess
 from shutil import copyfile
 from injector import run_injector
 from .runner import SqlRunner
@@ -16,7 +15,7 @@ class SQLiteRunner(SqlRunner):
     def init_db(self):
         log.info('Copying sqlite database to a temp file...')
         log.info('Temp file name: ' + self.db_file)
-        copyfile('tpc-h.sqlite', self.db_file)
+        copyfile('databases/sqlite/tpc-h.sqlite', self.db_file)
 
     def run_tpch(self, query):
         result_dir = os.path.join(self.directory, 'result/sqlite')
@@ -25,9 +24,9 @@ class SQLiteRunner(SqlRunner):
 
         self.process = run_injector(
             os.path.join(result_dir, 'q{}.out'.format(query)),
-            'queries/sqlite/{}.sql'.format(query),
+            'databases/sqlite/queries/{}.sql'.format(query),
             self.inject_delay,
-            ['/usr/bin/sqlite3', self.db_file]
+            ['databases/sqlite/bin/sqlite3', self.db_file]
         )
 
     def clean(self):
