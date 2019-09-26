@@ -3,6 +3,7 @@
 #include "process.hpp"
 #include "cxxopts.hpp"
 #include <iostream>
+#include <fstream>
 #include <random>
 #include <sys/wait.h>
 #include <chrono>
@@ -11,7 +12,7 @@
 using namespace std;
 using namespace chaos;
 
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
     cxxopts::Options options("injector", "Inject bit flips into a child process. Example usage: injector -o q1.out -i queries/sqlite/1.sql -m 5000 -c /usr/bin/sqlite3 tpc-h.sqlite");
     options
@@ -68,6 +69,11 @@ int main(int argc, char* argv[])
     const int status = process::wait_exit_code(pid);
 
     cout << "Child process return code: " << status << endl;
+
+    ofstream rc;
+    rc.open("rc");
+    rc << status << endl;
+    rc.close();
 
     return 0;
 }
