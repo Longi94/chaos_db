@@ -8,10 +8,12 @@ set(SOURCE_FILES
     src/args.cpp
     src/pmparser.c)
 
-add_subdirectory (cxxopts)
+add_library(cxxopts cxxopts/include/cxxopts.hpp)
+set_target_properties(cxxopts PROPERTIES LINKER_LANGUAGE CXX)
 
 include_directories(include)
-include_directories("cxxopts/include")
+include_directories(cxxopts/include)
 
 # Add source to this project's executable.
 add_executable (injector ${SOURCE_FILES})
+target_link_libraries(injector cxxopts)
