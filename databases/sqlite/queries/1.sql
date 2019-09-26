@@ -1,3 +1,5 @@
+.headers on
+
 SELECT L_RETURNFLAG,
        L_LINESTATUS,
        SUM(L_QUANTITY)                                       AS SUM_QTY,

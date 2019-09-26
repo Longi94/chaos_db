@@ -69,4 +69,5 @@ Vagrant.configure("2") do |config|
   # SHELL
 
   config.vm.provision "shell", path: "vm_setup.sh"
+  config.disksize.size = '50GB'
 end
