@@ -14,10 +14,6 @@ class SQLiteRunner(SqlRunner):
         self.db_file = os.path.join(directory, 'db.sqlite')
 
     def init_db(self):
-        log.info('Creating .sqliterc file')
-        with open(os.path.expanduser('~/.sqliterc'), 'w') as f:
-            f.write('.headers ON\n')
-
         log.info('Copying sqlite database to a temp file...')
         log.info('Temp file name: ' + self.db_file)
         copyfile('tpc-h.sqlite', self.db_file)
