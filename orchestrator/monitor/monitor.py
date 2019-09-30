@@ -1,3 +1,4 @@
+import filecmp
 from time import time
 
 
@@ -9,6 +10,7 @@ class ProcessMonitor(object):
         self.end_time = None
         self.inject_delay = inject_delay
         self.return_code = None
+        self.result = None
 
     def start(self, query):
         """
@@ -34,3 +36,6 @@ class ProcessMonitor(object):
             'return_code': self.return_code,
             'inject_delay': self.inject_delay
         }
+
+    def compare_files(self, file1, file2):
+        return filecmp.cmp(file1, file2)
