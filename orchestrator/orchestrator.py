@@ -2,7 +2,7 @@ import argparse
 import logging
 import tempfile
 import random
-import pandas as pd
+import csv
 from db import *
 from monitor import get_monitor
 from runner import get_runner
@@ -57,5 +57,10 @@ if __name__ == '__main__':
 
         results.append(monitor.to_dict())
 
-    df = pd.DataFrame(results)
-    df.to_csv(args.output, index=False)
+    with open(args.output, mode='w') as output_csv:
+        if len(results) > 0:
+            writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            writer.writerow(list(results[0].keys()))
+            for result in results:
+                writer.writerow(list(result.values()))
