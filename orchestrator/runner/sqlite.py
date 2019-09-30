@@ -18,15 +18,12 @@ class SQLiteRunner(SqlRunner):
         copyfile('databases/sqlite/tpc-h.sqlite', self.db_file)
 
     def run_tpch(self, query):
-        result_dir = os.path.join(self.directory, 'result/sqlite')
-        if not os.path.exists(result_dir):
-            os.makedirs(result_dir)
-
         self.process = run_injector(
-            os.path.join(result_dir, 'q{}.out'.format(query)),
+            os.path.join(self.directory, 'output.txt'.format(query)),
             'databases/sqlite/queries/{}.sql'.format(query),
             self.inject_delay,
-            ['databases/sqlite/bin/sqlite3', self.db_file]
+            ['databases/sqlite/bin/sqlite3', self.db_file],
+            os.path.join(self.directory, 'rc')
         )
 
     def clean(self):

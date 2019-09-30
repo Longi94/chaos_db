@@ -1,8 +1,8 @@
 import argparse
 import logging
-import tempfile
 import random
 import csv
+import os
 from db import *
 from monitor import get_monitor
 from runner import get_runner
@@ -20,7 +20,8 @@ if __name__ == '__main__':
                         help='The expected run time of the query, the time of the bit flip injection (which is random) '
                              'depends on this. Required if --flip is set.')
     parser.add_argument('-f', '--flip', action='store_true', default=False)
-    parser.add_argument('-o', '--output', type=str, required=True, help='Output CSV to save results to.')
+    parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
+                        help='The working directory. This directory will contain all experiment output and artifacts.')
     args = parser.parse_args()
 
     if args.flip and args.mean_runtime is None:
@@ -33,31 +34,35 @@ if __name__ == '__main__':
 
     results = []
 
+    os.makedirs(args.working_directory, exist_ok=True)
+    log.info('Putting everything into ' + args.working_directory)
+
     for i in range(args.iterations):
         log.info('Iteration ' + str(i))
-        with tempfile.TemporaryDirectory() as temp_dir:
-            log.info('Temp dir: ' + temp_dir)
 
-            inject_delay = None
-            if args.flip:
-                inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
-            runner = get_runner(args.database, temp_dir, inject_delay)
-            monitor = get_monitor(args.database, temp_dir, inject_delay)
+        iteration_dir = os.path.join(args.working_directory, str(i))
+        os.makedirs(iteration_dir, exist_ok=True)
 
-            runner.init_db()
-            try:
-                monitor.start(args.tpc_h)
-                runner.run_tpch(args.tpc_h)
-                runner.process.wait()
-            except Exception as e:
-                log.error('Error while running query', exc_info=e)
+        inject_delay = None
+        if args.flip:
+            inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
+        runner = get_runner(args.database, iteration_dir, inject_delay)
+        monitor = get_monitor(args.database, iteration_dir, inject_delay)
 
-            monitor.end()
-            runner.clean()
+        runner.init_db()
+        try:
+            monitor.start(args.tpc_h)
+            runner.run_tpch(args.tpc_h)
+            runner.process.wait()
+        except Exception as e:
+            log.error('Error while running query', exc_info=e)
+
+        monitor.end()
+        runner.clean()
 
         results.append(monitor.to_dict())
 
-    with open(args.output, mode='w') as output_csv:
+    with open(os.path.join(args.working_directory, 'results.csv'), mode='w') as output_csv:
         if len(results) > 0:
             writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 

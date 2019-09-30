@@ -4,8 +4,8 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def run_injector(output_file, input_file, inject_delay, child_command):
-    command = ['./build/release/injector/injector', '-o', output_file]
+def run_injector(output_file, input_file, inject_delay, child_command, return_code_file):
+    command = ['./build/release/injector/injector', '-o', output_file, '-r', return_code_file]
 
     if input_file is not None:
         command.extend(['-i', input_file])

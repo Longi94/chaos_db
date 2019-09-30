@@ -5,14 +5,12 @@ from result import *
 
 class SQLiteMonitor(ProcessMonitor):
     def evaluate_result(self):
-        with open('rc', 'r') as f:
+        with open(os.path.join(self.directory, 'rc'), 'r') as f:
             self.return_code = int(f.read().strip())
 
         if self.return_code == 0:
-            if self.compare_files(
-                    os.path.join(self.directory, 'result/sqlite/q{}.out').format(self.query),
-                    'databases/sqlite/answers/q{}.out'.format(self.query)
-            ):
+            if self.compare_files(os.path.join(self.directory, 'output.txt').format(self.query),
+                                  'databases/sqlite/answers/q{}.out'.format(self.query)):
                 self.result = RESULT_OK
             else:
                 self.result = RESULT_INCORRECT_OUTPUT
