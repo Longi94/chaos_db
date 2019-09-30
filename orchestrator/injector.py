@@ -1,11 +1,20 @@
 import subprocess
 import logging
+import os
 
 log = logging.getLogger(__name__)
 
+INJECTOR_PATH = './build/release/injector/injector'
+
+
+def check_injector():
+    if not os.path.exists(INJECTOR_PATH):
+        log.error('injector not found')
+        exit(1)
+
 
 def run_injector(output_file, input_file, inject_delay, child_command, return_code_file):
-    command = ['./build/release/injector/injector', '-o', output_file, '-r', return_code_file]
+    command = [INJECTOR_PATH, '-o', output_file, '-r', return_code_file]
 
     if input_file is not None:
         command.extend(['-i', input_file])

@@ -3,6 +3,7 @@ import logging
 import random
 import csv
 import os
+from injector import check_injector
 from db import *
 from monitor import get_monitor
 from runner import get_runner
@@ -26,6 +27,9 @@ if __name__ == '__main__':
 
     if args.flip and args.mean_runtime is None:
         parser.error('--mean-runtime is required when --flip is set to true')
+
+    if args.flip:
+        check_injector()
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()],
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')

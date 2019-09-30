@@ -5,7 +5,12 @@ from result import *
 
 class SQLiteMonitor(ProcessMonitor):
     def evaluate_result(self):
-        with open(os.path.join(self.directory, 'rc'), 'r') as f:
+        rc_file = os.path.join(self.directory, 'rc')
+        if not os.path.exists(rc_file):
+            # TODO what happened?
+            return
+
+        with open(rc_file, 'r') as f:
             self.return_code = int(f.read().strip())
 
         if self.return_code == 0:
