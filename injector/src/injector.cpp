@@ -24,7 +24,8 @@ int main(const int argc, char* argv[])
          cxxopts::value<string>())
         ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
-        ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>());
+        ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>())
+        ("r,return-code-file", "The return code of the child process is written to this file", cxxopts::value<string>());
 
     // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
@@ -70,10 +71,13 @@ int main(const int argc, char* argv[])
 
     cout << "Child process return code: " << status << endl;
 
-    ofstream rc;
-    rc.open("rc");
-    rc << status << endl;
-    rc.close();
+    if (args.count("return-code-file"))
+    {
+        ofstream rc;
+        rc.open(args["return-code-file"].as<string>().c_str());
+        rc << status << endl;
+        rc.close();
+    }
 
     return 0;
 }
