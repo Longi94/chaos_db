@@ -37,7 +37,10 @@ def run(iteration: int, args: argparse.Namespace) -> Dict:
     monitor.end()
     runner.clean()
 
-    return monitor.to_dict()
+    result = monitor.to_dict()
+    result['iteration'] = iteration
+
+    return result
 
 
 if __name__ == '__main__':
@@ -76,18 +79,20 @@ if __name__ == '__main__':
     os.makedirs(args.working_directory, exist_ok=True)
     log.info('Putting everything into ' + args.working_directory)
 
-    if args.threads > 1:
-        with ThreadPool(args.threads) as p:
-            for result in p.imap(partial(run, args=args), range(args.iterations)):
-                results.append(result)
-    else:
-        for i in range(args.iterations):
-            results.append(run(i, args))
+    thread_count = max(1, args.threads)
+    log.info(f'Running on {thread_count} threads')
 
     with open(os.path.join(args.working_directory, 'results.csv'), mode='w') as output_csv:
-        if len(results) > 0:
-            writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-            writer.writerow(list(results[0].keys()))
-            for result in results:
-                writer.writerow(list(result.values()))
+        writer.writerow(['iteration', 'result', 'return_code', 'runtime', 'inject_delay'])
+
+        with ThreadPool(thread_count) as p:
+            for result in p.imap(partial(run, args=args), range(args.iterations)):
+                writer.writerow([
+                    result['iteration'],
+                    result['result'],
+                    result['return_code'],
+                    result['runtime'],
+                    result['inject_delay'],
+                ])
