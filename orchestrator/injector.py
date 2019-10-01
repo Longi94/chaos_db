@@ -32,7 +32,5 @@ def run_injector(output_file: str, input_file: str, inject_delay: int, child_com
 
     log.info('Running command: ' + ' '.join(command))
     p = subprocess.Popen(command, stdout=subprocess.PIPE)
-    for line in iter(p.stdout.readline, b''):
-        log.info(line.decode("utf-8").strip())
 
     return p

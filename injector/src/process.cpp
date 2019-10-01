@@ -88,18 +88,18 @@ namespace chaos
             }
         }
 
-        int wait_exit_code(const pid_t pid)
+        void wait_exit_code(const pid_t pid)
         {
             int status;
             waitpid(pid, &status, 0);
 
-            if (!WIFEXITED(status))
-            {
-                // child process abnormally terminated
-                return excl_fail;
-            }
-
-            return WEXITSTATUS(status);
+            cout << "WIFEXITED: " << WIFEXITED(status) << endl;
+            cout << "WEXITSTATUS: " << WEXITSTATUS(status) << endl;
+            cout << "WIFSIGNALED: " << WIFSIGNALED(status) << endl;
+            cout << "WTERMSIG: " << WTERMSIG(status) << endl;
+            cout << "WCOREDUMP: " << WCOREDUMP(status) << endl;
+            cout << "WIFSTOPPED: " << WIFSTOPPED(status) << endl;
+            cout << "WSTOPSIG: " << WSTOPSIG(status) << endl;
         }
     }
 }

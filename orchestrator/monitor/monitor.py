@@ -1,6 +1,10 @@
 import filecmp
+import logging
+from subprocess import Popen
 from typing import Dict, Any
 from time import time
+
+log = logging.getLogger(__name__)
 
 
 class ProcessMonitor(object):
@@ -10,8 +14,27 @@ class ProcessMonitor(object):
         self.start_time = None
         self.end_time = None
         self.inject_delay = inject_delay
-        self.return_code = None
         self.result = None
+
+        # process completion status
+        self.exited = False
+        self.return_code = 0
+        self.signaled = False
+        self.term_sig = 0
+
+    def monitor(self, process: Popen):
+        for line in iter(process.stdout.readline, b''):
+            line = line.decode("utf-8").strip()
+            log.info(line)
+
+            if line.startswith('WIFEXITED: '):
+                self.exited = line[11:] == '1'
+            if line.startswith('WEXITSTATUS: '):
+                self.return_code = int(line[13:])
+            if line.startswith('WIFSIGNALED: '):
+                self.signaled = line[13:] == '1'
+            if line.startswith('WTERMSIG: '):
+                self.term_sig = int(line[10:])
 
     def start(self, query: int):
         self.query = query

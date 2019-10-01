@@ -30,6 +30,7 @@ def run(iteration: int, args: argparse.Namespace) -> Dict:
     try:
         monitor.start(args.tpc_h)
         runner.run_tpch(args.tpc_h)
+        monitor.monitor(runner.process)
         runner.process.wait()
     except Exception as e:
         log.error('Error while running query', exc_info=e)

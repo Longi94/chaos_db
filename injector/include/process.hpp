@@ -36,10 +36,9 @@ namespace chaos
         pid_t execute(string path, string output, string input, char** arguments);
 
         /**
-         * Wait for a process (using waitpid) and return the exit code.
+         * Wait for a process (using waitpid) and print out information about the process.
          * @param pid process id
-         * @return exit code of the process
          */
-        int wait_exit_code(pid_t pid);
+        void wait_exit_code(pid_t pid);
     }
 }
