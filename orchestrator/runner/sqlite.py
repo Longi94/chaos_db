@@ -22,8 +22,7 @@ class SQLiteRunner(SqlRunner):
             os.path.join(self.directory, 'output.txt'.format(query)),
             'databases/sqlite/queries/{}.sql'.format(query),
             self.inject_delay,
-            ['databases/sqlite/bin/sqlite3', self.db_file],
-            os.path.join(self.directory, 'rc')
+            ['databases/sqlite/bin/sqlite3', self.db_file]
         )
 
     def clean(self):

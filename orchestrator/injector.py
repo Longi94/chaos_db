@@ -17,9 +17,8 @@ def check_injector():
         exit(1)
 
 
-def run_injector(output_file: str, input_file: str, inject_delay: int, child_command: List[Any],
-                 return_code_file: str) -> subprocess.Popen:
-    command = [INJECTOR_PATH, '-o', output_file, '-r', return_code_file]
+def run_injector(output_file: str, input_file: str, inject_delay: int, child_command: List[Any]) -> subprocess.Popen:
+    command = [INJECTOR_PATH, '-o', output_file]
 
     if input_file is not None:
         command.extend(['-i', input_file])
