@@ -3,12 +3,42 @@ import logging
 import random
 import csv
 import os
+from typing import Dict
+from multiprocessing import Pool
+from functools import partial
 from injector import check_injector
 from db import *
 from monitor import get_monitor
 from runner import get_runner
 
 log = logging.getLogger(__name__)
+
+
+def run(iteration: int, args: argparse.Namespace) -> Dict:
+    log.info('Iteration ' + str(iteration))
+
+    iteration_dir = os.path.join(args.working_directory, str(iteration))
+    os.makedirs(iteration_dir, exist_ok=True)
+
+    inject_delay = None
+    if args.flip:
+        inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
+    runner = get_runner(args.database, iteration_dir, inject_delay)
+    monitor = get_monitor(args.database, iteration_dir, inject_delay)
+
+    runner.init_db()
+    try:
+        monitor.start(args.tpc_h)
+        runner.run_tpch(args.tpc_h)
+        runner.process.wait()
+    except Exception as e:
+        log.error('Error while running query', exc_info=e)
+
+    monitor.end()
+    runner.clean()
+
+    return monitor.to_dict()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -23,6 +53,9 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--flip', action='store_true', default=False)
     parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
                         help='The working directory. This directory will contain all experiment output and artifacts.')
+    parser.add_argument('-p', '--processes', required=False, default=1, type=int,
+                        help='Run multiple experiments at the same time with this number of processes. For each '
+                             'experiment 2 or more processes might be spawned depending on the database.')
     args = parser.parse_args()
 
     if args.flip and args.mean_runtime is None:
@@ -32,7 +65,7 @@ if __name__ == '__main__':
         check_injector()
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()],
-                        format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
+                        format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s:%(process)d] : %(message)s')
 
     log.info('DB type: ' + args.database)
 
@@ -41,30 +74,13 @@ if __name__ == '__main__':
     os.makedirs(args.working_directory, exist_ok=True)
     log.info('Putting everything into ' + args.working_directory)
 
-    for i in range(args.iterations):
-        log.info('Iteration ' + str(i))
-
-        iteration_dir = os.path.join(args.working_directory, str(i))
-        os.makedirs(iteration_dir, exist_ok=True)
-
-        inject_delay = None
-        if args.flip:
-            inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
-        runner = get_runner(args.database, iteration_dir, inject_delay)
-        monitor = get_monitor(args.database, iteration_dir, inject_delay)
-
-        runner.init_db()
-        try:
-            monitor.start(args.tpc_h)
-            runner.run_tpch(args.tpc_h)
-            runner.process.wait()
-        except Exception as e:
-            log.error('Error while running query', exc_info=e)
-
-        monitor.end()
-        runner.clean()
-
-        results.append(monitor.to_dict())
+    if args.processes > 1:
+        with Pool(args.processes) as p:
+            for result in p.imap(partial(run, args=args), range(args.iterations)):
+                results.append(result)
+    else:
+        for i in range(args.iterations):
+            results.append(run(i, args))
 
     with open(os.path.join(args.working_directory, 'results.csv'), mode='w') as output_csv:
         if len(results) > 0:
