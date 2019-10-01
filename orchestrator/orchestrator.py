@@ -67,16 +67,14 @@ if __name__ == '__main__':
     if args.flip:
         check_injector()
 
+    os.makedirs(args.working_directory, exist_ok=True)
+
     log_file = os.path.join(args.working_directory, 'experiment.log')
     logging.basicConfig(level=logging.DEBUG,
                         handlers=[logging.StreamHandler(), logging.FileHandler(log_file, mode='w')],
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
     log.info('DB type: ' + args.database)
-
-    results = []
-
-    os.makedirs(args.working_directory, exist_ok=True)
     log.info('Putting everything into ' + args.working_directory)
 
     thread_count = max(1, args.threads)
