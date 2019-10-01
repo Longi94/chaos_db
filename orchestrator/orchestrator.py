@@ -64,7 +64,9 @@ if __name__ == '__main__':
     if args.flip:
         check_injector()
 
-    logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()],
+    log_file = os.path.join(args.working_directory, 'experiment.log')
+    logging.basicConfig(level=logging.DEBUG,
+                        handlers=[logging.StreamHandler(), logging.FileHandler(log_file, mode='w')],
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
     log.info('DB type: ' + args.database)
