@@ -27,4 +27,6 @@ class SQLiteRunner(SqlRunner):
         )
 
     def clean(self):
+        if os.path.exists(self.db_file):
+            os.remove(self.db_file)
         pass
