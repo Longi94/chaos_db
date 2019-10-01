@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class SQLiteRunner(SqlRunner):
-    def __init__(self, directory, inject_delay):
+    def __init__(self, directory: str, inject_delay: int):
         super(SQLiteRunner, self).__init__(directory, inject_delay)
         self.db_file = os.path.join(directory, 'db.sqlite')
 
@@ -17,7 +17,7 @@ class SQLiteRunner(SqlRunner):
         log.info('Temp file name: ' + self.db_file)
         copyfile('databases/sqlite/tpc-h.sqlite', self.db_file)
 
-    def run_tpch(self, query):
+    def run_tpch(self, query: int):
         self.process = run_injector(
             os.path.join(self.directory, 'output.txt'.format(query)),
             'databases/sqlite/queries/{}.sql'.format(query),

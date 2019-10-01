@@ -1,5 +1,5 @@
 class SqlRunner(object):
-    def __init__(self, directory, inject_delay):
+    def __init__(self, directory: str, inject_delay: int):
         self.directory = directory
         self.inject_delay = inject_delay
         self.process = None
@@ -10,12 +10,11 @@ class SqlRunner(object):
         """
         raise NotImplementedError()
 
-    def run_tpch(self, query):
+    def run_tpch(self, query: int):
         """
         Run a TPC-H query.
 
         :param query: number of the query (1-22)
-        :type query: int
         """
         raise NotImplementedError()
 

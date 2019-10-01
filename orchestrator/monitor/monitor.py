@@ -1,9 +1,10 @@
 import filecmp
+from typing import Dict, Any
 from time import time
 
 
 class ProcessMonitor(object):
-    def __init__(self, directory, inject_delay):
+    def __init__(self, directory: str, inject_delay: int):
         self.directory = directory
         self.query = None
         self.start_time = None
@@ -12,10 +13,7 @@ class ProcessMonitor(object):
         self.return_code = None
         self.result = None
 
-    def start(self, query):
-        """
-        :type query: int
-        """
+    def start(self, query: int):
         self.query = query
         self.start_time = time()
 
@@ -26,7 +24,7 @@ class ProcessMonitor(object):
     def evaluate_result(self):
         raise NotImplementedError()
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         return {
             'runtime': self.end_time - self.start_time,
             'return_code': self.return_code,
@@ -34,5 +32,5 @@ class ProcessMonitor(object):
             'result': self.result
         }
 
-    def compare_files(self, file1, file2):
+    def compare_files(self, file1: str, file2: str) -> bool:
         return filecmp.cmp(file1, file2)

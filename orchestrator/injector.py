@@ -1,6 +1,7 @@
 import subprocess
 import logging
 import os
+from typing import List, Any
 
 log = logging.getLogger(__name__)
 
@@ -8,12 +9,16 @@ INJECTOR_PATH = './build/release/injector/injector'
 
 
 def check_injector():
+    """
+    Stops execution if the injector was not found.
+    """
     if not os.path.exists(INJECTOR_PATH):
         log.error('injector not found')
         exit(1)
 
 
-def run_injector(output_file, input_file, inject_delay, child_command, return_code_file):
+def run_injector(output_file: str, input_file: str, inject_delay: int, child_command: List[Any],
+                 return_code_file: str) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file, '-r', return_code_file]
 
     if input_file is not None:
