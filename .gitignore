@@ -634,3 +634,5 @@ build/
 !databases/*/answers/q*.out
 results.csv
 databases/tpch/*/
+
+.vscode/
