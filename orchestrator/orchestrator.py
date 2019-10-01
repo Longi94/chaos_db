@@ -84,14 +84,26 @@ if __name__ == '__main__':
     with open(os.path.join(args.working_directory, 'results.csv'), mode='w') as output_csv:
         writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        writer.writerow(['iteration', 'result', 'return_code', 'runtime', 'inject_delay'])
+        writer.writerow([
+            'iteration',
+            'result',
+            'exited',
+            'return_code',
+            'signaled',
+            'term_sig',
+            'runtime',
+            'inject_delay'
+        ])
 
         with ThreadPool(thread_count) as p:
             for result in p.imap(partial(run, args=args), range(args.iterations)):
                 writer.writerow([
                     result['iteration'],
                     result['result'],
+                    result['exited'],
                     result['return_code'],
+                    result['signaled'],
+                    result['term_sig'],
                     result['runtime'],
                     result['inject_delay'],
                 ])

@@ -52,7 +52,10 @@ class ProcessMonitor(object):
             'runtime': self.end_time - self.start_time,
             'return_code': self.return_code,
             'inject_delay': self.inject_delay,
-            'result': self.result
+            'result': self.result,
+            'exited': self.exited,
+            'signaled': self.signaled,
+            'term_sig': self.term_sig,
         }
 
     def compare_files(self, file1: str, file2: str) -> bool:
