@@ -4,7 +4,7 @@ import random
 import csv
 import os
 from typing import Dict
-from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
 from functools import partial
 from injector import check_injector
 from db import *
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--iterations', type=int, default=1, required=False,
                         help='Number of times to run the experiment')
-    parser.add_argument('-t', '--tpc-h', dest='tpc_h', type=int, required=True, help='The TPC-H query to run')
+    parser.add_argument('-q', '--query', dest='tpc_h', type=int, required=True, help='The TPC-H query to run')
     parser.add_argument('-d', '--database', type=str, choices=[DB_SQLITE], required=True,
                         help='Database to run the experiment on')
     parser.add_argument('-m', '--mean-runtime', dest='mean_runtime', type=float, required=False,
@@ -53,8 +53,8 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--flip', action='store_true', default=False)
     parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
                         help='The working directory. This directory will contain all experiment output and artifacts.')
-    parser.add_argument('-p', '--processes', required=False, default=1, type=int,
-                        help='Run multiple experiments at the same time with this number of processes. For each '
+    parser.add_argument('-t', '--threads', required=False, default=1, type=int,
+                        help='Run multiple experiments at the same time with this number of threads. For each '
                              'experiment 2 or more processes might be spawned depending on the database.')
     args = parser.parse_args()
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         check_injector()
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()],
-                        format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s:%(process)d] : %(message)s')
+                        format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
     log.info('DB type: ' + args.database)
 
@@ -74,8 +74,8 @@ if __name__ == '__main__':
     os.makedirs(args.working_directory, exist_ok=True)
     log.info('Putting everything into ' + args.working_directory)
 
-    if args.processes > 1:
-        with Pool(args.processes) as p:
+    if args.threads > 1:
+        with ThreadPool(args.threads) as p:
             for result in p.imap(partial(run, args=args), range(args.iterations)):
                 results.append(result)
     else:
