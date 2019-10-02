@@ -13,7 +13,7 @@ namespace chaos
 {
     namespace flipper
     {
-        int flip_random_bit(const int pid, const off_t offset)
+        int flip_random_bit(const int pid, const off_t offset, const memory::space m_space)
         {
             if (process::attach(pid))
             {
@@ -37,16 +37,37 @@ namespace chaos
                     const auto heap_size = memory_info->heap_end - memory_info->heap_start;
                     const auto stack_size = memory_info->stack_end - memory_info->stack_start;
 
-                    // Randomly choose an address in heap or stack
-                    const int rand_i = rand() % (heap_size + stack_size);
+                    switch (m_space) {
+                        case memory::heap:
+                            {
+                                cout << "Choosing address from heap." << endl;
+                                const int rand_i = rand() % heap_size;
+                                addr = memory_info->heap_start + rand_i;
+                                break;
+                            }
+                        case memory::stack:
+                            {
+                                cout << "Choosing address from stack." << endl;
+                                const int rand_i = rand() % stack_size;
+                                addr = memory_info->stack_start + rand_i;
+                                break;
+                            }
+                        default:
+                            {
+                                cout << "Choosing address from stack or heap." << endl;
+                                // Randomly choose an address in heap or stack
+                                const int rand_i = rand() % (heap_size + stack_size);
 
-                    if (rand_i > heap_size)
-                    {
-                        addr = memory_info->stack_start - heap_size + rand_i;
-                    }
-                    else
-                    {
-                        addr = memory_info->heap_start + rand_i;
+                                if (rand_i > heap_size)
+                                {
+                                    addr = memory_info->stack_start - heap_size + rand_i;
+                                }
+                                else
+                                {
+                                    addr = memory_info->heap_start + rand_i;
+                                }
+                                break;
+                            }
                     }
 
                     delete memory_info;

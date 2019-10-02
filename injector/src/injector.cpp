@@ -1,5 +1,6 @@
 #include "args.hpp"
 #include "flipper.hpp"
+#include "memory.hpp"
 #include "process.hpp"
 #include "cxxopts.hpp"
 #include <iostream>
@@ -24,7 +25,9 @@ int main(const int argc, char* argv[])
          cxxopts::value<string>())
         ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
-        ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>());
+        ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>())
+        ("s,inject-space", "Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
+                 cxxopts::value<string>());
 
     // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
@@ -47,6 +50,19 @@ int main(const int argc, char* argv[])
     const auto output = args["output"].as<string>();
     const auto input = args["input"].as<string>();
 
+    memory::space space = memory::all;
+
+    if (args.count("inject-space")) {
+        const auto inject_space = args["inject-space"].as<string>();
+
+        if (inject_space.compare("heap") == 0) {
+            space = memory::heap;
+        }
+        else if (inject_space.compare("stack") == 0) {
+            space = memory::stack;
+        }
+    }
+
     // Find where -c or --command is to find the arguments after that, those will be passed to the child process
     const auto arg_end = argv + argc;
     char** command_option = find(argv, arg_end, string("-c"));
@@ -63,7 +79,7 @@ int main(const int argc, char* argv[])
         const auto ms = args["milliseconds"].as<unsigned long>();
         cout << "Flip random bit in " << ms << " milliseconds..." << endl;
         this_thread::sleep_for(chrono::milliseconds(ms));
-        flipper::flip_random_bit(pid, -1);
+        flipper::flip_random_bit(pid, -1, space);
     }
 
     process::wait_exit_code(pid);

@@ -13,6 +13,8 @@ namespace chaos
             off_t stack_end;
         };
 
+        enum space { all, heap, stack };
+
         /**
          * Open the memory file of a process. /proc/<pid>/mem
          * @param pid process id
