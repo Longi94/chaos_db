@@ -23,7 +23,7 @@ def run(iteration: int, args: argparse.Namespace) -> Dict:
     inject_delay = None
     if args.flip:
         inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
-    runner = get_runner(args.database, iteration_dir, inject_delay)
+    runner = get_runner(args.database, iteration_dir, inject_delay, args.inject_space)
     monitor = get_monitor(args.database, iteration_dir, inject_delay)
 
     runner.init_db()
@@ -60,6 +60,8 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--threads', required=False, default=1, type=int,
                         help='Run multiple experiments at the same time with this number of threads. For each '
                              'experiment 2 or more processes might be spawned depending on the database.')
+    parser.add_argument('-s', '--inject-space', dest='inject_space', type=str, choices=['heap', 'stack'],
+                        required=False, help='Address space to inject the fault into.')
     args = parser.parse_args()
 
     if args.flip and args.mean_runtime is None:
