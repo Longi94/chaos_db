@@ -1,6 +1,6 @@
 #include "cxxopts.hpp"
 #include "flipper.hpp"
-#include <string>
+#include "memory.hpp"
 
 using namespace std;
 
@@ -17,6 +17,18 @@ namespace chaos
                     throw cxxopts::option_required_exception(r);
                 }
             }
+        }
+
+        char** get_command_arguments(const int argc, char* argv[])
+        {
+            // Find where -c or --command is to find the arguments after that, those will be passed to the child process
+            const auto arg_end = argv + argc;
+            char** command_option = find(argv, arg_end, string("-c"));
+            if (command_option == arg_end)
+            {
+                command_option = find(argv, arg_end, string("--command"));
+            }
+            return command_option + 1;
         }
 
         flipper::fault_type get_fault_type(const cxxopts::ParseResult args)
@@ -38,6 +50,25 @@ namespace chaos
             }
 
             return flipper::flip;
+        }
+
+        memory::space get_memory_space(const cxxopts::ParseResult args)
+        {
+            if (!args.count("inject-space"))
+            {
+                return memory::all;
+            }
+
+            const auto inject_space = args["inject-space"].as<string>();
+
+            if (inject_space.compare("heap") == 0) {
+                return memory::heap;
+            }
+            else if (inject_space.compare("stack") == 0) {
+                return memory::stack;
+            }
+
+            return memory::all;
         }
     }
 }

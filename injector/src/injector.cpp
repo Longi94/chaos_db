@@ -51,28 +51,9 @@ int main(const int argc, char* argv[])
     const auto output = args["output"].as<string>();
     const auto input = args["input"].as<string>();
 
-    memory::space space = memory::all;
+    const auto space = args::get_memory_space(args);
     const auto fault_type = args::get_fault_type(args);
-
-    if (args.count("inject-space")) {
-        const auto inject_space = args["inject-space"].as<string>();
-
-        if (inject_space.compare("heap") == 0) {
-            space = memory::heap;
-        }
-        else if (inject_space.compare("stack") == 0) {
-            space = memory::stack;
-        }
-    }
-
-    // Find where -c or --command is to find the arguments after that, those will be passed to the child process
-    const auto arg_end = argv + argc;
-    char** command_option = find(argv, arg_end, string("-c"));
-    if (command_option == arg_end)
-    {
-        command_option = find(argv, arg_end, string("--command"));
-    }
-    char** command_args = command_option + 1;
+    const auto command_args = args::get_command_arguments(argc, argv);
 
     const pid_t pid = process::execute(path, output, input, command_args);
 
