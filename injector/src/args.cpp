@@ -35,7 +35,7 @@ namespace chaos
         {
             if (!args.count("fault"))
             {
-                return flipper::flip;
+                return flipper::none;
             }
 
             const auto fault_str = args["fault"].as<string>();
@@ -49,7 +49,7 @@ namespace chaos
                 return flipper::stuck;
             }
 
-            return flipper::flip;
+            return flipper::none;
         }
 
         memory::space get_memory_space(const cxxopts::ParseResult args)

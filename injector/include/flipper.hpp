@@ -6,7 +6,7 @@ namespace chaos
 {
     namespace flipper
     {
-        enum fault_type { flip, stuck };
+        enum fault_type { none, flip, stuck };
 
         /**
          * Flip a bit in the memory of a process.
