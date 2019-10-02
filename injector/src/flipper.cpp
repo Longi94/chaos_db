@@ -102,5 +102,52 @@ namespace chaos
             delete[] byte;
             return 0;
         }
+
+        Flipper* get_flipper(const fault_type fault_type)
+        {
+            switch (fault_type)
+            {
+                case flip:
+                    return new BitFlipper();
+                case stuck:
+                    return new BitSticker();
+                default:
+                    return nullptr;
+            }
+        }
+
+        int BitFlipper::inject(const pid_t pid, const off_t address)
+        {
+            const auto byte = new int8_t[1];
+
+            const auto fd = memory::open_mem(pid);
+
+            if (memory::read_byte(fd, byte, address))
+            {
+                return -1;
+            }
+
+            cout << "Read byte: " << bitset<8>(byte[0]) << endl;
+
+            // Flip a random bit
+            byte[0] ^= 1 << rand() % 7;
+            cout << "Flipped byte: " << bitset<8>(byte[0]) << endl;
+
+            if (memory::write_byte(fd, byte, address))
+            {
+                return -1;
+            }
+
+            close(fd);
+
+            process::detach(pid);
+            delete[] byte;
+            return 0;
+        }
+
+        int BitSticker::inject(const pid_t pid, const off_t address)
+        {
+
+        }
     }
 }
