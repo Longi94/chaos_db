@@ -25,6 +25,7 @@ int main(const int argc, char* argv[])
          cxxopts::value<string>())
         ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
+        ("f,fault", "The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>()->default_value("flip"))
         ("m,milliseconds", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>())
         ("s,inject-space", "Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
                  cxxopts::value<string>());
@@ -51,6 +52,7 @@ int main(const int argc, char* argv[])
     const auto input = args["input"].as<string>();
 
     memory::space space = memory::all;
+    const auto fault_type = args::get_fault_type(args);
 
     if (args.count("inject-space")) {
         const auto inject_space = args["inject-space"].as<string>();

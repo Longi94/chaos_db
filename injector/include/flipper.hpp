@@ -6,6 +6,8 @@ namespace chaos
 {
     namespace flipper
     {
+        enum fault_type { flip, stuck };
+
         /**
          * Flip a bit in the memory of a process.
          * @param pid The id of the process whose memory will be touched.
