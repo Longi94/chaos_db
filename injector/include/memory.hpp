@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <unistd.h>
 
 namespace chaos
@@ -7,6 +8,7 @@ namespace chaos
     {
         struct heap_stack
         {
+            heap_stack(){}
             off_t heap_start;
             off_t heap_end;
             off_t stack_start;
@@ -45,7 +47,7 @@ namespace chaos
          * @param pid the process id
          * @return pointer to the heap_stack struct
          */
-        heap_stack* get_heap_and_stack_spaces(int pid);
+        std::unique_ptr<heap_stack> get_heap_and_stack_spaces(int pid);
 
         /**
          * Get a random virtual address from the memory space of a process.

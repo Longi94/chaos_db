@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <iostream>
 #include <cstring>
+#include <memory>
 #include <fcntl.h>
 
 extern "C" {
@@ -58,7 +59,7 @@ namespace chaos
             return 0;
         }
 
-        heap_stack* get_heap_and_stack_spaces(const int pid)
+        unique_ptr<heap_stack> get_heap_and_stack_spaces(const int pid)
         {
             procmaps_iterator* maps = pmparser_parse(pid);
 
@@ -70,7 +71,7 @@ namespace chaos
 
             //iterate over areas
             procmaps_struct* map;
-            heap_stack* result = static_cast<heap_stack*>(malloc(sizeof(heap_stack)));
+            unique_ptr<heap_stack> result = unique_ptr<heap_stack>(new heap_stack());
 
             while ((map = pmparser_next(maps)) != nullptr)
             {
@@ -91,7 +92,7 @@ namespace chaos
         }
 
         off_t get_random_address(const pid_t pid, const space m_space) {
-            heap_stack* memory_info = get_heap_and_stack_spaces(pid);
+            auto memory_info = get_heap_and_stack_spaces(pid);
 
             off_t addr;
 
@@ -138,8 +139,6 @@ namespace chaos
                             break;
                         }
                 }
-
-                delete memory_info;
             }
 
             return addr;

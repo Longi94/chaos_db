@@ -1,6 +1,7 @@
 #pragma once
 #include <unistd.h>
 #include <cstdint>
+#include <memory>
 #include "memory.hpp"
 
 namespace chaos
@@ -37,6 +38,6 @@ namespace chaos
          * Get the appropriate fault injector class.
          * @param fault_type the type of the fault that needs to be injected
          */
-        FaultInjector* get_injector(fault_type fault_type);
+        std::unique_ptr<FaultInjector> get_injector(fault_type fault_type);
     }
 }

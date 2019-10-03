@@ -3,6 +3,7 @@
 #include "process.hpp"
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <bitset>
 #include <fcntl.h>
@@ -13,14 +14,14 @@ namespace chaos
 {
     namespace flipper
     {
-        FaultInjector* get_injector(const fault_type fault_type)
+        unique_ptr<FaultInjector> get_injector(const fault_type fault_type)
         {
             switch (fault_type)
             {
                 case flip:
-                    return new BitFlipper();
+                    return unique_ptr<FaultInjector>(new BitFlipper());
                 case stuck:
-                    return new BitSticker();
+                    return unique_ptr<FaultInjector>(new BitSticker());
                 default:
                     return nullptr;
             }
