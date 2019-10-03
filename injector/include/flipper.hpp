@@ -17,19 +17,19 @@ namespace chaos
          */
         int flip_random_bit(int pid, off_t offset, memory::space m_space);
 
-        class Flipper
+        class FaultInjector
         {
         public:
             virtual int inject(pid_t pid, off_t address) = 0;
         };
 
-        class BitFlipper : public Flipper
+        class BitFlipper : public FaultInjector
         {
         public:
             int inject(pid_t pid, off_t address);
         };
 
-        class BitSticker : public Flipper
+        class BitSticker : public FaultInjector
         {
         public:
             int inject(pid_t pid, off_t address);
@@ -39,6 +39,6 @@ namespace chaos
          * Get the appropriate fault injector class.
          * @param fault_type the type of the fault that needs to be injected
          */
-        Flipper* get_flipper(fault_type fault_type);
+        FaultInjector* get_injector(fault_type fault_type);
     }
 }

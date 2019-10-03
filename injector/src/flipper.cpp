@@ -103,7 +103,7 @@ namespace chaos
             return 0;
         }
 
-        Flipper* get_flipper(const fault_type fault_type)
+        FaultInjector* get_injector(const fault_type fault_type)
         {
             switch (fault_type)
             {
@@ -147,7 +147,7 @@ namespace chaos
 
         int BitSticker::inject(const pid_t pid, const off_t address)
         {
-
+            return 0;
         }
     }
 }
