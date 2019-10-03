@@ -26,7 +26,7 @@ int main(const int argc, char* argv[])
         ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
-        ("d,delay", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>()->default_value(0))
+        ("d,delay", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>())
         ("s,inject-space", "Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
                  cxxopts::value<string>());
 
@@ -61,9 +61,13 @@ int main(const int argc, char* argv[])
 
     if (injector != nullptr)
     {
-        const auto ms = args["delay"].as<unsigned long>();
-        cout << "Injecting fault in " << ms << " milliseconds..." << endl;
-        this_thread::sleep_for(chrono::milliseconds(ms));
+        unsigned long delay = 0;
+        if (args.count("delay"))
+        {
+            delay = args["delay"].as<unsigned long>();
+        }
+        cout << "Injecting fault in " << delay << " milliseconds..." << endl;
+        this_thread::sleep_for(chrono::milliseconds(delay));
         flipper::flip_random_bit(pid, -1, space);
     }
 
