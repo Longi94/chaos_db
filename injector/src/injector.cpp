@@ -68,7 +68,14 @@ int main(const int argc, char* argv[])
         }
         cout << "Injecting fault in " << delay << " milliseconds..." << endl;
         this_thread::sleep_for(chrono::milliseconds(delay));
-        flipper::flip_random_bit(pid, -1, space);
+
+        const auto addr = memory::get_random_address(pid, space);
+        const auto mask = 1 << rand() % 7;
+
+        cout << "Chosen address: " << hex << addr << dec << endl;
+        cout << "Inject mask: " << bitset<8>(mask) << endl;
+        
+        injector->inject(pid, addr, mask);
     }
 
     process::wait_exit_code(pid);

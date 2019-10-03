@@ -1,5 +1,6 @@
 #pragma once
 #include <unistd.h>
+#include <cstdint>
 #include "memory.hpp"
 
 namespace chaos
@@ -8,31 +9,28 @@ namespace chaos
     {
         enum fault_type { none, flip, stuck };
 
-        /**
-         * Flip a bit in the memory of a process.
-         * @param pid The id of the process whose memory will be touched.
-         * @param offset The address of the byte to flip bit in. If -1 a random address will be chosen.
-         * @param m_space The memory space to inject the bit flip into.
-         * @return 0 if successful, -1 if there was an error
-         */
-        int flip_random_bit(int pid, off_t offset, memory::space m_space);
-
         class FaultInjector
         {
         public:
-            virtual int inject(pid_t pid, off_t address) = 0;
+            /**
+             * Inject the fault into the memory.
+             * @param pid the id of the process whose memory will be tinkered with
+             * @param address of the byte
+             * @param the byte mask
+             */
+            virtual int inject(pid_t pid, off_t address, int8_t mask) = 0;
         };
 
         class BitFlipper : public FaultInjector
         {
         public:
-            int inject(pid_t pid, off_t address);
+            int inject(pid_t pid, off_t address, int8_t mask);
         };
 
         class BitSticker : public FaultInjector
         {
         public:
-            int inject(pid_t pid, off_t address);
+            int inject(pid_t pid, off_t address, int8_t mask);
         };
 
         /**
