@@ -24,54 +24,7 @@ namespace chaos
 
             if (addr < 0)
             {
-                memory::heap_stack* memory_info = memory::get_heap_and_stack_spaces(pid);
-
-                if (memory_info != nullptr)
-                {
-                    cout << "Heap: " << hex << memory_info->heap_start << "-" << memory_info->heap_end << " " <<
-                        dec << memory_info->heap_end - memory_info->heap_start << endl;
-
-                    cout << "Stack: " << hex << memory_info->stack_start << "-" << memory_info->stack_end << " " <<
-                        dec << memory_info->stack_end - memory_info->stack_start << endl;
-
-                    const auto heap_size = memory_info->heap_end - memory_info->heap_start;
-                    const auto stack_size = memory_info->stack_end - memory_info->stack_start;
-
-                    switch (m_space) {
-                        case memory::heap:
-                            {
-                                cout << "Choosing address from heap." << endl;
-                                const int rand_i = rand() % heap_size;
-                                addr = memory_info->heap_start + rand_i;
-                                break;
-                            }
-                        case memory::stack:
-                            {
-                                cout << "Choosing address from stack." << endl;
-                                const int rand_i = rand() % stack_size;
-                                addr = memory_info->stack_start + rand_i;
-                                break;
-                            }
-                        default:
-                            {
-                                cout << "Choosing address from stack or heap." << endl;
-                                // Randomly choose an address in heap or stack
-                                const int rand_i = rand() % (heap_size + stack_size);
-
-                                if (rand_i > heap_size)
-                                {
-                                    addr = memory_info->stack_start - heap_size + rand_i;
-                                }
-                                else
-                                {
-                                    addr = memory_info->heap_start + rand_i;
-                                }
-                                break;
-                            }
-                    }
-
-                    delete memory_info;
-                }
+                addr = memory::get_random_address(pid, m_space);
             }
 
             cout << "Chosen address: " << hex << addr << dec << endl;

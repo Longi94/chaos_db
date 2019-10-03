@@ -46,6 +46,13 @@ namespace chaos
          * @return pointer to the heap_stack struct
          */
         heap_stack* get_heap_and_stack_spaces(int pid);
+
+        /**
+         * Get a random virtual address from the memory space of a process.
+         * @param pid the id of the process
+         * @param m_space the part of the memory to get the address from
+         */
+        off_t get_random_address(pid_t pid, space m_space);
     }
 }
 
