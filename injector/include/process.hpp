@@ -38,5 +38,11 @@ namespace chaos
          * @param pid process id
          */
         void wait_exit_code(pid_t pid);
+
+        /**
+         * Check if a child process is running.
+         * @param pid process id
+         */ 
+        bool is_child_running(pid_t pid);
     }
 }

@@ -101,5 +101,12 @@ namespace chaos
             cout << "WIFSTOPPED: " << WIFSTOPPED(status) << endl;
             cout << "WSTOPSIG: " << WSTOPSIG(status) << endl;
         }
+
+        bool is_child_running(const pid_t pid)
+        {
+            int status;
+            pid_t result = waitpid(pid, &status, WNOHANG);
+            return result == 0;
+        }
     }
 }

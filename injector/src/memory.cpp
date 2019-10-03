@@ -18,7 +18,7 @@ namespace chaos
     {
         int open_mem(const int pid)
         {
-            char file[64];
+            char file[16];
             sprintf(file, "/proc/%d/mem", pid);
             return open(file, O_RDWR);
         }
