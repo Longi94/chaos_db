@@ -5,8 +5,6 @@
 constexpr auto pipe_read = 0;
 constexpr auto pipe_write = 1;
 
-using namespace std;
-
 namespace chaos
 {
     namespace process
@@ -33,7 +31,7 @@ namespace chaos
          * @param arguments command line arguments for the child process
          * @return the process id of the child process
          */
-        pid_t execute(string path, string output, string input, char** arguments);
+        pid_t execute(std::string path, std::string output, std::string input, char** arguments);
 
         /**
          * Wait for a process (using waitpid) and print out information about the process.
