@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <random>
 
 namespace chaos
 {
@@ -51,8 +52,8 @@ namespace chaos
          * Get a random virtual address from the memory space of a process.
          * @param pid the id of the process
          * @param m_space the part of the memory to get the address from
+         * @param rng random number generator
          */
-        off_t get_random_address(pid_t pid, space m_space);
+        off_t get_random_address(pid_t pid, space m_space, std::mt19937 &rng);
     }
 }
-

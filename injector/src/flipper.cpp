@@ -15,14 +15,14 @@ namespace chaos
 {
     namespace flipper
     {
-        unique_ptr<FaultInjector> get_injector(const fault_type fault_type)
+        unique_ptr<FaultInjector> get_injector(const fault_type fault_type, mt19937 &rng)
         {
             switch (fault_type)
             {
                 case flip:
-                    return unique_ptr<FaultInjector>(new BitFlipper());
+                    return unique_ptr<FaultInjector>(new BitFlipper(rng));
                 case stuck:
-                    return unique_ptr<FaultInjector>(new BitSticker());
+                    return unique_ptr<FaultInjector>(new BitSticker(rng));
                 default:
                     return nullptr;
             }

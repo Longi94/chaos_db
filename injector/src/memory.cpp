@@ -5,6 +5,7 @@
 #include <cstring>
 #include <memory>
 #include <fcntl.h>
+#include <random>
 
 extern "C" {
 #include "pmparser.h"
@@ -91,7 +92,7 @@ namespace chaos
             return result;
         }
 
-        off_t get_random_address(const pid_t pid, const space m_space) {
+        off_t get_random_address(const pid_t pid, const space m_space, mt19937 &rng) {
             const auto memory_info = get_heap_and_stack_spaces(pid);
 
             off_t addr = 0;
@@ -111,22 +112,23 @@ namespace chaos
                     case heap:
                         {
                             cout << "Choosing address from heap." << endl;
-                            const int rand_i = rand() % heap_size;
-                            addr = memory_info->heap_start + rand_i;
+                            uniform_int_distribution<off_t> address_dist(memory_info->heap_start, memory_info->heap_end);
+                            addr = address_dist(rng);
                             break;
                         }
                     case stack:
                         {
                             cout << "Choosing address from stack." << endl;
-                            const int rand_i = rand() % stack_size;
-                            addr = memory_info->stack_start + rand_i;
+                            uniform_int_distribution<off_t> address_dist(memory_info->stack_start, memory_info->stack_end);
+                            addr = address_dist(rng);
                             break;
                         }
                     default:
                         {
                             cout << "Choosing address from stack or heap." << endl;
                             // Randomly choose an address in heap or stack
-                            const int rand_i = rand() % (heap_size + stack_size);
+                            uniform_int_distribution<off_t> address_dist(0, heap_size + stack_size);
+                            const off_t rand_i = address_dist(rng);
 
                             if (rand_i > heap_size)
                             {

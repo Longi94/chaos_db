@@ -45,7 +45,8 @@ int main(const int argc, char* argv[])
     args::check_required(args, {"command", "output"});
 
     // Init random
-    srand(time(nullptr));
+    random_device dev;
+    mt19937 rng(dev());
 
     const auto path = args["command"].as<string>();
     const auto output = args["output"].as<string>();
@@ -57,7 +58,7 @@ int main(const int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, command_args);
 
-    const auto injector = flipper::get_injector(fault_type);
+    const auto injector = get_injector(fault_type, rng);
 
     if (injector != nullptr)
     {
@@ -69,8 +70,10 @@ int main(const int argc, char* argv[])
         cout << "Injecting fault in " << delay << " milliseconds..." << endl;
         this_thread::sleep_for(chrono::milliseconds(delay));
 
-        const auto addr = memory::get_random_address(pid, space);
-        const auto mask = 1 << rand() % 7;
+        const auto addr = get_random_address(pid, space, rng);
+
+        uniform_int_distribution<int> mask_dist(0, 7);
+        const auto mask = 1 << mask_dist(rng);
 
         cout << "Chosen address: " << hex << addr << dec << endl;
         cout << "Inject mask: " << bitset<8>(mask) << endl;
