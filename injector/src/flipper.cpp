@@ -70,6 +70,9 @@ namespace chaos
         {
             const auto byte = new int8_t[1];
 
+            // We get an IO error if we start immediately after the process was created
+            this_thread::sleep_for(chrono::milliseconds(100));
+
             while (process::is_child_running(pid))
             {
                 if (process::attach(pid))
