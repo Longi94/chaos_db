@@ -17,7 +17,8 @@ namespace chaos
 
         /**
          * Get the command line arguments for the child process from the parsed options.
-         * @param args parsed option from cxxopts
+         * @param argc argument count
+         * @param argv arguments array
          */
         char** get_command_arguments(int argc, char* argv[]);
 

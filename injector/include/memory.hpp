@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <unistd.h>
 
 namespace chaos
 {
@@ -8,7 +7,6 @@ namespace chaos
     {
         struct heap_stack
         {
-            heap_stack(){}
             off_t heap_start;
             off_t heap_end;
             off_t stack_start;

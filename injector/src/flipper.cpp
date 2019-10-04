@@ -8,7 +8,6 @@
 #include <bitset>
 #include <thread>
 #include <chrono>
-#include <fcntl.h>
 
 using namespace std;
 

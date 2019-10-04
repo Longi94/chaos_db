@@ -92,9 +92,9 @@ namespace chaos
         }
 
         off_t get_random_address(const pid_t pid, const space m_space) {
-            auto memory_info = get_heap_and_stack_spaces(pid);
+            const auto memory_info = get_heap_and_stack_spaces(pid);
 
-            off_t addr;
+            off_t addr = 0;
 
             if (memory_info != nullptr)
             {

@@ -47,7 +47,7 @@ namespace chaos
             return 0;
         }
 
-        pid_t execute(string path, string output, string input, char** arguments)
+        pid_t execute(const string path, const string output, const string input, char** arguments)
         {
             cout << "Forking to run:";
             for (char** p = arguments; *p != nullptr; p++)
@@ -105,7 +105,7 @@ namespace chaos
         bool is_child_running(const pid_t pid)
         {
             int status;
-            pid_t result = waitpid(pid, &status, WNOHANG);
+            const pid_t result = waitpid(pid, &status, WNOHANG);
             return result == 0;
         }
     }

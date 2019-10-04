@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <cstdint>
 #include <memory>
-#include "memory.hpp"
 
 namespace chaos
 {
@@ -17,7 +16,7 @@ namespace chaos
              * Inject the fault into the memory.
              * @param pid the id of the process whose memory will be tinkered with
              * @param address of the byte
-             * @param the byte mask
+             * @param mask the byte mask
              */
             virtual int inject(pid_t pid, off_t address, int8_t mask) = 0;
         };
