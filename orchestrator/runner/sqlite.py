@@ -8,8 +8,8 @@ log = logging.getLogger(__name__)
 
 
 class SQLiteRunner(SqlRunner):
-    def __init__(self, directory: str, inject_delay: int, inject_space: str):
-        super(SQLiteRunner, self).__init__(directory, inject_delay, inject_space)
+    def __init__(self, directory: str, inject_delay: int, fault: str, inject_space: str):
+        super(SQLiteRunner, self).__init__(directory, inject_delay, fault, inject_space)
         self.db_file = os.path.join(directory, 'db.sqlite')
 
     def init_db(self):
@@ -23,6 +23,7 @@ class SQLiteRunner(SqlRunner):
             'databases/sqlite/queries/{}.sql'.format(query),
             self.inject_delay,
             ['databases/sqlite/bin/sqlite3', self.db_file],
+            self.fault,
             self.inject_space
         )
 

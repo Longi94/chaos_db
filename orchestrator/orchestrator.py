@@ -21,9 +21,9 @@ def run(iteration: int, args: argparse.Namespace) -> Dict:
     os.makedirs(iteration_dir, exist_ok=True)
 
     inject_delay = None
-    if args.flip:
+    if args.fault is not None:
         inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
-    runner = get_runner(args.database, iteration_dir, inject_delay, args.inject_space)
+    runner = get_runner(args.database, iteration_dir, inject_delay, args.fault, args.inject_space)
     monitor = get_monitor(args.database, iteration_dir, inject_delay)
 
     runner.init_db()
@@ -54,7 +54,8 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mean-runtime', dest='mean_runtime', type=float, required=False,
                         help='The expected run time of the query, the time of the bit flip injection (which is random) '
                              'depends on this. Required if --flip is set.')
-    parser.add_argument('-f', '--flip', action='store_true', default=False)
+    parser.add_argument('-f', '--fault', type=str, choices=['flip', 'stuck'],
+                        help='The type of fault to inject.')
     parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
                         help='The working directory. This directory will contain all experiment output and artifacts.')
     parser.add_argument('-t', '--threads', required=False, default=1, type=int,
@@ -64,10 +65,10 @@ if __name__ == '__main__':
                         required=False, help='Address space to inject the fault into.')
     args = parser.parse_args()
 
-    if args.flip and args.mean_runtime is None:
-        parser.error('--mean-runtime is required when --flip is set to true')
+    if args.fault == 'flip' and args.mean_runtime is None:
+        parser.error('--mean-runtime is required when --fault is set to flip is set to true')
 
-    if args.flip:
+    if args.fault is not None:
         check_injector()
 
     os.makedirs(args.working_directory, exist_ok=True)

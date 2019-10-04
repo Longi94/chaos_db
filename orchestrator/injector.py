@@ -17,7 +17,7 @@ def check_injector():
         exit(1)
 
 
-def run_injector(output_file: str, input_file: str, inject_delay: int, child_command: List[Any],
+def run_injector(output_file: str, input_file: str, inject_delay: int, child_command: List[Any], fault: str,
                  inject_space: str) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file]
 
@@ -25,7 +25,10 @@ def run_injector(output_file: str, input_file: str, inject_delay: int, child_com
         command.extend(['-i', input_file])
 
     if inject_delay is not None:
-        command.extend(['-m', str(inject_delay)])
+        command.extend(['-d', str(inject_delay)])
+
+    if fault is not None:
+        command.extend(['-f', fault])
 
     if inject_space is not None:
         command.extend(['-s', inject_space])
