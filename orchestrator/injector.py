@@ -1,7 +1,7 @@
 import subprocess
 import logging
 import os
-from typing import List, Any
+from typing import List, Any, Optional
 
 log = logging.getLogger(__name__)
 
@@ -17,12 +17,15 @@ def check_injector():
         exit(1)
 
 
-def run_injector(output_file: str, input_file: str, inject_delay: int, child_command: List[Any], fault: str,
-                 inject_space: str) -> subprocess.Popen:
+def run_injector(output_file: str, input_file: Optional[str], error_file: Optional[str], inject_delay: Optional[int],
+                 child_command: List[Any], fault: Optional[str], inject_space: Optional[str]) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file]
 
     if input_file is not None:
         command.extend(['-i', input_file])
+
+    if input_file is not None:
+        command.extend(['-e', error_file])
 
     if inject_delay is not None:
         command.extend(['-d', str(inject_delay)])

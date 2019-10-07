@@ -19,8 +19,9 @@ class SQLiteRunner(SqlRunner):
 
     def run_tpch(self, query: int):
         self.process = run_injector(
-            os.path.join(self.directory, 'output.txt'.format(query)),
+            os.path.join(self.directory, 'output.txt'),
             'databases/sqlite/queries/{}.sql'.format(query),
+            os.path.join(self.directory, 'stderr.txt'),
             self.inject_delay,
             ['databases/sqlite/bin/sqlite3', self.db_file],
             self.fault,
