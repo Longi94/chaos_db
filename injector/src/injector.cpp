@@ -23,7 +23,8 @@ int main(const int argc, char* argv[])
         ("c,command",
          "The command the child process should run. This should be the last option as anything after this will be interpreted as the command.",
          cxxopts::value<string>())
-        ("o,output", "Out put file to save the output of the command to", cxxopts::value<string>())
+        ("o,output", "Redirect stdout of the child process into this file", cxxopts::value<string>())
+        ("e,error", "Redirect stderr of the child process into this file", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
         ("d,delay", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>())
@@ -34,7 +35,7 @@ int main(const int argc, char* argv[])
     int argc_copy = argc;
     char** argv_copy = argv;
 
-    auto args = options.parse(argc_copy, argv_copy);
+    const auto args = options.parse(argc_copy, argv_copy);
 
     if (args.count("help"))
     {
@@ -51,12 +52,18 @@ int main(const int argc, char* argv[])
     const auto path = args["command"].as<string>();
     const auto output = args["output"].as<string>();
     const auto input = args["input"].as<string>();
+    string error = string();
+
+    if (args.count("error"))
+    {
+        error = args["error"].as<string>();
+    }
 
     const auto space = args::get_memory_space(args);
     const auto fault_type = args::get_fault_type(args);
     const auto command_args = args::get_command_arguments(argc, argv);
 
-    const pid_t pid = process::execute(path, output, input, command_args);
+    const pid_t pid = process::execute(path, output, input, error, command_args);
 
     const auto injector = get_injector(fault_type, rng);
 

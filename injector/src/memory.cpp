@@ -72,7 +72,7 @@ namespace chaos
 
             //iterate over areas
             procmaps_struct* map;
-            unique_ptr<heap_stack> result = unique_ptr<heap_stack>(new heap_stack());
+            unique_ptr<heap_stack> result(new heap_stack());
 
             while ((map = pmparser_next(maps)) != nullptr)
             {

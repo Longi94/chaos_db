@@ -47,7 +47,7 @@ namespace chaos
             return 0;
         }
 
-        pid_t execute(const string path, const string output, const string input, char** arguments)
+        pid_t execute(const string path, const string output, const string input, const string error, char** arguments)
         {
             cout << "Forking to run:";
             for (char** p = arguments; *p != nullptr; p++)
@@ -68,6 +68,14 @@ namespace chaos
                     const int fdout = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
                     dup2(fdout, pipe_write);
                     close(fdout);
+
+                    // redirect stderr to file
+                    if (!error.empty())
+                    {
+                        const int fderr = open(error.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                        dup2(fderr, pipe_error);
+                        close(fderr);
+                    }
 
                     // pipe file into stdin
                     if (!input.empty())

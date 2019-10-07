@@ -4,6 +4,7 @@
 
 constexpr auto pipe_read = 0;
 constexpr auto pipe_write = 1;
+constexpr auto pipe_error = 2;
 
 namespace chaos
 {
@@ -28,10 +29,11 @@ namespace chaos
          * @param path path to the binary
          * @param output file to write the stdout of the child process to
          * @param input file to pipe into the stdin of the child process
+         * @param error file to pipe into the stderr of the child process
          * @param arguments command line arguments for the child process
          * @return the process id of the child process
          */
-        pid_t execute(std::string path, std::string output, std::string input, char** arguments);
+        pid_t execute(std::string path, std::string output, std::string input, std::string error, char** arguments);
 
         /**
          * Wait for a process (using waitpid) and print out information about the process.
