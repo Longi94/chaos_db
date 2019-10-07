@@ -18,7 +18,11 @@
             "remoteCopySourcesExclusionList": [
                 ".vs",
                 ".git",
-                "databases"
+                "databases",
+                ".vagrant",
+                ".idea",
+                "out",
+                "build"
             ],
             "rsyncCommandArgs": "-t --delete --delete-excluded",
             "remoteCopyBuildOutput": false,
