@@ -2,7 +2,7 @@
 
 apt update
 apt install -y cmake build-essential gcc gdb rsync zip python3-pip
-pip3 install pandas
+pip3 install pandas jupyter
 
 # SQLite3
 dpkg --add-architecture i386
