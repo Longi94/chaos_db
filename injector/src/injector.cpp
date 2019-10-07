@@ -15,7 +15,10 @@ using namespace chaos;
 
 int main(const int argc, char* argv[])
 {
-    cxxopts::Options options("injector", "Inject bit flips into a child process. Example usage: injector -o q1.out -i queries/sqlite/1.sql -m 5000 -c /usr/bin/sqlite3 tpc-h.sqlite");
+    cxxopts::Options options(
+        "injector",
+        "Inject bit flips into a child process. Example usage: injector -o q1.out -i queries/sqlite/1.sql -m 5000 -c /usr/bin/sqlite3 tpc-h.sqlite"
+    );
     options
         .allow_unrecognised_options()
         .add_options()
@@ -27,9 +30,15 @@ int main(const int argc, char* argv[])
         ("e,error", "Redirect stderr of the child process into this file", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
-        ("d,delay", "Milliseconds to wait before injecting a bit flip into the child process", cxxopts::value<unsigned long>())
-        ("s,inject-space", "Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
-                 cxxopts::value<string>());
+        ("flip-rate", "Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is \"flip\".",
+         cxxopts::value<float>())
+        ("stuck-rate", "Frequency of stuck bits in a bit/megabytes unit. Required if the fault type is \"stuck\".",
+         cxxopts::value<float>())
+        ("d,delay", "Milliseconds to wait before injecting a bit flip into the child process",
+         cxxopts::value<unsigned long>())
+        ("s,inject-space",
+         "Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
+         cxxopts::value<string>());
 
     // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
@@ -44,6 +53,8 @@ int main(const int argc, char* argv[])
     }
 
     args::check_required(args, {"command", "output"});
+    args::check_depend(args, "fault", "flip", "flip-rate");
+    args::check_depend(args, "fault", "stuck", "stuck-rate");
 
     // Init random
     random_device dev;
@@ -65,7 +76,7 @@ int main(const int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, error, command_args);
 
-    const auto injector = get_injector(fault_type, rng);
+    const auto injector = get_injector(fault_type, args, rng);
 
     if (injector != nullptr)
     {
@@ -84,7 +95,7 @@ int main(const int argc, char* argv[])
 
         cout << "Chosen address: " << hex << addr << dec << endl;
         cout << "Inject mask: " << bitset<8>(mask) << endl;
-        
+
         injector->inject(pid, addr, mask);
     }
 

@@ -16,6 +16,15 @@ namespace chaos
         void check_required(cxxopts::ParseResult& args, const std::vector<std::string>& required);
 
         /**
+         * If parent is present, child must be present too. Throws an exception of this dependency is violated.
+         * @param args parsed option from cxxopts
+         * @param parent option that depends on the child
+         * @param value expected value of the parent option
+         * @param child option that must be present if parent is present.
+         */
+        void check_depend(cxxopts::ParseResult& args, const std::string& parent, const std::string& value, const std::string& child);
+
+        /**
          * Get the command line arguments for the child process from the parsed options.
          * @param argc argument count
          * @param argv arguments array

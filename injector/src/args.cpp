@@ -8,7 +8,7 @@ namespace chaos
 {
     namespace args
     {
-        void check_required(cxxopts::ParseResult& args, const std::vector<std::string>& required)
+        void check_required(cxxopts::ParseResult& args, const vector<string>& required)
         {
             for (auto& r : required)
             {
@@ -16,6 +16,14 @@ namespace chaos
                 {
                     throw cxxopts::option_required_exception(r);
                 }
+            }
+        }
+
+        void check_depend(cxxopts::ParseResult& args, const string& parent, const string& value, const string& child)
+        {
+            if (args.count(parent) > 0 && args.count(child) == 0)
+            {
+                throw cxxopts::option_required_exception(child);
             }
         }
 

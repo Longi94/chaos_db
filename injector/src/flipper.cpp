@@ -1,6 +1,7 @@
 #include "flipper.hpp"
 #include "memory.hpp"
 #include "process.hpp"
+#include "args.hpp"
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -15,17 +16,32 @@ namespace chaos
 {
     namespace flipper
     {
-        unique_ptr<FaultInjector> get_injector(const fault_type fault_type, mt19937& rng)
+        unique_ptr<FaultInjector> get_injector(const fault_type fault_type, cxxopts::ParseResult& args, mt19937& rng)
         {
             switch (fault_type)
             {
-                case flip:
-                    return unique_ptr<FaultInjector>(new BitFlipper(rng));
-                case stuck:
-                    return unique_ptr<FaultInjector>(new BitSticker(rng));
-                default:
-                    return nullptr;
+            case flip:
+                return unique_ptr<FaultInjector>(new BitFlipper(args, rng));
+            case stuck:
+                return unique_ptr<FaultInjector>(new BitSticker(args, rng));
+            default:
+                return nullptr;
             }
+        }
+
+        FaultInjector::FaultInjector(cxxopts::ParseResult& args, std::mt19937& rng) : rng_(rng)
+        {
+            inject_space_ = args::get_memory_space(args);
+        }
+
+        BitFlipper::BitFlipper(cxxopts::ParseResult& args, mt19937& rng): FaultInjector(args, rng)
+        {
+            flip_rate_ = args["flip-rate"].as<float>();
+        }
+
+        BitSticker::BitSticker(cxxopts::ParseResult& args, mt19937& rng): FaultInjector(args, rng)
+        {
+            stuck_rate_ = args["stuck-rate"].as<float>();
         }
 
         int BitFlipper::inject(const pid_t pid, const off_t address, const int8_t mask)
@@ -107,7 +123,7 @@ namespace chaos
 
                 this_thread::sleep_for(chrono::milliseconds(500));
             }
-            
+
             delete[] byte;
             return 0;
         }
