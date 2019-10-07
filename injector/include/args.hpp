@@ -13,7 +13,7 @@ namespace chaos
          * @param args parsed option from cxxopts
          * @param required list of option names
          */
-        void check_required(cxxopts::ParseResult args, const std::vector<std::string>& required);
+        void check_required(cxxopts::ParseResult& args, const std::vector<std::string>& required);
 
         /**
          * Get the command line arguments for the child process from the parsed options.
@@ -27,13 +27,13 @@ namespace chaos
          * @param args parsed option from cxxopts
          * @return fault_type variable
          */
-        flipper::fault_type get_fault_type(cxxopts::ParseResult args);
+        flipper::fault_type get_fault_type(cxxopts::ParseResult& args);
 
         /**
          * Get the inject space from the arguments.
          * @param args parsed option from cxxopts
          * @return memory::space variable
          */
-        memory::space get_memory_space(cxxopts::ParseResult args);
+        memory::space get_memory_space(cxxopts::ParseResult& args);
     }
 }

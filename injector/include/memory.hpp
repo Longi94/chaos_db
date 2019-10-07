@@ -54,6 +54,6 @@ namespace chaos
          * @param m_space the part of the memory to get the address from
          * @param rng random number generator
          */
-        off_t get_random_address(pid_t pid, space m_space, std::mt19937 &rng);
+        off_t get_random_address(pid_t pid, space m_space, std::mt19937& rng);
     }
 }

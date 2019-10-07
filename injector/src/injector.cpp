@@ -35,7 +35,7 @@ int main(const int argc, char* argv[])
     int argc_copy = argc;
     char** argv_copy = argv;
 
-    const auto args = options.parse(argc_copy, argv_copy);
+    auto args = options.parse(argc_copy, argv_copy);
 
     if (args.count("help"))
     {
@@ -49,9 +49,9 @@ int main(const int argc, char* argv[])
     random_device dev;
     mt19937 rng(dev());
 
-    const auto path = args["command"].as<string>();
-    const auto output = args["output"].as<string>();
-    const auto input = args["input"].as<string>();
+    auto path = args["command"].as<string>();
+    auto output = args["output"].as<string>();
+    auto input = args["input"].as<string>();
     string error = string();
 
     if (args.count("error"))

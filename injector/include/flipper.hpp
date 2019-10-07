@@ -31,7 +31,7 @@ namespace chaos
         class BitFlipper : public FaultInjector
         {
         public:
-            explicit BitFlipper(std::mt19937 &rng): FaultInjector(rng)
+            explicit BitFlipper(std::mt19937& rng): FaultInjector(rng)
             {
             }
 
@@ -41,7 +41,7 @@ namespace chaos
         class BitSticker : public FaultInjector
         {
         public:
-            explicit BitSticker(std::mt19937 &rng) : FaultInjector(rng)
+            explicit BitSticker(std::mt19937& rng) : FaultInjector(rng)
             {
             }
 
@@ -53,6 +53,6 @@ namespace chaos
          * @param fault_type the type of the fault that needs to be injected
          * @param rng random number generator used for randomly selecting an address
          */
-        std::unique_ptr<FaultInjector> get_injector(fault_type fault_type, std::mt19937 &rng);
+        std::unique_ptr<FaultInjector> get_injector(fault_type fault_type, std::mt19937& rng);
     }
 }

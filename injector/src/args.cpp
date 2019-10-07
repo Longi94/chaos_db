@@ -8,7 +8,7 @@ namespace chaos
 {
     namespace args
     {
-        void check_required(const cxxopts::ParseResult args, const std::vector<std::string>& required)
+        void check_required(cxxopts::ParseResult& args, const std::vector<std::string>& required)
         {
             for (auto& r : required)
             {
@@ -31,7 +31,7 @@ namespace chaos
             return command_option + 1;
         }
 
-        flipper::fault_type get_fault_type(const cxxopts::ParseResult args)
+        flipper::fault_type get_fault_type(cxxopts::ParseResult& args)
         {
             if (!args.count("fault"))
             {
@@ -52,7 +52,7 @@ namespace chaos
             return flipper::none;
         }
 
-        memory::space get_memory_space(const cxxopts::ParseResult args)
+        memory::space get_memory_space(cxxopts::ParseResult& args)
         {
             if (!args.count("inject-space"))
             {

@@ -47,7 +47,7 @@ namespace chaos
             return 0;
         }
 
-        pid_t execute(const string path, const string output, const string input, const string error, char** arguments)
+        pid_t execute(string& path, string& output, string& input, string& error, char** arguments)
         {
             cout << "Forking to run:";
             for (char** p = arguments; *p != nullptr; p++)

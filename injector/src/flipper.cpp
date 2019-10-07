@@ -15,7 +15,7 @@ namespace chaos
 {
     namespace flipper
     {
-        unique_ptr<FaultInjector> get_injector(const fault_type fault_type, mt19937 &rng)
+        unique_ptr<FaultInjector> get_injector(const fault_type fault_type, mt19937& rng)
         {
             switch (fault_type)
             {
