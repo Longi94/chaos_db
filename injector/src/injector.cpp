@@ -1,6 +1,5 @@
 #include "args.hpp"
 #include "flipper.hpp"
-#include "memory.hpp"
 #include "process.hpp"
 #include "cxxopts.hpp"
 #include <iostream>
@@ -31,11 +30,9 @@ int main(const int argc, char* argv[])
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
         ("flip-rate", "Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is \"flip\".",
-         cxxopts::value<float>())
+         cxxopts::value<double>())
         ("stuck-rate", "Frequency of stuck bits in a bit/megabytes unit. Required if the fault type is \"stuck\".",
-         cxxopts::value<float>())
-        ("d,delay", "Milliseconds to wait before injecting a bit flip into the child process",
-         cxxopts::value<unsigned long>())
+         cxxopts::value<double>())
         ("s,inject-space",
          "Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
          cxxopts::value<string>());
@@ -70,33 +67,16 @@ int main(const int argc, char* argv[])
         error = args["error"].as<string>();
     }
 
-    const auto space = args::get_memory_space(args);
     const auto fault_type = args::get_fault_type(args);
     const auto command_args = args::get_command_arguments(argc, argv);
 
-    const pid_t pid = process::execute(path, output, input, error, command_args);
-
     const auto injector = get_injector(fault_type, args, rng);
+
+    const pid_t pid = process::execute(path, output, input, error, command_args);
 
     if (injector != nullptr)
     {
-        unsigned long delay = 0;
-        if (args.count("delay"))
-        {
-            delay = args["delay"].as<unsigned long>();
-        }
-        cout << "Injecting fault in " << delay << " milliseconds..." << endl;
-        this_thread::sleep_for(chrono::milliseconds(delay));
-
-        const auto addr = get_random_address(pid, space, rng);
-
-        uniform_int_distribution<int> mask_dist(0, 7);
-        const auto mask = 1 << mask_dist(rng);
-
-        cout << "Chosen address: " << hex << addr << dec << endl;
-        cout << "Inject mask: " << bitset<8>(mask) << endl;
-
-        injector->inject(pid, addr, mask);
+        injector->inject(pid);
     }
 
     process::wait_exit_code(pid);

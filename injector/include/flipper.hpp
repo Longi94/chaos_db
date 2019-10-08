@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <chrono>
 #include "cxxopts.hpp"
 #include "memory.hpp"
 
@@ -25,10 +26,8 @@ namespace chaos
             /**
              * Inject the fault into the memory.
              * @param pid the id of the process whose memory will be tinkered with
-             * @param address of the byte
-             * @param mask the byte mask
              */
-            virtual int inject(pid_t pid, off_t address, int8_t mask) = 0;
+            virtual int inject(pid_t pid) = 0;
         };
 
         class BitFlipper : public FaultInjector
@@ -37,10 +36,13 @@ namespace chaos
             BitFlipper(cxxopts::ParseResult& args, std::mt19937& rng);
 
         private:
-            float flip_rate_;
+            double flip_rate_;
 
         public:
-            int inject(pid_t pid, off_t address, int8_t mask) override;
+            int inject(pid_t pid) override;
+        private:
+            std::chrono::milliseconds get_interval(pid_t pid) const;
+            int flip_random_bit(pid_t pid);
         };
 
         class BitSticker : public FaultInjector
@@ -49,10 +51,10 @@ namespace chaos
             BitSticker(cxxopts::ParseResult& args, std::mt19937& rng);
 
         private:
-            float stuck_rate_;
+            double stuck_rate_;
 
         public:
-            int inject(pid_t pid, off_t address, int8_t mask) override;
+            int inject(pid_t pid) override;
         };
 
         /**

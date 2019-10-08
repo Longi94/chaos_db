@@ -21,7 +21,7 @@ namespace chaos
 
         void check_depend(cxxopts::ParseResult& args, const string& parent, const string& value, const string& child)
         {
-            if (args.count(parent) > 0 && args.count(child) == 0)
+            if (args.count(parent) > 0 && args[parent].as<string>().compare(value) == 0 && args.count(child) == 0)
             {
                 throw cxxopts::option_required_exception(child);
             }
