@@ -1,6 +1,5 @@
 #pragma once
 #include <unistd.h>
-#include <cstdint>
 #include <memory>
 #include <random>
 #include <chrono>
@@ -21,7 +20,7 @@ namespace chaos
         protected:
             std::mt19937 rng_;
             memory::space inject_space_;
-            double mean_runtime_;
+            long mean_runtime_;
 
         public:
             /**
@@ -51,7 +50,7 @@ namespace chaos
              * @param pid child process id
              * @return time interval of the flip frequency in milliseconds
              */
-            std::chrono::milliseconds get_interval(pid_t pid) const;
+            long get_interval(pid_t pid) const;
 
             /**
              * Flip a random bit in the child process' memory. The address and the bit is randomly chosen using rng_.

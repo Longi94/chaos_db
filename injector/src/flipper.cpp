@@ -2,6 +2,7 @@
 #include "memory.hpp"
 #include "process.hpp"
 #include "args.hpp"
+#include "time.hpp"
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -35,7 +36,11 @@ namespace chaos
 
             if (args.count("mean-runtime"))
             {
-                mean_runtime_ = args["mean-runtime"].as<double>();
+                mean_runtime_ = args["mean-runtime"].as<long>();
+            }
+            else
+            {
+                mean_runtime_ = 0;
             }
         }
 
@@ -52,9 +57,8 @@ namespace chaos
 
         int BitFlipper::inject(const pid_t pid)
         {
-            auto last_flip = chrono::duration_cast<chrono::milliseconds>(
-                chrono::system_clock::now().time_since_epoch()
-            );
+            const long start_ts = time::current_time_millis();
+            auto last_flip = start_ts;
 
             const chrono::milliseconds sleep_clock(clock);
             uniform_real_distribution<double> flip_p_dist(0, 1);
@@ -63,13 +67,22 @@ namespace chaos
 
             while (process::is_child_running(pid))
             {
-                auto interval = get_interval(pid);
+                const auto interval = get_interval(pid);
+                const long current_ts = time::current_time_millis();
 
-                cerr << "Interval: " << interval.count() << endl;
+                cerr << "Interval: " << interval << endl;
 
                 if (random_flip_frequency_)
                 {
-                    const double p_flip = clock / static_cast<double>(interval.count());
+                    double p_flip = clock / static_cast<double>(interval);
+
+                    if (last_flip == start_ts && mean_runtime_ > 0 && p_flip < 1.0)
+                    {
+                        // there were no flips yet, give a probability boost to inject a flip at least once
+                        // the boost increases over time, P will reach 1 once the current run-time reaches 3/4 of the mean runtime
+                        cerr << "Increasing probability of a flip" << endl;
+                        p_flip += (1.0 - p_flip) * (static_cast<double>(current_ts - start_ts) / (mean_runtime_ * 0.75));
+                    }
 
                     cerr << "Flip probability: " << p_flip << endl;
 
@@ -79,14 +92,11 @@ namespace chaos
                     if (n <= p_flip)
                     {
                         flip_random_bit(pid);
+                        last_flip = current_ts;
                     }
                 }
                 else
                 {
-                    const auto current_ts = chrono::duration_cast<chrono::milliseconds>(
-                        chrono::system_clock::now().time_since_epoch()
-                    );
-
                     if (current_ts - interval > last_flip)
                     {
                         flip_random_bit(pid);
@@ -99,7 +109,7 @@ namespace chaos
             return 0;
         }
 
-        std::chrono::milliseconds BitFlipper::get_interval(const pid_t pid) const
+        long BitFlipper::get_interval(const pid_t pid) const
         {
             const auto heap_stack = memory::get_heap_and_stack_spaces(pid);
 
@@ -122,7 +132,7 @@ namespace chaos
             cerr << "Mem size: " << mem_size << " bytes" << endl;
 
             const long interval = 1000000000 / (static_cast<double>(mem_size) * flip_rate_);
-            return chrono::milliseconds(interval);
+            return interval;
         }
 
         int BitFlipper::flip_random_bit(const pid_t pid)

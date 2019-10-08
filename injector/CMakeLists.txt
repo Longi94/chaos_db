@@ -6,6 +6,7 @@ set(SOURCE_FILES
     src/memory.cpp
     src/process.cpp
     src/args.cpp
+    src/time.cpp
     src/pmparser.c)
 
 add_library(cxxopts cxxopts/include/cxxopts.hpp)
