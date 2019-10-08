@@ -41,7 +41,18 @@ namespace chaos
         public:
             int inject(pid_t pid) override;
         private:
+            /**
+             * Calculates how frequently bit flips should happen based on flip_rate_ and the currently allocated memory
+             * size of the child process.
+             * @param pid child process id
+             * @return time interval of the flip frequency in milliseconds
+             */
             std::chrono::milliseconds get_interval(pid_t pid) const;
+
+            /**
+             * Flip a random bit in the child process' memory. The address and the bit is randomly chosen using rng_.
+             * @param pid child process id
+             */
             int flip_random_bit(pid_t pid);
         };
 

@@ -51,16 +51,27 @@ namespace chaos
                 chrono::system_clock::now().time_since_epoch()
             );
 
+            this_thread::sleep_for(chrono::milliseconds(100));
+
             while (process::is_child_running(pid))
             {
-                this_thread::sleep_for(chrono::milliseconds(100));
-                if (process::is_child_running(pid))
+                const auto current_ts = chrono::duration_cast<chrono::milliseconds>(
+                    chrono::system_clock::now().time_since_epoch()
+                );
+
+                auto interval = get_interval(pid);
+                if (interval.count() < 100)
                 {
-                    auto current_ts = chrono::duration_cast<chrono::milliseconds>(
-                        chrono::system_clock::now().time_since_epoch()
-                    );
-                    flip_random_bit(pid);
+                    // don't inject too frequently
+                    interval = chrono::milliseconds(100);
                 }
+
+                if (current_ts - interval > last_flip)
+                {
+                    flip_random_bit(pid);
+                    last_flip = current_ts;
+                }
+                this_thread::sleep_for(chrono::milliseconds(100));
             }
             return 0;
         }
@@ -85,7 +96,7 @@ namespace chaos
                 break;
             }
 
-            const long interval = 1000 / (flip_rate_ * (static_cast<double>(mem_size) / 1000000));
+            const long interval = 1000000000 * flip_rate_ / static_cast<double>(mem_size);
             return chrono::milliseconds(interval);
         }
 
