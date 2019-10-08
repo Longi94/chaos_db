@@ -21,6 +21,7 @@ namespace chaos
         protected:
             std::mt19937 rng_;
             memory::space inject_space_;
+            double mean_runtime_;
 
         public:
             /**
@@ -36,7 +37,10 @@ namespace chaos
             BitFlipper(cxxopts::ParseResult& args, std::mt19937& rng);
 
         private:
+            static const long clock = 100;
+
             double flip_rate_;
+            bool random_flip_frequency_;
 
         public:
             int inject(pid_t pid) override;

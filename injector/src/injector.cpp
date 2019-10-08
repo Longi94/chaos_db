@@ -29,8 +29,10 @@ int main(const int argc, char* argv[])
         ("e,error", "Redirect stderr of the child process into this file", cxxopts::value<string>())
         ("i,input", "File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
+        ("m,mean-runtime", "The mean runtime of the experiment in seconds.", cxxopts::value<double>())
         ("flip-rate", "Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is \"flip\".",
          cxxopts::value<double>())
+        ("random-flip-rate", "Randomize the frequency of bit flips keeping the flip-rate in mind. At least one flip is ensured if --mean-runtime is provided.")
         ("stuck-rate", "Frequency of stuck bits in a bit/megabytes unit. Required if the fault type is \"stuck\".",
          cxxopts::value<double>())
         ("s,inject-space",

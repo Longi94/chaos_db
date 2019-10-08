@@ -32,11 +32,17 @@ namespace chaos
         FaultInjector::FaultInjector(cxxopts::ParseResult& args, std::mt19937& rng) : rng_(rng)
         {
             inject_space_ = args::get_memory_space(args);
+
+            if (args.count("mean-runtime"))
+            {
+                mean_runtime_ = args["mean-runtime"].as<double>();
+            }
         }
 
         BitFlipper::BitFlipper(cxxopts::ParseResult& args, mt19937& rng): FaultInjector(args, rng)
         {
             flip_rate_ = args["flip-rate"].as<double>();
+            random_flip_frequency_ = args.count("random-flip-rate") > 0;
         }
 
         BitSticker::BitSticker(cxxopts::ParseResult& args, mt19937& rng): FaultInjector(args, rng)
@@ -46,32 +52,49 @@ namespace chaos
 
         int BitFlipper::inject(const pid_t pid)
         {
-
             auto last_flip = chrono::duration_cast<chrono::milliseconds>(
                 chrono::system_clock::now().time_since_epoch()
             );
 
-            this_thread::sleep_for(chrono::milliseconds(100));
+            const chrono::milliseconds sleep_clock(clock);
+            uniform_real_distribution<double> flip_p_dist(0, 1);
+
+            this_thread::sleep_for(sleep_clock);
 
             while (process::is_child_running(pid))
             {
-                const auto current_ts = chrono::duration_cast<chrono::milliseconds>(
-                    chrono::system_clock::now().time_since_epoch()
-                );
-
                 auto interval = get_interval(pid);
-                if (interval.count() < 100)
+
+                cerr << "Interval: " << interval.count() << endl;
+
+                if (random_flip_frequency_)
                 {
-                    // don't inject too frequently
-                    interval = chrono::milliseconds(100);
+                    const double p_flip = clock / static_cast<double>(interval.count());
+
+                    cerr << "Flip probability: " << p_flip << endl;
+
+                    const auto n = flip_p_dist(rng_);
+                    cerr << "Generated number: " << n << endl;
+
+                    if (n <= p_flip)
+                    {
+                        flip_random_bit(pid);
+                    }
+                }
+                else
+                {
+                    const auto current_ts = chrono::duration_cast<chrono::milliseconds>(
+                        chrono::system_clock::now().time_since_epoch()
+                    );
+
+                    if (current_ts - interval > last_flip)
+                    {
+                        flip_random_bit(pid);
+                        last_flip = current_ts;
+                    }
                 }
 
-                if (current_ts - interval > last_flip)
-                {
-                    flip_random_bit(pid);
-                    last_flip = current_ts;
-                }
-                this_thread::sleep_for(chrono::milliseconds(100));
+                this_thread::sleep_for(sleep_clock);
             }
             return 0;
         }
@@ -96,7 +119,9 @@ namespace chaos
                 break;
             }
 
-            const long interval = 1000000000 * flip_rate_ / static_cast<double>(mem_size);
+            cerr << "Mem size: " << mem_size << " bytes" << endl;
+
+            const long interval = 1000000000 / (static_cast<double>(mem_size) * flip_rate_);
             return chrono::milliseconds(interval);
         }
 
