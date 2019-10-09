@@ -76,12 +76,11 @@ int main(const int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, error, command_args);
 
-    if (injector != nullptr)
-    {
-        injector->inject(pid);
-    }
+    injector->inject(pid);
 
     process::wait_exit_code(pid);
+
+    injector->print_data();
 
     return 0;
 }

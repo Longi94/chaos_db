@@ -9,6 +9,7 @@
 #include <bitset>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 using namespace std;
 
@@ -35,6 +36,10 @@ namespace chaos
             while (process::is_child_running(pid))
             {
                 const auto memory_info = memory::get_heap_and_stack_spaces(pid);
+
+                max_heap_size_ = max(max_heap_size_, memory_info->heap_size);
+                max_stack_size_ = max(max_stack_size_, memory_info->stack_size);
+
                 const auto interval = get_interval(memory_info);
                 const long current_ts = time::current_time_millis();
 

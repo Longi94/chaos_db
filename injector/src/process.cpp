@@ -66,28 +66,52 @@ namespace chaos
                 {
                     // redirect stdout to file
                     const int fdout = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                    dup2(fdout, pipe_write);
-                    close(fdout);
+                    if (fdout == -1)
+                    {
+                        cerr << "Failed to open fdout " << output << ": " << strerror(errno) << endl;
+                    }
+                    else
+                    {
+                        dup2(fdout, pipe_write);
+                        close(fdout);
+                    }
 
                     // redirect stderr to file
                     if (!error.empty())
                     {
                         const int fderr = open(error.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                        dup2(fderr, pipe_error);
-                        close(fderr);
+                        if (fdout == -1)
+                        {
+                            cerr << "Failed to open fderr " << error << ": " << strerror(errno) << endl;
+                        }
+                        else
+                        {
+                            dup2(fderr, pipe_error);
+                            close(fderr);
+                        }
                     }
 
                     // pipe file into stdin
                     if (!input.empty())
                     {
                         const int fdin = open(input.c_str(), O_RDONLY);
-                        dup2(fdin, pipe_read);
-                        close(fdin);
+                        if (fdout == -1)
+                        {
+                            cerr << "Failed to open fdin " << input << ": " << strerror(errno) << endl;
+                        }
+                        else
+                        {
+                            dup2(fdin, pipe_read);
+                            close(fdin);
+                        }
                     }
 
-                    execv(path.c_str(), arguments);
-                    perror("execl");
-                    exit(excl_fail);
+                    if (execv(path.c_str(), arguments) == -1)
+                    {
+                        cerr << strerror(errno) << endl;
+                        perror("execl");
+                        exit(excl_fail);
+                    }
                     return 0;
                 }
             default:

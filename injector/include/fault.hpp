@@ -20,13 +20,16 @@ namespace chaos
             std::mt19937 rng_;
             memory::space inject_space_;
             long mean_runtime_;
+            long max_heap_size_ = 0;
+            long max_stack_size_ = 0;
 
         public:
             /**
              * Inject the fault into the memory.
              * @param pid the id of the process whose memory will be tinkered with
              */
-            virtual int inject(pid_t pid) = 0;
+            virtual int inject(pid_t pid);
+            void print_data() const;
         };
 
         /**
