@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cxxopts.hpp"
-#include "flipper.hpp"
+#include "fault.hpp"
 #include "memory.hpp"
 
 namespace chaos
@@ -36,7 +36,7 @@ namespace chaos
          * @param args parsed option from cxxopts
          * @return fault_type variable
          */
-        flipper::fault_type get_fault_type(cxxopts::ParseResult& args);
+        fault::fault_type get_fault_type(cxxopts::ParseResult& args);
 
         /**
          * Get the inject space from the arguments.

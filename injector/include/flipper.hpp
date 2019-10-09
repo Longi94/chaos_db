@@ -1,36 +1,17 @@
 #pragma once
+#include "fault.hpp"
 #include <unistd.h>
 #include <memory>
 #include <random>
 #include <chrono>
 #include "cxxopts.hpp"
-#include "memory.hpp"
 
 namespace chaos
 {
     namespace flipper
     {
-        enum fault_type { none, flip, stuck };
 
-        class FaultInjector
-        {
-        public:
-            explicit FaultInjector(cxxopts::ParseResult& args, std::mt19937& rng);
-
-        protected:
-            std::mt19937 rng_;
-            memory::space inject_space_;
-            long mean_runtime_;
-
-        public:
-            /**
-             * Inject the fault into the memory.
-             * @param pid the id of the process whose memory will be tinkered with
-             */
-            virtual int inject(pid_t pid) = 0;
-        };
-
-        class BitFlipper : public FaultInjector
+        class BitFlipper : public fault::FaultInjector
         {
         public:
             BitFlipper(cxxopts::ParseResult& args, std::mt19937& rng);
@@ -59,7 +40,7 @@ namespace chaos
             int flip_random_bit(pid_t pid);
         };
 
-        class BitSticker : public FaultInjector
+        class BitSticker : public fault::FaultInjector
         {
         public:
             BitSticker(cxxopts::ParseResult& args, std::mt19937& rng);
@@ -76,6 +57,6 @@ namespace chaos
          * @param fault_type the type of the fault that needs to be injected
          * @param rng random number generator used for randomly selecting an address
          */
-        std::unique_ptr<FaultInjector> get_injector(fault_type fault_type, cxxopts::ParseResult& args, std::mt19937& rng);
+        std::unique_ptr<fault::FaultInjector> get_injector(fault::fault_type fault_type, cxxopts::ParseResult& args, std::mt19937& rng);
     }
 }

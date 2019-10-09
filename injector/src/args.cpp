@@ -1,6 +1,6 @@
 #include "args.hpp"
 #include "cxxopts.hpp"
-#include "flipper.hpp"
+#include "fault.hpp"
 #include "memory.hpp"
 
 using namespace std;
@@ -40,25 +40,25 @@ namespace chaos
             return command_option + 1;
         }
 
-        flipper::fault_type get_fault_type(cxxopts::ParseResult& args)
+        fault::fault_type get_fault_type(cxxopts::ParseResult& args)
         {
             if (!args.count("fault"))
             {
-                return flipper::none;
+                return fault::none;
             }
 
             const auto fault_str = args["fault"].as<string>();
 
             if (fault_str.compare("flip") == 0)
             {
-                return flipper::flip;
+                return fault::flip;
             }
-            else if (fault_str.compare("stuck") == 0)
+            if (fault_str.compare("stuck") == 0)
             {
-                return flipper::stuck;
+                return fault::stuck;
             }
 
-            return flipper::none;
+            return fault::none;
         }
 
         memory::space get_memory_space(cxxopts::ParseResult& args)
