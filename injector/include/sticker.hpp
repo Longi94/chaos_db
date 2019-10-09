@@ -17,7 +17,7 @@ namespace chaos
             double stuck_rate_;
 
         public:
-            int inject(pid_t pid) override;
+            void inject(pid_t pid, std::atomic_bool& child_running) override;
         };
     }
 }

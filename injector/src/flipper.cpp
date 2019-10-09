@@ -23,7 +23,7 @@ namespace chaos
             random_flip_frequency_ = args.count("random-flip-rate") > 0;
         }
 
-        int BitFlipper::inject(const pid_t pid)
+        void BitFlipper::inject(const pid_t pid, atomic_bool& child_running)
         {
             const long start_ts = time::current_time_millis();
             auto last_flip = start_ts;
@@ -33,7 +33,7 @@ namespace chaos
 
             this_thread::sleep_for(sleep_clock);
 
-            while (process::is_child_running(pid))
+            while (child_running)
             {
                 const auto memory_info = memory::get_heap_and_stack_spaces(pid);
 
@@ -79,7 +79,6 @@ namespace chaos
 
                 this_thread::sleep_for(sleep_clock);
             }
-            return 0;
         }
 
         long BitFlipper::get_interval(const unique_ptr<memory::heap_stack>& memory_info) const

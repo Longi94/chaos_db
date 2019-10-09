@@ -20,7 +20,7 @@ namespace chaos
             bool random_flip_frequency_;
 
         public:
-            int inject(pid_t pid) override;
+            void inject(pid_t pid, std::atomic_bool& child_running) override;
         private:
             /**
              * Calculates how frequently bit flips should happen based on flip_rate_ and the currently allocated memory

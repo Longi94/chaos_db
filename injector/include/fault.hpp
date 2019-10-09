@@ -4,6 +4,8 @@
 #include <random>
 #include "cxxopts.hpp"
 #include "memory.hpp"
+#include <atomic>
+#include <thread>
 
 namespace chaos
 {
@@ -27,8 +29,9 @@ namespace chaos
             /**
              * Inject the fault into the memory.
              * @param pid the id of the process whose memory will be tinkered with
+             * @param child_running
              */
-            virtual int inject(pid_t pid);
+            virtual void inject(pid_t pid, std::atomic_bool& child_running);
             void print_data() const;
         };
 

@@ -18,5 +18,6 @@ include_directories(include)
 include_directories(cxxopts/include)
 
 # Add source to this project's executable.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -pthread")
 add_executable (injector ${SOURCE_FILES})
 target_link_libraries(injector cxxopts)
