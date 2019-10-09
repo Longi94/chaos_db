@@ -8,10 +8,12 @@ namespace chaos
     {
         struct heap_stack
         {
-            off_t heap_start;
-            off_t heap_end;
-            off_t stack_start;
-            off_t stack_end;
+            off_t heap_start = 0;
+            off_t heap_end = 0;
+            off_t stack_start = 0;
+            off_t stack_end = 0;
+            long heap_size = 0;
+            long stack_size = 0;
         };
 
         enum space { all, heap, stack };
@@ -50,10 +52,10 @@ namespace chaos
 
         /**
          * Get a random virtual address from the memory space of a process.
-         * @param pid the id of the process
+         * @param memory_info memory info of the child process
          * @param m_space the part of the memory to get the address from
          * @param rng random number generator
          */
-        off_t get_random_address(pid_t pid, space m_space, std::mt19937& rng);
+        off_t get_random_address(const std::unique_ptr<heap_stack>& memory_info, space m_space, std::mt19937& rng);
     }
 }

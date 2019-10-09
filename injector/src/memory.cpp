@@ -87,14 +87,15 @@ namespace chaos
                 }
             }
 
+            result->heap_size = result->heap_end - result->heap_start;
+            result->stack_size = result->stack_end - result->stack_start;
+
             pmparser_free(maps);
 
             return result;
         }
 
-        off_t get_random_address(const pid_t pid, const space m_space, mt19937& rng) {
-            const auto memory_info = get_heap_and_stack_spaces(pid);
-
+        off_t get_random_address(const unique_ptr<heap_stack>& memory_info, const space m_space, mt19937& rng) {
             off_t addr = 0;
 
             if (memory_info != nullptr)
@@ -104,9 +105,6 @@ namespace chaos
 
                 cout << "Stack: " << hex << memory_info->stack_start << "-" << memory_info->stack_end << " " <<
                     dec << memory_info->stack_end - memory_info->stack_start << endl;
-
-                const auto heap_size = memory_info->heap_end - memory_info->heap_start;
-                const auto stack_size = memory_info->stack_end - memory_info->stack_start;
 
                 switch (m_space) {
                     case heap:
@@ -127,12 +125,12 @@ namespace chaos
                         {
                             cout << "Choosing address from stack or heap." << endl;
                             // Randomly choose an address in heap or stack
-                            uniform_int_distribution<off_t> address_dist(0, heap_size + stack_size);
+                            uniform_int_distribution<off_t> address_dist(0, memory_info->heap_size + memory_info->stack_size);
                             const off_t rand_i = address_dist(rng);
 
-                            if (rand_i > heap_size)
+                            if (rand_i > memory_info->heap_size)
                             {
-                                addr = memory_info->stack_start - heap_size + rand_i;
+                                addr = memory_info->stack_start - memory_info->heap_size + rand_i;
                             }
                             else
                             {

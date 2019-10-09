@@ -34,7 +34,8 @@ namespace chaos
 
             while (process::is_child_running(pid))
             {
-                const auto interval = get_interval(pid);
+                const auto memory_info = memory::get_heap_and_stack_spaces(pid);
+                const auto interval = get_interval(memory_info);
                 const long current_ts = time::current_time_millis();
 
                 cerr << "Interval: " << interval << endl;
@@ -58,7 +59,7 @@ namespace chaos
 
                     if (n <= p_flip)
                     {
-                        flip_random_bit(pid);
+                        flip_random_bit(pid, memory_info);
                         last_flip = current_ts;
                     }
                 }
@@ -66,7 +67,7 @@ namespace chaos
                 {
                     if (current_ts - interval > last_flip)
                     {
-                        flip_random_bit(pid);
+                        flip_random_bit(pid, memory_info);
                         last_flip = current_ts;
                     }
                 }
@@ -76,23 +77,20 @@ namespace chaos
             return 0;
         }
 
-        long BitFlipper::get_interval(const pid_t pid) const
+        long BitFlipper::get_interval(const unique_ptr<memory::heap_stack>& memory_info) const
         {
-            const auto heap_stack = memory::get_heap_and_stack_spaces(pid);
-
             long mem_size;
 
             switch (inject_space_)
             {
             case memory::heap:
-                mem_size = heap_stack->heap_end - heap_stack->heap_start;
+                mem_size = memory_info->heap_size;
                 break;
             case memory::stack:
-                mem_size = heap_stack->stack_end - heap_stack->stack_start;
+                mem_size = memory_info->stack_size;
                 break;
             default:
-                mem_size = heap_stack->heap_end - heap_stack->heap_start + heap_stack->stack_end - heap_stack->
-                    stack_start;
+                mem_size = memory_info->heap_size + memory_info->stack_size;
                 break;
             }
 
@@ -102,9 +100,9 @@ namespace chaos
             return interval;
         }
 
-        int BitFlipper::flip_random_bit(const pid_t pid)
+        int BitFlipper::flip_random_bit(const pid_t pid, const unique_ptr<memory::heap_stack>& memory_info)
         {
-            const auto address = get_random_address(pid, inject_space_, rng_);
+            const auto address = get_random_address(memory_info, inject_space_, rng_);
 
             uniform_int_distribution<int> mask_dist(0, 7);
             const auto mask = 1 << mask_dist(rng_);
