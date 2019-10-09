@@ -2,6 +2,7 @@
 #include "args.hpp"
 #include "cxxopts.hpp"
 #include "flipper.hpp"
+#include "sticker.hpp"
 #include <random>
 
 using namespace std;
@@ -15,9 +16,9 @@ namespace chaos
             switch (fault_type)
             {
             case flip:
-                return unique_ptr<FaultInjector>(new flipper::BitFlipper(args, rng));
+                return unique_ptr<FaultInjector>(new BitFlipper(args, rng));
             case stuck:
-                return unique_ptr<FaultInjector>(new flipper::BitSticker(args, rng));
+                return unique_ptr<FaultInjector>(new BitSticker(args, rng));
             default:
                 return nullptr;
             }

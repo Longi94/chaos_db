@@ -1,17 +1,14 @@
 #pragma once
-#include "fault.hpp"
 #include <unistd.h>
-#include <memory>
 #include <random>
-#include <chrono>
+#include "fault.hpp"
 #include "cxxopts.hpp"
 
 namespace chaos
 {
-    namespace flipper
+    namespace fault
     {
-
-        class BitFlipper : public fault::FaultInjector
+        class BitFlipper : public FaultInjector
         {
         public:
             BitFlipper(cxxopts::ParseResult& args, std::mt19937& rng);
@@ -39,24 +36,5 @@ namespace chaos
              */
             int flip_random_bit(pid_t pid);
         };
-
-        class BitSticker : public fault::FaultInjector
-        {
-        public:
-            BitSticker(cxxopts::ParseResult& args, std::mt19937& rng);
-
-        private:
-            double stuck_rate_;
-
-        public:
-            int inject(pid_t pid) override;
-        };
-
-        /**
-         * Get the appropriate fault injector class.
-         * @param fault_type the type of the fault that needs to be injected
-         * @param rng random number generator used for randomly selecting an address
-         */
-        std::unique_ptr<fault::FaultInjector> get_injector(fault::fault_type fault_type, cxxopts::ParseResult& args, std::mt19937& rng);
     }
 }
