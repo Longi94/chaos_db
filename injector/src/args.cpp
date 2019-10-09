@@ -1,3 +1,4 @@
+#include "args.hpp"
 #include "cxxopts.hpp"
 #include "flipper.hpp"
 #include "memory.hpp"
