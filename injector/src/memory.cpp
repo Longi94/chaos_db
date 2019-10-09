@@ -143,5 +143,11 @@ namespace chaos
 
             return addr;
         }
+
+        bool is_in_memory(const off_t address, const std::unique_ptr<heap_stack>& memory_info)
+        {
+            return memory_info->heap_start <= address && address < memory_info->heap_end ||
+                memory_info->stack_start <= address && address < memory_info->heap_end;
+        }
     }
 }

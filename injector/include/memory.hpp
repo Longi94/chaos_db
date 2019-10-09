@@ -57,5 +57,13 @@ namespace chaos
          * @param rng random number generator
          */
         off_t get_random_address(const std::unique_ptr<heap_stack>& memory_info, space m_space, std::mt19937& rng);
+
+        /**
+         * Check if the address in the memory info.
+         * @param address virtual memory address
+         * @param memory_info memory info of the child process
+         * @return true if the address is in the memory space
+         */
+        inline bool is_in_memory(off_t address, const std::unique_ptr<heap_stack>& memory_info);
     }
 }
