@@ -147,6 +147,7 @@ namespace chaos
 
             process::detach(pid);
             delete[] byte;
+            fault_count_++;
             return 0;
         }
     }

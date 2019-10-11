@@ -59,6 +59,7 @@ namespace chaos
         void FaultInjector::print_data() const
         {
             process::print_process_status(process_status_);
+            cout << "FAULT_COUNT: " << fault_count_ << endl;
             cout << "MAX_HEAP_SIZE: " << max_heap_size_ << endl;
             cout << "MAX_STACK_SIZE: " << max_stack_size_ << endl;
         }

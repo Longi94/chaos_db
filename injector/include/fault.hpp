@@ -22,6 +22,7 @@ namespace chaos
             std::mt19937 rng_;
             memory::space inject_space_;
             int process_status_ = 0;
+            int fault_count_ = 0;
             long mean_runtime_;
             long max_heap_size_ = 0;
             long max_stack_size_ = 0;
