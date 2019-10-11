@@ -1,3 +1,4 @@
+#include "injector.hpp"
 #include "args.hpp"
 #include "fault.hpp"
 #include "process.hpp"
@@ -80,4 +81,9 @@ int main(const int argc, char* argv[])
     injector->print_data();
 
     return 0;
+}
+
+void inject(const char* input, const char* output)
+{
+    cout << input << " | " << output << endl;
 }
