@@ -36,15 +36,15 @@ namespace chaos
         pid_t execute(std::string& path, std::string& output, std::string& input, std::string& error, char** arguments);
 
         /**
-         * Wait for a process (using waitpid) and print out information about the process.
-         * @param pid process id
+         * Prints out information about process.
          */
-        void wait_exit_code(pid_t pid);
+        void print_process_status(int status);
 
         /**
          * Check if a child process is running.
          * @param pid process id
+         * @param status
          */ 
-        bool is_child_running(pid_t pid);
+        bool is_child_running(pid_t pid, int& status);
     }
 }

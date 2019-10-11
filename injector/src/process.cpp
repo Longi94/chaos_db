@@ -120,11 +120,8 @@ namespace chaos
             }
         }
 
-        void wait_exit_code(const pid_t pid)
+        void print_process_status(const int status)
         {
-            int status;
-            waitpid(pid, &status, 0);
-
             cout << "WIFEXITED: " << WIFEXITED(status) << endl;
             cout << "WEXITSTATUS: " << WEXITSTATUS(status) << endl;
             cout << "WIFSIGNALED: " << WIFSIGNALED(status) << endl;
@@ -134,9 +131,8 @@ namespace chaos
             cout << "WSTOPSIG: " << WSTOPSIG(status) << endl;
         }
 
-        bool is_child_running(const pid_t pid)
+        bool is_child_running(const pid_t pid, int& status)
         {
-            int status;
             const pid_t result = waitpid(pid, &status, WNOHANG);
             return result == 0;
         }

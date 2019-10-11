@@ -21,6 +21,7 @@ namespace chaos
         protected:
             std::mt19937 rng_;
             memory::space inject_space_;
+            int process_status_ = 0;
             long mean_runtime_;
             long max_heap_size_ = 0;
             long max_stack_size_ = 0;
@@ -29,9 +30,8 @@ namespace chaos
             /**
              * Inject the fault into the memory.
              * @param pid the id of the process whose memory will be tinkered with
-             * @param child_running
              */
-            virtual void inject(pid_t pid, std::atomic_bool& child_running);
+            virtual void inject(pid_t pid);
             void print_data() const;
         };
 

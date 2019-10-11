@@ -12,7 +12,7 @@ namespace chaos
             stuck_rate_ = args["stuck-rate"].as<double>();
         }
 
-        void BitSticker::inject(const pid_t pid, atomic_bool& child_running)
+        void BitSticker::inject(const pid_t pid)
         {
             // const auto byte = new int8_t[1];
             //

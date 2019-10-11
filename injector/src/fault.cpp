@@ -7,7 +7,6 @@
 #include <random>
 #include <chrono>
 #include <thread>
-#include <atomic>
 
 using namespace std;
 
@@ -43,11 +42,11 @@ namespace chaos
             }
         }
 
-        void FaultInjector::inject(const pid_t pid, atomic_bool& child_running)
+        void FaultInjector::inject(const pid_t pid)
         {
             const chrono::milliseconds sleep_clock(100);
             this_thread::sleep_for(sleep_clock);
-            while (child_running)
+            while (process::is_child_running(pid, process_status_))
             {
                 const auto memory_info = memory::get_heap_and_stack_spaces(pid);
 
@@ -59,6 +58,7 @@ namespace chaos
 
         void FaultInjector::print_data() const
         {
+            process::print_process_status(process_status_);
             cout << "MAX_HEAP_SIZE: " << max_heap_size_ << endl;
             cout << "MAX_STACK_SIZE: " << max_stack_size_ << endl;
         }

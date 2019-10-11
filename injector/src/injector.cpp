@@ -76,15 +76,7 @@ int main(const int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, error, command_args);
 
-    atomic_bool running(true);
-    thread inject_thread(&fault::FaultInjector::inject, injector.get(), pid, ref(running));
-
-    cout << "Waiting for process to finish..." << endl;
-    process::wait_exit_code(pid);
-
-    running = false;
-    inject_thread.join();
-
+    injector->inject(pid);
     injector->print_data();
 
     return 0;
