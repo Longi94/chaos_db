@@ -12,7 +12,7 @@ tar xvf ${DIR}/${POSTGRES_DIR}.tar.bz2 -C ${DIR}/
 
 mkdir ${DIR}/bin
 cd ${POSTGRES_DIR}
-./configure --prefix ${DIR}/bin/ --disable-strict --disable-cassert CFLAGS="-O3"
+./configure --prefix ${DIR}/bin/ --disable-debug --disable-cassert CFLAGS="-O3"
 make
 make install
 
