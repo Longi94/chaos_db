@@ -18,3 +18,5 @@ make
 make install
 
 rm -rf ${DIR}/${MONETDB_DIR}
+
+echo "user=monetdb\npassword=monetdb\n" > ~/.monetdb
