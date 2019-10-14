@@ -7,5 +7,3 @@ cd duckdb
 git checkout v${VERSION} -b v${VERSION}
 make
 cd ..
-mv duckdb/build/release bin
-rm -rf duckdb
