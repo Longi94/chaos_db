@@ -1,10 +1,15 @@
 #!/bin/bash
-ZIP_SOURCE=sqlite-amalgamation-3290000
 
-wget -O $ZIP_SOURCE.zip https://www.sqlite.org/2019/$ZIP_SOURCE.zip
-unzip $ZIP_SOURCE.zip
-mkdir bin
-gcc $ZIP_SOURCE/shell.c $ZIP_SOURCE/sqlite3.c -lpthread -ldl -o bin/sqlite3
+DIR=$(realpath $1)
+AMALG_VER=3290000
+ZIP_SOURCE=sqlite-amalgamation-${AMALG_VER}
 
-rm $ZIP_SOURCE.zip
-rm -rf $ZIP_SOURCE
+if [[ ! -f ${DIR}/${ZIP_SOURCE}.zip ]]; then
+    wget -O ${DIR}/${ZIP_SOURCE}.zip https://www.sqlite.org/2019/${ZIP_SOURCE}.zip
+fi
+
+unzip ${DIR}/${ZIP_SOURCE}.zip -d ${DIR}/
+mkdir ${DIR}/bin
+gcc ${DIR}/${ZIP_SOURCE}/shell.c ${DIR}/${ZIP_SOURCE}/sqlite3.c -lpthread -ldl -o bin/sqlite3
+
+rm -rf ${DIR}/${ZIP_SOURCE}
