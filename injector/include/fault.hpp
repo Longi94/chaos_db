@@ -4,8 +4,6 @@
 #include <random>
 #include "cxxopts.hpp"
 #include "memory.hpp"
-#include <atomic>
-#include <thread>
 
 namespace chaos
 {
