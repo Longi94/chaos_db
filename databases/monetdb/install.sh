@@ -1,5 +1,12 @@
 #!/bin/bash
 
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+[[ $# -ge 1 ]] || die "1 argument required, $# provided"
+
 DIR=$(realpath $1)
 MAIN_VERSION=Apr2019-SP1
 VERSION=11.33.11
