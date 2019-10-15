@@ -1,13 +1,10 @@
 #!/bin/bash
 
-TPCH_VERSION=2.18.0_rc2
-
-unzip tpc-h-tool.zip
-cp Makefile $TPCH_VERSION/dbgen/
-cd $TPCH_VERSION/dbgen/ || exit
+git clone https://github.com/gregrahn/tpch-kit
+cd tpch-kit/dbgen
 make
 ./dbgen -v -f -s 1
 
 cd ../..
 mkdir tables
-mv $TPCH_VERSION/dbgen/*.tbl tables/
+mv tpch-kit/dbgen/*.tbl tables/
