@@ -23,7 +23,6 @@ class SQLiteRunner(SqlRunner):
             output_file=os.path.join(self.directory, 'output.txt'),
             input_file='databases/sqlite/queries/{}.sql'.format(query),
             error_file=os.path.join(self.directory, 'stderr.txt'),
-            inject_delay=self.inject_delay,
             child_command=['databases/sqlite/bin/sqlite3', self.db_file],
             fault=self.fault,
             inject_space=self.inject_space,

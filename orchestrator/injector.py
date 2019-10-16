@@ -17,7 +17,7 @@ def check_injector():
         exit(1)
 
 
-def run_injector(output_file: str, input_file: Optional[str], error_file: Optional[str], inject_delay: Optional[int],
+def run_injector(output_file: str, input_file: Optional[str], error_file: Optional[str],
                  child_command: List[Any], fault: Optional[str], inject_space: Optional[str],
                  flip_rate: float, random_flip_rate: bool, mean_runtime: float) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file]
@@ -27,9 +27,6 @@ def run_injector(output_file: str, input_file: Optional[str], error_file: Option
 
     if input_file is not None:
         command.extend(['-e', error_file])
-
-    if inject_delay is not None:
-        command.extend(['-d', str(inject_delay)])
 
     if fault is not None:
         command.extend(['-f', fault])
