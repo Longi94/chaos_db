@@ -47,6 +47,6 @@ def run_injector(output_file: str, input_file: Optional[str], error_file: Option
     command.extend(child_command)
 
     log.info('Running command: ' + ' '.join(command))
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE)
 
     return p

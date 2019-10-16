@@ -22,7 +22,7 @@ class ProcessMonitor(object):
         self.term_sig = 0
 
     def monitor(self, process: Popen):
-        for line in iter(process.stdout.readline, b''):
+        for line in process.stdout:
             line = line.decode("utf-8").strip()
             log.info(line)
 
@@ -34,6 +34,8 @@ class ProcessMonitor(object):
                 self.signaled = line[13:] == '1'
             if line.startswith('WTERMSIG: '):
                 self.term_sig = int(line[10:])
+
+        log.info('Monitor done.')
 
     def start(self, query: int):
         self.query = query
