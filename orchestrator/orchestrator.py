@@ -102,6 +102,7 @@ if __name__ == '__main__':
             'term_sig',
             'runtime'
         ])
+        output_csv.flush()
 
         with ThreadPool(thread_count) as p:
             for result in p.imap(partial(run, args=args), range(args.iterations)):
@@ -114,3 +115,4 @@ if __name__ == '__main__':
                     result['term_sig'],
                     result['runtime']
                 ])
+                output_csv.flush()
