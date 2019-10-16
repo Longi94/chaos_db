@@ -8,12 +8,11 @@ log = logging.getLogger(__name__)
 
 
 class ProcessMonitor(object):
-    def __init__(self, directory: str, inject_delay: int):
+    def __init__(self, directory: str):
         self.directory = directory
         self.query = None
         self.start_time = None
         self.end_time = None
-        self.inject_delay = inject_delay
         self.result = None
 
         # process completion status
@@ -51,7 +50,6 @@ class ProcessMonitor(object):
         return {
             'runtime': self.end_time - self.start_time,
             'return_code': self.return_code,
-            'inject_delay': self.inject_delay,
             'result': self.result,
             'exited': self.exited,
             'signaled': self.signaled,

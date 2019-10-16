@@ -20,11 +20,8 @@ def run(iteration: int, args: argparse.Namespace) -> Dict:
     iteration_dir = os.path.join(args.working_directory, str(iteration))
     os.makedirs(iteration_dir, exist_ok=True)
 
-    inject_delay = None
-    if args.fault is not None:
-        inject_delay = int(random.uniform(0.0, args.mean_runtime * 0.75) * 1000)
-    runner = get_runner(args.database, iteration_dir, inject_delay, args)
-    monitor = get_monitor(args.database, iteration_dir, inject_delay)
+    runner = get_runner(args.database, iteration_dir, args)
+    monitor = get_monitor(args.database, iteration_dir)
 
     runner.init_db()
     try:
@@ -103,8 +100,7 @@ if __name__ == '__main__':
             'return_code',
             'signaled',
             'term_sig',
-            'runtime',
-            'inject_delay'
+            'runtime'
         ])
 
         with ThreadPool(thread_count) as p:
@@ -116,6 +112,5 @@ if __name__ == '__main__':
                     result['return_code'],
                     result['signaled'],
                     result['term_sig'],
-                    result['runtime'],
-                    result['inject_delay'],
+                    result['runtime']
                 ])

@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 
 
 class SQLiteRunner(SqlRunner):
-    def __init__(self, directory: str, inject_delay: int, args: argparse.Namespace):
-        super(SQLiteRunner, self).__init__(directory, inject_delay, args)
+    def __init__(self, directory: str, args: argparse.Namespace):
+        super(SQLiteRunner, self).__init__(directory, args)
         self.db_file = os.path.join(directory, 'db.sqlite')
 
     def init_db(self):
