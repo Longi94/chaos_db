@@ -19,7 +19,7 @@ def check_injector():
 
 def run_injector(output_file: str, input_file: Optional[str], error_file: Optional[str], inject_delay: Optional[int],
                  child_command: List[Any], fault: Optional[str], inject_space: Optional[str],
-                 flip_rate: float, random_flip_rate: bool) -> subprocess.Popen:
+                 flip_rate: float, random_flip_rate: bool, mean_runtime: float) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file]
 
     if input_file is not None:
@@ -39,6 +39,9 @@ def run_injector(output_file: str, input_file: Optional[str], error_file: Option
 
     if flip_rate is not None:
         command.extend(['--flip-rate', str(flip_rate)])
+
+    if mean_runtime is not None:
+        command.extend(['--mean-runtime', str(mean_runtime)])
 
     if random_flip_rate:
         command.append('--random-flip-rate')

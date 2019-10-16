@@ -20,15 +20,15 @@ class SQLiteRunner(SqlRunner):
 
     def run_tpch(self, query: int):
         self.process = run_injector(
-            os.path.join(self.directory, 'output.txt'),
-            'databases/sqlite/queries/{}.sql'.format(query),
-            os.path.join(self.directory, 'stderr.txt'),
-            self.inject_delay,
-            ['databases/sqlite/bin/sqlite3', self.db_file],
-            self.fault,
-            self.inject_space,
-            self.flip_rate,
-            self.random_flip_rate
+            output_file=os.path.join(self.directory, 'output.txt'),
+            input_file='databases/sqlite/queries/{}.sql'.format(query),
+            error_file=os.path.join(self.directory, 'stderr.txt'),
+            inject_delay=self.inject_delay,
+            child_command=['databases/sqlite/bin/sqlite3', self.db_file],
+            fault=self.fault,
+            inject_space=self.inject_space,
+            flip_rate=self.flip_rate,
+            random_flip_rate=self.random_flip_rate
         )
 
     def clean(self):
