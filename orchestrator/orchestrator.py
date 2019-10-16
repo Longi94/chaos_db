@@ -51,9 +51,9 @@ if __name__ == '__main__':
     parser.add_argument('-q', '--query', dest='tpc_h', type=int, required=True, help='The TPC-H query to run')
     parser.add_argument('-d', '--database', type=str, choices=[DB_SQLITE], required=True,
                         help='Database to run the experiment on')
-    parser.add_argument('-m', '--mean-runtime', dest='mean_runtime', type=float, required=False,
-                        help='The expected run time of the query, the time of the bit flip injection (which is random) '
-                             'depends on this. Required if --flip is set.')
+    parser.add_argument('-m', '--mean-runtime', dest='mean_runtime', type=int, required=False,
+                        help='The expected run time of the query in milliseconds, the time of the bit flip injection '
+                             '(which is random) depends on this. Required if --flip is set.')
     parser.add_argument('-f', '--fault', type=str, choices=['flip', 'stuck'],
                         help='The type of fault to inject.')
     parser.add_argument('-fr', '--flip-rate', type=float, dest='flip_rate',
