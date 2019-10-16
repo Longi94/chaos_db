@@ -1,5 +1,6 @@
 import os
 import logging
+import argparse
 from shutil import copyfile
 from injector import run_injector
 from .runner import SqlRunner
@@ -8,8 +9,8 @@ log = logging.getLogger(__name__)
 
 
 class SQLiteRunner(SqlRunner):
-    def __init__(self, directory: str, inject_delay: int, fault: str, inject_space: str):
-        super(SQLiteRunner, self).__init__(directory, inject_delay, fault, inject_space)
+    def __init__(self, directory: str, inject_delay: int, args: argparse.Namespace):
+        super(SQLiteRunner, self).__init__(directory, inject_delay, args)
         self.db_file = os.path.join(directory, 'db.sqlite')
 
     def init_db(self):
@@ -25,7 +26,9 @@ class SQLiteRunner(SqlRunner):
             self.inject_delay,
             ['databases/sqlite/bin/sqlite3', self.db_file],
             self.fault,
-            self.inject_space
+            self.inject_space,
+            self.flip_rate,
+            self.random_flip_rate
         )
 
     def clean(self):

@@ -1,9 +1,14 @@
+import argparse
+
+
 class SqlRunner(object):
-    def __init__(self, directory: str, inject_delay: int, fault: str, inject_space: str):
+    def __init__(self, directory: str, inject_delay: int, args: argparse.Namespace):
         self.directory = directory
         self.inject_delay = inject_delay
-        self.fault = fault
-        self.inject_space = inject_space
+        self.fault = args.fault
+        self.inject_space = args.inject_space
+        self.flip_rate = args.flip_rate
+        self.random_flip_rate = args.random_flip_rate
         self.process = None
 
     def init_db(self):
