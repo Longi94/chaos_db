@@ -43,7 +43,7 @@ namespace chaos
                 const auto interval = get_interval(memory_info);
                 const long current_ts = time::current_time_millis();
 
-                cerr << "Interval: " << interval << endl;
+                // cerr << "Interval: " << interval << endl;
 
                 if (random_flip_frequency_)
                 {
@@ -53,14 +53,14 @@ namespace chaos
                     {
                         // there were no flips yet, give a probability boost to inject a flip at least once
                         // the boost increases over time, P will reach 1 once the current run-time reaches 3/4 of the mean runtime
-                        cerr << "Increasing probability of a flip" << endl;
+                        // cerr << "Increasing probability of a flip" << endl;
                         p_flip += (1.0 - p_flip) * (static_cast<double>(current_ts - start_ts) / (mean_runtime_ * 0.75));
                     }
 
-                    cerr << "Flip probability: " << p_flip << endl;
+                    // cerr << "Flip probability: " << p_flip << endl;
 
                     const auto n = flip_p_dist(rng_);
-                    cerr << "Generated number: " << n << endl;
+                    // cerr << "Generated number: " << n << endl;
 
                     if (n <= p_flip)
                     {
@@ -98,7 +98,7 @@ namespace chaos
                 break;
             }
 
-            cerr << "Mem size: " << mem_size << " bytes" << endl;
+            // cerr << "Mem size: " << mem_size << " bytes" << endl;
 
             const long interval = 1000000000 / (static_cast<double>(mem_size) * flip_rate_);
             return interval;
