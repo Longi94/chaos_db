@@ -100,12 +100,15 @@ if __name__ == '__main__':
             'return_code',
             'signaled',
             'term_sig',
-            'runtime'
+            'runtime',
+            'fault_count',
+            'max_heap_size',
+            'max_stack_size'
         ])
         output_csv.flush()
 
         with ThreadPool(thread_count) as p:
-            for result in p.imap(partial(run, args=args), range(args.iterations)):
+            for result in p.imap_unordered(partial(run, args=args), range(args.iterations)):
                 writer.writerow([
                     result['iteration'],
                     result['result'],
@@ -113,6 +116,9 @@ if __name__ == '__main__':
                     result['return_code'],
                     result['signaled'],
                     result['term_sig'],
-                    result['runtime']
+                    result['runtime'],
+                    result['fault_count'],
+                    result['max_heap_size'],
+                    result['max_stack_size']
                 ])
                 output_csv.flush()

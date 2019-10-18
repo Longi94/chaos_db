@@ -20,20 +20,32 @@ class ProcessMonitor(object):
         self.return_code = 0
         self.signaled = False
         self.term_sig = 0
+        self.max_heap_size = 0
+        self.max_stack_size = 0
+        self.fault_count = 0
 
     def monitor(self, process: Popen):
+        def get_val(line: str):
+            return line.split(':')[1].strip()
+
         for line in process.stdout:
             line = line.decode("utf-8").strip()
             log.info(line)
 
             if line.startswith('WIFEXITED: '):
-                self.exited = line[11:] == '1'
+                self.exited = get_val(line) == '1'
             if line.startswith('WEXITSTATUS: '):
-                self.return_code = int(line[13:])
+                self.return_code = int(get_val(line))
             if line.startswith('WIFSIGNALED: '):
-                self.signaled = line[13:] == '1'
+                self.signaled = get_val(line) == '1'
             if line.startswith('WTERMSIG: '):
-                self.term_sig = int(line[10:])
+                self.term_sig = int(get_val(line))
+            if line.startswith('MAX_HEAP_SIZE: '):
+                self.max_heap_size = int(get_val(line))
+            if line.startswith('MAX_STACK_SIZE: '):
+                self.max_stack_size = int(get_val(line))
+            if line.startswith('FAULT_COUNT: '):
+                self.fault_count = int(get_val(line))
 
         log.info('Monitor done.')
 
@@ -56,6 +68,9 @@ class ProcessMonitor(object):
             'exited': self.exited,
             'signaled': self.signaled,
             'term_sig': self.term_sig,
+            'max_heap_size': self.max_heap_size,
+            'max_stack_size': self.max_stack_size,
+            'fault_count': self.fault_count,
         }
 
     def compare_files(self, file1: str, file2: str) -> bool:
