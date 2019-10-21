@@ -41,6 +41,13 @@ namespace chaos
                 max_stack_size_ = max(max_stack_size_, memory_info->stack_size);
 
                 const auto interval = get_interval(memory_info);
+
+                if (interval == -1)
+                {
+                    // happens when due to the child process dying during parsing the maps file a race condition occurs
+                    return;
+                }
+
                 const long current_ts = time::current_time_millis();
 
                 // cerr << "Interval: " << interval << endl;
@@ -99,6 +106,10 @@ namespace chaos
             }
 
             // cerr << "Mem size: " << mem_size << " bytes" << endl;
+            if (mem_size == 0)
+            {
+                return -1;
+            }
 
             const long interval = 1000000000 / (static_cast<double>(mem_size) * flip_rate_);
             return interval;

@@ -72,19 +72,22 @@ namespace chaos
 
             //iterate over areas
             procmaps_struct* map;
+            procmaps_struct* previous = nullptr;
             unique_ptr<heap_stack> result(new heap_stack());
 
-            while ((map = pmparser_next(maps)) != nullptr)
+            while ((map = pmparser_next(maps)) != nullptr && previous != map)
             {
                 if (strcmp(map->pathname, "[heap]") == 0)
                 {
                     result->heap_start = reinterpret_cast<off_t>(map->addr_start);
                     result->heap_end = reinterpret_cast<off_t>(map->addr_end);
-                } else if (strcmp(map->pathname, "[stack]") == 0)
+                }
+                else if (strcmp(map->pathname, "[stack]") == 0)
                 {
                     result->stack_start = reinterpret_cast<off_t>(map->addr_start);
                     result->stack_end = reinterpret_cast<off_t>(map->addr_end);
                 }
+                previous = map;
             }
 
             result->heap_size = result->heap_end - result->heap_start;
