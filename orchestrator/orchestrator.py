@@ -2,6 +2,7 @@ import argparse
 import logging
 import csv
 import os
+import time
 from typing import Dict
 from multiprocessing.pool import ThreadPool
 from functools import partial
@@ -89,6 +90,8 @@ if __name__ == '__main__':
     thread_count = max(1, args.threads)
     log.info(f'Running on {thread_count} threads')
 
+    start_ts = time.time()
+
     with open(os.path.join(args.working_directory, 'results.csv'), mode='w', buffering=1) as output_csv:
         writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
@@ -119,3 +122,9 @@ if __name__ == '__main__':
                     result['max_heap_size'],
                     result['max_stack_size']
                 ])
+
+    end_ts = time.time()
+
+    hours, remainder = divmod(end_ts, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    log.info('Finished in {:02}:{:02}:{:02}'.format(hours, minutes, seconds))
