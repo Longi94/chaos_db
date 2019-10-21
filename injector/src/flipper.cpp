@@ -45,7 +45,8 @@ namespace chaos
                 if (interval == -1)
                 {
                     // happens when due to the child process dying during parsing the maps file a race condition occurs
-                    return;
+                    this_thread::sleep_for(sleep_clock);
+                    continue;
                 }
 
                 const long current_ts = time::current_time_millis();

@@ -112,10 +112,12 @@ procmaps_struct* pmparser_next(procmaps_iterator* p_procmaps_it) {
 void pmparser_free(procmaps_iterator* p_procmaps_it) {
     procmaps_struct* maps_list = p_procmaps_it->head;
     if (maps_list == NULL) return;
+    procmaps_struct* prev = NULL;
     procmaps_struct* act = maps_list;
     procmaps_struct* nxt = act->next;
-    while (act != NULL) {
+    while (act != NULL && act != prev) {
         free(act);
+        prev = act;
         act = nxt;
         if (nxt != NULL)
             nxt = nxt->next;
