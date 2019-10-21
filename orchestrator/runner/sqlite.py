@@ -19,17 +19,19 @@ class SQLiteRunner(SqlRunner):
         copyfile('databases/sqlite/tpc-h.sqlite', self.db_file)
 
     def run_tpch(self, query: int):
-        self.process = run_injector(
-            output_file=os.path.join(self.directory, 'output.txt'),
-            input_file='databases/sqlite/queries/{}.sql'.format(query),
-            error_file=os.path.join(self.directory, 'stderr.txt'),
-            child_command=['databases/sqlite/bin/sqlite3', self.db_file],
-            fault=self.fault,
-            inject_space=self.inject_space,
-            flip_rate=self.flip_rate,
-            random_flip_rate=self.random_flip_rate,
-            mean_runtime=self.mean_runtime
-        )
+        with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
+            self.process = run_injector(
+                output_file=os.path.join(self.directory, 'output.txt'),
+                input_file='databases/sqlite/queries/{}.sql'.format(query),
+                error_file=os.path.join(self.directory, 'stderr.txt'),
+                child_command=['databases/sqlite/bin/sqlite3', self.db_file],
+                fault=self.fault,
+                inject_space=self.inject_space,
+                flip_rate=self.flip_rate,
+                random_flip_rate=self.random_flip_rate,
+                mean_runtime=self.mean_runtime,
+                inject_stderr=f
+            )
 
     def clean(self):
         if os.path.exists(self.db_file):
