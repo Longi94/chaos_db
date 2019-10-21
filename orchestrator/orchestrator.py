@@ -1,6 +1,5 @@
 import argparse
 import logging
-import random
 import csv
 import os
 from typing import Dict
@@ -90,7 +89,7 @@ if __name__ == '__main__':
     thread_count = max(1, args.threads)
     log.info(f'Running on {thread_count} threads')
 
-    with open(os.path.join(args.working_directory, 'results.csv'), mode='w') as output_csv:
+    with open(os.path.join(args.working_directory, 'results.csv'), mode='w', buffering=1) as output_csv:
         writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         writer.writerow([
@@ -105,7 +104,6 @@ if __name__ == '__main__':
             'max_heap_size',
             'max_stack_size'
         ])
-        output_csv.flush()
 
         with ThreadPool(thread_count) as p:
             for result in p.imap_unordered(partial(run, args=args), range(args.iterations)):
@@ -121,4 +119,3 @@ if __name__ == '__main__':
                     result['max_heap_size'],
                     result['max_stack_size']
                 ])
-                output_csv.flush()
