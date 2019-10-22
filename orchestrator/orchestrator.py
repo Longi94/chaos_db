@@ -12,6 +12,7 @@ from monitor import get_monitor
 from runner import get_runner
 from queries import *
 from fault_type import *
+from util import get_hostname
 
 log = logging.getLogger(__name__)
 
@@ -125,12 +126,14 @@ if __name__ == '__main__':
 
     results_file = os.path.join(experiment_dir, 'results.csv')
     resumed = os.path.exists(results_file)
+    hostname = get_hostname()
 
     with open(results_file, mode=('a' if resumed else 'w'), buffering=1) as output_csv:
         writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         if not resumed:
             writer.writerow([
+                'hostname',
                 'iteration',
                 'result',
                 'exited',
@@ -148,6 +151,7 @@ if __name__ == '__main__':
                                            range(args.iterations)):
                 if result is not None:
                     writer.writerow([
+                        hostname,
                         result['iteration'],
                         result['result'],
                         result['exited'],
