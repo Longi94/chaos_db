@@ -103,30 +103,30 @@ namespace chaos
 
             if (memory_info != nullptr)
             {
-                cout << "Heap: " << hex << memory_info->heap_start << "-" << memory_info->heap_end << " " <<
-                    dec << memory_info->heap_end - memory_info->heap_start << endl;
-
-                cout << "Stack: " << hex << memory_info->stack_start << "-" << memory_info->stack_end << " " <<
-                    dec << memory_info->stack_end - memory_info->stack_start << endl;
+                // cout << "Heap: " << hex << memory_info->heap_start << "-" << memory_info->heap_end << " " <<
+                //     dec << memory_info->heap_end - memory_info->heap_start << endl;
+                //
+                // cout << "Stack: " << hex << memory_info->stack_start << "-" << memory_info->stack_end << " " <<
+                //     dec << memory_info->stack_end - memory_info->stack_start << endl;
 
                 switch (m_space) {
                     case heap:
                         {
-                            cout << "Choosing address from heap." << endl;
+                            // cout << "Choosing address from heap." << endl;
                             uniform_int_distribution<off_t> address_dist(memory_info->heap_start, memory_info->heap_end);
                             addr = address_dist(rng);
                             break;
                         }
                     case stack:
                         {
-                            cout << "Choosing address from stack." << endl;
+                            // cout << "Choosing address from stack." << endl;
                             uniform_int_distribution<off_t> address_dist(memory_info->stack_start, memory_info->stack_end);
                             addr = address_dist(rng);
                             break;
                         }
                     default:
                         {
-                            cout << "Choosing address from stack or heap." << endl;
+                            // cout << "Choosing address from stack or heap." << endl;
                             // Randomly choose an address in heap or stack
                             uniform_int_distribution<off_t> address_dist(0, memory_info->heap_size + memory_info->stack_size);
                             const off_t rand_i = address_dist(rng);
@@ -147,7 +147,7 @@ namespace chaos
             return addr;
         }
 
-        bool is_in_memory(const off_t address, const std::unique_ptr<heap_stack>& memory_info)
+        bool is_in_memory(const off_t address, const unique_ptr<heap_stack>& memory_info)
         {
             return memory_info->heap_start <= address && address < memory_info->heap_end ||
                 memory_info->stack_start <= address && address < memory_info->heap_end;
