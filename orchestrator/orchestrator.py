@@ -10,23 +10,33 @@ from injector import check_injector
 from db import *
 from monitor import get_monitor
 from runner import get_runner
+from queries import *
+from fault_type import *
 
 log = logging.getLogger(__name__)
 
 
-def run(iteration: int, args: argparse.Namespace) -> Dict:
+def run(iteration: int, args: argparse.Namespace, experiment_dir: str) -> Dict or None:
     log.info('Iteration ' + str(iteration))
 
-    iteration_dir = os.path.join(args.working_directory, str(iteration))
-    os.makedirs(iteration_dir, exist_ok=True)
+    iteration_dir = os.path.join(experiment_dir, str(iteration))
+
+    if os.path.exists(iteration_dir):
+        if os.path.exists(os.path.join(iteration_dir, 'output.txt')) and \
+                os.path.exists(os.path.join(iteration_dir, 'stderr.txt')) and \
+                os.path.exists(os.path.join(iteration_dir, 'inject_stderr.txt')):
+            log.info('Skipping iteration ' + str(iteration))
+            return None
+    else:
+        os.makedirs(iteration_dir, exist_ok=True)
 
     runner = get_runner(args.database, iteration_dir, args)
     monitor = get_monitor(args.database, iteration_dir)
 
     runner.init_db()
     try:
-        monitor.start(args.tpc_h)
-        runner.run_tpch(args.tpc_h)
+        monitor.start(args.query)
+        runner.run_query(args.query)
         monitor.monitor(runner.process)
         runner.process.wait()
     except Exception as e:
@@ -41,19 +51,35 @@ def run(iteration: int, args: argparse.Namespace) -> Dict:
     return result
 
 
+def get_dir_name(args: argparse.Namespace) -> str:
+    name = f'{args.database}_{args.query}_{args.iterations}'
+
+    if args.fault is not None:
+        name += f'_{args.fault}'
+
+    if args.fault == FAULT_BIT_FLIP:
+        name += f'_{args.flip_rate}'
+
+        if args.random_flip_rate:
+            name += '_randomized'
+
+    return name
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--iterations', type=int, default=1, required=False,
                         help='Number of times to run the experiment')
-    parser.add_argument('-q', '--query', dest='tpc_h', type=int, required=True, help='The TPC-H query to run')
+    parser.add_argument('-q', '--query', choices=[TPCH1, TPCH3, INSERTS, UPDATES], type=str, required=True,
+                        help='The TPC-H query to run')
     parser.add_argument('-d', '--database', type=str, choices=[DB_SQLITE], required=True,
                         help='Database to run the experiment on')
     parser.add_argument('-m', '--mean-runtime', dest='mean_runtime', type=int, required=False,
                         help='The expected run time of the query in milliseconds, the time of the bit flip injection '
                              '(which is random) depends on this. Required if --flip is set.')
-    parser.add_argument('-f', '--fault', type=str, choices=['flip', 'stuck'],
+    parser.add_argument('-f', '--fault', type=str, choices=[FAULT_BIT_FLIP, FAULT_STUCK_BIT],
                         help='The type of fault to inject.')
-    parser.add_argument('-fr', '--flip-rate', type=float, dest='flip_rate',
+    parser.add_argument('-fr', '--flip-rate', type=float, dest='flip_rate', default=1.0,
                         help='Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is '
                              '"flip".')
     parser.add_argument('-rfr', '--random-flip-rate', default=False, action='store_true', dest='random_flip_rate',
@@ -77,54 +103,65 @@ if __name__ == '__main__':
     if args.fault is not None:
         check_injector()
 
-    os.makedirs(args.working_directory, exist_ok=True)
+    experiment_dir = get_dir_name(args)
+    experiment_dir = os.path.join(args.working_directory, experiment_dir)
 
-    log_file = os.path.join(args.working_directory, 'experiment.log')
+    iteration_list = set(range(args.iterations))
+
+    os.makedirs(experiment_dir, exist_ok=True)
+
+    log_file = os.path.join(experiment_dir, 'experiment.log')
     logging.basicConfig(level=logging.DEBUG,
                         handlers=[logging.StreamHandler(), logging.FileHandler(log_file, mode='w')],
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
     log.info('DB type: ' + args.database)
-    log.info('Putting everything into ' + args.working_directory)
+    log.info('Putting everything into ' + experiment_dir)
 
     thread_count = max(1, args.threads)
     log.info(f'Running on {thread_count} threads')
 
     start_ts = time.time()
 
-    with open(os.path.join(args.working_directory, 'results.csv'), mode='w', buffering=1) as output_csv:
+    results_file = os.path.join(experiment_dir, 'results.csv')
+    resumed = os.path.exists(results_file)
+
+    with open(results_file, mode=('a' if resumed else 'w'), buffering=1) as output_csv:
         writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        writer.writerow([
-            'iteration',
-            'result',
-            'exited',
-            'return_code',
-            'signaled',
-            'term_sig',
-            'runtime',
-            'fault_count',
-            'max_heap_size',
-            'max_stack_size'
-        ])
+        if not resumed:
+            writer.writerow([
+                'iteration',
+                'result',
+                'exited',
+                'return_code',
+                'signaled',
+                'term_sig',
+                'runtime',
+                'fault_count',
+                'max_heap_size',
+                'max_stack_size'
+            ])
 
         with ThreadPool(thread_count) as p:
-            for result in p.imap_unordered(partial(run, args=args), range(args.iterations)):
-                writer.writerow([
-                    result['iteration'],
-                    result['result'],
-                    result['exited'],
-                    result['return_code'],
-                    result['signaled'],
-                    result['term_sig'],
-                    result['runtime'],
-                    result['fault_count'],
-                    result['max_heap_size'],
-                    result['max_stack_size']
-                ])
+            for result in p.imap_unordered(partial(run, args=args, experiment_dir=experiment_dir),
+                                           range(args.iterations)):
+                if result is not None:
+                    writer.writerow([
+                        result['iteration'],
+                        result['result'],
+                        result['exited'],
+                        result['return_code'],
+                        result['signaled'],
+                        result['term_sig'],
+                        result['runtime'],
+                        result['fault_count'],
+                        result['max_heap_size'],
+                        result['max_stack_size']
+                    ])
 
     end_ts = time.time()
 
-    hours, remainder = divmod(end_ts, 3600)
+    hours, remainder = divmod(end_ts - start_ts, 3600)
     minutes, seconds = divmod(remainder, 60)
-    log.info('Finished in {:02}:{:02}:{:02}'.format(hours, minutes, seconds))
+    log.info('Finished in {:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds)))

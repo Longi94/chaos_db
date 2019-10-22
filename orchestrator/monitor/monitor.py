@@ -49,7 +49,7 @@ class ProcessMonitor(object):
 
         log.info('Monitor done.')
 
-    def start(self, query: int):
+    def start(self, query: str):
         self.query = query
         self.start_time = time()
 

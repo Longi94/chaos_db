@@ -17,7 +17,7 @@ class SqlRunner(object):
         """
         raise NotImplementedError()
 
-    def run_tpch(self, query: int):
+    def run_query(self, query: int):
         """
         Run a TPC-H query.
 

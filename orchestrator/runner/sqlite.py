@@ -4,6 +4,7 @@ import argparse
 from shutil import copyfile
 from injector import run_injector
 from .runner import SqlRunner
+from queries import *
 
 log = logging.getLogger(__name__)
 
@@ -18,11 +19,21 @@ class SQLiteRunner(SqlRunner):
         log.info('Temp file name: ' + self.db_file)
         copyfile('databases/sqlite/tpc-h.sqlite', self.db_file)
 
-    def run_tpch(self, query: int):
+    def run_query(self, query: int):
+        query_file = None
+
+        if query == TPCH1:
+            query_file = 'databases/sqlite/queries/1.sql'
+        elif query == TPCH3:
+            query_file = 'databases/sqlite/queries/3.sql'
+
+        if query_file is None:
+            raise NameError(f'Unknown query: {query}')
+
         with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
             self.process = run_injector(
                 output_file=os.path.join(self.directory, 'output.txt'),
-                input_file='databases/sqlite/queries/{}.sql'.format(query),
+                input_file=query_file,
                 error_file=os.path.join(self.directory, 'stderr.txt'),
                 child_command=['databases/sqlite/bin/sqlite3', self.db_file],
                 fault=self.fault,
