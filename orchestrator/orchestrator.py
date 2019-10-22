@@ -1,13 +1,12 @@
 import argparse
 import logging
-import csv
 import os
 import time
-from typing import Dict
+from typing import Dict, Set
 from multiprocessing.pool import ThreadPool
 from functools import partial
 from injector import check_injector
-from db import *
+from db import DB_SQLITE, ResultsDatabase
 from monitor import get_monitor
 from runner import get_runner
 from queries import *
@@ -17,19 +16,15 @@ from util import get_hostname
 log = logging.getLogger(__name__)
 
 
-def run(iteration: int, args: argparse.Namespace, experiment_dir: str) -> Dict or None:
+def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_iters: Set[int]) -> Dict or None:
     log.info('Iteration ' + str(iteration))
 
-    iteration_dir = os.path.join(experiment_dir, str(iteration))
+    if iteration in existing_iters:
+        log.info('Skipping iteration ' + str(iteration))
+        return
 
-    if os.path.exists(iteration_dir):
-        if os.path.exists(os.path.join(iteration_dir, 'output.txt')) and \
-                os.path.exists(os.path.join(iteration_dir, 'stderr.txt')) and \
-                os.path.exists(os.path.join(iteration_dir, 'inject_stderr.txt')):
-            log.info('Skipping iteration ' + str(iteration))
-            return None
-    else:
-        os.makedirs(iteration_dir, exist_ok=True)
+    iteration_dir = os.path.join(experiment_dir, str(iteration))
+    os.makedirs(iteration_dir, exist_ok=True)
 
     runner = get_runner(args.database, iteration_dir, args)
     monitor = get_monitor(args.database, iteration_dir)
@@ -107,9 +102,10 @@ if __name__ == '__main__':
     experiment_dir = get_dir_name(args)
     experiment_dir = os.path.join(args.working_directory, experiment_dir)
 
-    iteration_list = set(range(args.iterations))
-
     os.makedirs(experiment_dir, exist_ok=True)
+
+    db = ResultsDatabase(os.path.join(experiment_dir, 'results.sqlite'))
+    existing = db.get_iterations()
 
     log_file = os.path.join(experiment_dir, 'experiment.log')
     logging.basicConfig(level=logging.DEBUG,
@@ -128,41 +124,26 @@ if __name__ == '__main__':
     resumed = os.path.exists(results_file)
     hostname = get_hostname()
 
-    with open(results_file, mode=('a' if resumed else 'w'), buffering=1) as output_csv:
-        writer = csv.writer(output_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    with ThreadPool(thread_count) as p:
+        for result in p.imap_unordered(partial(run, args=args, experiment_dir=experiment_dir,
+                                               existing_iters=existing),
+                                       range(args.iterations)):
+            if result is not None:
+                db.insert_result((
+                    result['iteration'],
+                    hostname,
+                    result['result'],
+                    result['exited'],
+                    result['return_code'],
+                    result['signaled'],
+                    result['term_sig'],
+                    result['runtime'],
+                    result['fault_count'],
+                    result['max_heap_size'],
+                    result['max_stack_size']
+                ))
 
-        if not resumed:
-            writer.writerow([
-                'hostname',
-                'iteration',
-                'result',
-                'exited',
-                'return_code',
-                'signaled',
-                'term_sig',
-                'runtime',
-                'fault_count',
-                'max_heap_size',
-                'max_stack_size'
-            ])
-
-        with ThreadPool(thread_count) as p:
-            for result in p.imap_unordered(partial(run, args=args, experiment_dir=experiment_dir),
-                                           range(args.iterations)):
-                if result is not None:
-                    writer.writerow([
-                        hostname,
-                        result['iteration'],
-                        result['result'],
-                        result['exited'],
-                        result['return_code'],
-                        result['signaled'],
-                        result['term_sig'],
-                        result['runtime'],
-                        result['fault_count'],
-                        result['max_heap_size'],
-                        result['max_stack_size']
-                    ])
+    db.close()
 
     end_ts = time.time()
 
