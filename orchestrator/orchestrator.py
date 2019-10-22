@@ -96,8 +96,7 @@ if __name__ == '__main__':
     if args.fault == 'flip' and args.flip_rate is None:
         parser.error('--flip-rate is required when --fault is set to flip')
 
-    if args.fault is not None:
-        check_injector()
+    check_injector()
 
     experiment_dir = get_dir_name(args)
     experiment_dir = os.path.join(args.working_directory, experiment_dir)
