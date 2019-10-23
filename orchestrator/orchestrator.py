@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_iters: Set[int]) -> Dict or None:
     log.info('Iteration ' + str(iteration))
+    print('Iteration ' + str(iteration))
 
     if iteration in existing_iters:
         log.info('Skipping iteration ' + str(iteration))
@@ -109,7 +110,7 @@ if __name__ == '__main__':
 
     log_file = os.path.join(experiment_dir, 'experiment.log')
     logging.basicConfig(level=logging.DEBUG,
-                        handlers=[logging.StreamHandler(), logging.FileHandler(log_file, mode='w')],
+                        handlers=[logging.FileHandler(log_file, mode='w')],
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
     log.info('DB type: ' + args.database)
