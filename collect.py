@@ -21,7 +21,8 @@ process.wait()
 
 files = sorted(os.listdir(TEMP_DIR))
 
-conn = sqlite3.connect(os.path.join(TEMP_DIR, files[0]))
+combined_file = os.path.join(TEMP_DIR, files[0])
+conn = sqlite3.connect(combined_file)
 
 for db in files[1:]:
     print(f'Merging {db}...')
@@ -33,5 +34,5 @@ for db in files[1:]:
     conn.execute('DETACH DATABASE dba')
 
 conn.close()
-shutil.copy(files[0], args.output)
+shutil.copy(combined_file, args.output)
 shutil.rmtree('result-tables')
