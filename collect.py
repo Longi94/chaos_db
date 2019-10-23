@@ -16,7 +16,7 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 result_path = os.path.join(args.path, 'results.sqlite')
 
-process = subprocess.Popen(f'clush -v -w {args.nodes} --rcopy {result_path} --dest result-tables/')
+process = subprocess.Popen(['clush -v', '-w', args.nodes, '--rcopy', result_path, '--dest', 'result-tables/'])
 process.wait()
 
 files = sorted(os.listdir(TEMP_DIR))
