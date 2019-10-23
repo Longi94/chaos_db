@@ -11,7 +11,7 @@ class ResultsDatabase(object):
         cursor = self.connection.cursor()
         cursor.execute(
             '''CREATE TABLE IF NOT EXISTS result (
-                   iteration      INTEGER PRIMARY KEY,
+                   iteration      INTEGER NOT NULL,
                    hostname       TEXT    NOT NULL,
                    result         INTEGER NOT NULL,
                    exited         INTEGER NOT NULL,
