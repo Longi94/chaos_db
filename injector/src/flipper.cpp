@@ -176,7 +176,7 @@ namespace chaos
                 cout << "Injected flip: " << hex << address << dec << ", " <<
                     bitset<8>(byte[0]) << " > " << bitset<8>(flipped_byte[0]) << endl;
 
-                if (memory::write_byte(fd, byte, address))
+                if (memory::write_byte(fd, flipped_byte, address))
                 {
                     process::detach(pid);
                     delete[] byte;
