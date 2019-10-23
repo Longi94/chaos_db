@@ -41,7 +41,8 @@ class SQLiteRunner(SqlRunner):
                 flip_rate=self.flip_rate,
                 random_flip_rate=self.random_flip_rate,
                 mean_runtime=self.mean_runtime,
-                inject_stderr=f
+                inject_stderr=f,
+                single=self.single
             )
 
     def clean(self):

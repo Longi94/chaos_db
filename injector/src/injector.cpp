@@ -29,6 +29,7 @@ int main(const int argc, char* argv[])
         ("e,error", "string: Redirect stderr of the child process into this file", cxxopts::value<string>())
         ("i,input", "string: File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "string: The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
+        ("single", "flag: inject one single fault")
         ("m,mean-runtime", "long: The mean runtime of the experiment in milliseconds.", cxxopts::value<long>())
         ("flip-rate", "double: Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is \"flip\".",
          cxxopts::value<double>())
@@ -52,7 +53,6 @@ int main(const int argc, char* argv[])
     }
 
     args::check_required(args, {"command", "output"});
-    args::check_depend(args, "fault", "flip", "flip-rate");
     args::check_depend(args, "fault", "stuck", "stuck-rate");
 
     // Init random

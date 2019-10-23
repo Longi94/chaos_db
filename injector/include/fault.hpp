@@ -21,6 +21,7 @@ namespace chaos
         protected:
             std::mt19937 rng_;
             memory::space inject_space_;
+            bool single_fault_;
             int process_status_ = 0;
             int fault_count_ = 0;
             long mean_runtime_;

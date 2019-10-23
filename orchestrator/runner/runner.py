@@ -9,6 +9,7 @@ class SqlRunner(object):
         self.flip_rate = args.flip_rate
         self.random_flip_rate = args.random_flip_rate
         self.mean_runtime = args.mean_runtime
+        self.single = args.single
         self.process = None
 
     def init_db(self):

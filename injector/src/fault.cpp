@@ -31,6 +31,7 @@ namespace chaos
         FaultInjector::FaultInjector(cxxopts::ParseResult& args, mt19937& rng) : rng_(rng)
         {
             inject_space_ = args::get_memory_space(args);
+            single_fault_ = args.count("single");
 
             if (args.count("mean-runtime"))
             {

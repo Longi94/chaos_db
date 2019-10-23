@@ -10,6 +10,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -19,12 +20,32 @@ namespace chaos
     {
         BitFlipper::BitFlipper(cxxopts::ParseResult& args, mt19937& rng): FaultInjector(args, rng)
         {
-            flip_rate_ = args["flip-rate"].as<double>();
+            if (args.count("flip-rate"))
+            {
+                flip_rate_ = args["flip-rate"].as<double>();
+            } else
+            {
+                flip_rate_ = 0;
+            }
             random_flip_frequency_ = args.count("random-flip-rate") > 0;
         }
 
         void BitFlipper::inject(const pid_t pid)
         {
+            if (single_fault_)
+            {
+                // inject a single bit flip at a random time
+                uniform_int_distribution<long> runtime_dist(0, mean_runtime_ * 0.75);
+                const long delay = runtime_dist(rng_);
+                cout << "Injecting bit flip after " << delay << " milliseconds";
+                this_thread::sleep_for(chrono::milliseconds(delay));
+
+                const auto memory_info = memory::get_heap_and_stack_spaces(pid);
+                flip_random_bit(pid, memory_info, 1);
+                waitpid(pid, &process_status_, 0);
+                return;
+            }
+
             const long start_ts = time::current_time_millis();
             auto last_flip = start_ts;
             double overflow = 0;

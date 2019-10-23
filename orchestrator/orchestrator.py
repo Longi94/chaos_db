@@ -88,13 +88,14 @@ if __name__ == '__main__':
                              'experiment 2 or more processes might be spawned depending on the database.')
     parser.add_argument('-s', '--inject-space', dest='inject_space', type=str, choices=['heap', 'stack'],
                         required=False, help='Address space to inject the fault into.')
+    parser.add_argument('--single', default=False, action='store_true', help='Inject a single fault')
     args = parser.parse_args()
 
-    if args.fault == 'flip' and args.mean_runtime is None:
-        parser.error('--mean-runtime is required when --fault is set to flip')
+    if args.fault == 'flip' and args.single and args.mean_runtime is None:
+        parser.error('--mean-runtime is required when --fault is set to flip and --single is given')
 
-    if args.fault == 'flip' and args.flip_rate is None:
-        parser.error('--flip-rate is required when --fault is set to flip')
+    if args.fault == 'flip' and args.flip_rate is None and not args.single:
+        parser.error('--flip-rate is required when --fault is set to flip and --single is not given')
 
     check_injector()
 
