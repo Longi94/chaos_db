@@ -48,7 +48,7 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
 
 
 def get_dir_name(args: argparse.Namespace) -> str:
-    name = f'{args.database}_{args.query}_{args.iterations}'
+    name = f'{args.database}_{args.query}'
 
     if args.fault is not None:
         name += f'_{args.fault}'
