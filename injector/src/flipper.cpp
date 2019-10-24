@@ -1,7 +1,6 @@
 #include "flipper.hpp"
 #include "memory.hpp"
 #include "process.hpp"
-#include "time.hpp"
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -23,7 +22,8 @@ namespace chaos
             if (args.count("flip-rate"))
             {
                 flip_rate_ = args["flip-rate"].as<double>();
-            } else
+            }
+            else
             {
                 flip_rate_ = 0;
             }
@@ -46,76 +46,64 @@ namespace chaos
                 return;
             }
 
-            const long start_ts = time::current_time_millis();
-            auto last_flip = start_ts;
+            auto last_flip = start_time_;
             double overflow = 0;
 
-            const chrono::milliseconds sleep_clock(clock);
             uniform_real_distribution<double> flip_p_dist(0, 1);
 
-            this_thread::sleep_for(sleep_clock);
+            loop(pid, clock, [this, pid, &flip_p_dist, &overflow, &last_flip](
+                 const unique_ptr<memory::heap_stack>& memory_info, const long current_ts)
+                 {
+                     const auto interval = get_interval(memory_info);
 
-            while (process::is_child_running(pid, process_status_))
-            {
-                const auto memory_info = memory::get_heap_and_stack_spaces(pid);
+                     if (interval == -1)
+                     {
+                         // happens when due to the child process dying during parsing the maps file a race condition occurs
+                         return;
+                     }
 
-                max_heap_size_ = max(max_heap_size_, memory_info->heap_size);
-                max_stack_size_ = max(max_stack_size_, memory_info->stack_size);
+                     // cerr << "Interval: " << interval << endl;
+                     double p_flip = clock / interval;
 
-                const auto interval = get_interval(memory_info);
+                     if (p_flip >= 1.0)
+                     {
+                         const double n = clock / interval + overflow;
+                         const int flip_count = n;
+                         overflow = n - flip_count;
+                         flip_random_bit(pid, memory_info, flip_count);
+                         last_flip = current_ts;
+                     }
+                     else if (random_flip_frequency_)
+                     {
+                         if (last_flip == start_time_ && mean_runtime_ > 0 && p_flip < 1.0)
+                         {
+                             // there were no flips yet, give a probability boost to inject a flip at least once
+                             // the boost increases over time, P will reach 1 once the current run-time reaches 3/4 of the mean runtime
+                             // cerr << "Increasing probability of a flip" << endl;
+                             p_flip += (1.0 - p_flip) * (static_cast<double>(current_ts - start_time_) / (mean_runtime_
+                                 * 0.75));
+                         }
 
-                if (interval == -1)
-                {
-                    // happens when due to the child process dying during parsing the maps file a race condition occurs
-                    this_thread::sleep_for(sleep_clock);
-                    continue;
-                }
+                         // cerr << "Flip probability: " << p_flip << endl;
 
-                const long current_ts = time::current_time_millis();
+                         const auto n = flip_p_dist(rng_);
+                         // cerr << "Generated number: " << n << endl;
 
-                // cerr << "Interval: " << interval << endl;
-                double p_flip = clock / interval;
-
-                if (p_flip >= 1.0)
-                {
-                    const double n = clock / interval + overflow;
-                    const int flip_count = n;
-                    overflow = n - flip_count;
-                    flip_random_bit(pid, memory_info, flip_count);
-                    last_flip = current_ts;
-                }
-                else if (random_flip_frequency_)
-                {
-                    if (last_flip == start_ts && mean_runtime_ > 0 && p_flip < 1.0)
-                    {
-                        // there were no flips yet, give a probability boost to inject a flip at least once
-                        // the boost increases over time, P will reach 1 once the current run-time reaches 3/4 of the mean runtime
-                        // cerr << "Increasing probability of a flip" << endl;
-                        p_flip += (1.0 - p_flip) * (static_cast<double>(current_ts - start_ts) / (mean_runtime_ * 0.75));
-                    }
-
-                    // cerr << "Flip probability: " << p_flip << endl;
-
-                    const auto n = flip_p_dist(rng_);
-                    // cerr << "Generated number: " << n << endl;
-
-                    if (n <= p_flip)
-                    {
-                        flip_random_bit(pid, memory_info, 1);
-                        last_flip = current_ts;
-                    }
-                }
-                else
-                {
-                    if (current_ts - interval > last_flip)
-                    {
-                        flip_random_bit(pid, memory_info, 1);
-                        last_flip = current_ts;
-                    }
-                }
-
-                this_thread::sleep_for(sleep_clock);
-            }
+                         if (n <= p_flip)
+                         {
+                             flip_random_bit(pid, memory_info, 1);
+                             last_flip = current_ts;
+                         }
+                     }
+                     else
+                     {
+                         if (current_ts - interval > last_flip)
+                         {
+                             flip_random_bit(pid, memory_info, 1);
+                             last_flip = current_ts;
+                         }
+                     }
+                 });
         }
 
         double BitFlipper::get_interval(const unique_ptr<memory::heap_stack>& memory_info) const
@@ -145,7 +133,8 @@ namespace chaos
             return interval;
         }
 
-        int BitFlipper::flip_random_bit(const pid_t pid, const unique_ptr<memory::heap_stack>& memory_info, const int flip_count)
+        int BitFlipper::flip_random_bit(const pid_t pid, const unique_ptr<memory::heap_stack>& memory_info,
+                                        const int flip_count)
         {
             cout << "Flipping " << flip_count << " bits..." << endl;
             if (process::attach(pid))

@@ -4,9 +4,11 @@
 #include "cxxopts.hpp"
 #include "flipper.hpp"
 #include "sticker.hpp"
+#include "time.hpp"
 #include <random>
 #include <chrono>
 #include <thread>
+#include <signal.h>
 
 using namespace std;
 
@@ -14,7 +16,6 @@ namespace chaos
 {
     namespace fault
     {
-
         unique_ptr<FaultInjector> get_injector(const fault_type fault_type, cxxopts::ParseResult& args, mt19937& rng)
         {
             switch (fault_type)
@@ -45,16 +46,9 @@ namespace chaos
 
         void FaultInjector::inject(const pid_t pid)
         {
-            const chrono::milliseconds sleep_clock(100);
-            this_thread::sleep_for(sleep_clock);
-            while (process::is_child_running(pid, process_status_))
+            loop(pid, 100, [](const unique_ptr<memory::heap_stack>& memory_info, const long current_ts)
             {
-                const auto memory_info = memory::get_heap_and_stack_spaces(pid);
-
-                max_heap_size_ = max(max_heap_size_, memory_info->heap_size);
-                max_stack_size_ = max(max_stack_size_, memory_info->stack_size);
-                this_thread::sleep_for(sleep_clock);
-            }
+            });
         }
 
         void FaultInjector::print_data() const
@@ -63,6 +57,51 @@ namespace chaos
             cout << "FAULT_COUNT: " << fault_count_ << endl;
             cout << "MAX_HEAP_SIZE: " << max_heap_size_ << endl;
             cout << "MAX_STACK_SIZE: " << max_stack_size_ << endl;
+            cout << "TIMEOUT: " << timeout_ << endl;
+        }
+
+        void FaultInjector::init_time()
+        {
+            start_time_ = time::current_time_millis();
+            timeout_time_ = start_time_ + 600000; // 10 minute timeout
+        }
+
+        bool FaultInjector::check_timeout(const pid_t pid, long& current_timestamp)
+        {
+            current_timestamp = time::current_time_millis();
+            if (current_timestamp > timeout_time_)
+            {
+                cout << pid << " timeout, killing..." << endl;
+                kill(pid, SIGTERM);
+                timeout_ = true;
+            }
+            return timeout_;
+        }
+
+        void FaultInjector::loop(const pid_t pid, const long interval, const function<void(const unique_ptr<memory::heap_stack>&, long)> f)
+        {
+            init_time();
+            const chrono::milliseconds sleep_clock(interval);
+            this_thread::sleep_for(sleep_clock);
+
+            while (process::is_child_running(pid, process_status_))
+            {
+                long current_ts = 0;
+                if (check_timeout(pid, current_ts))
+                {
+                    this_thread::sleep_for(sleep_clock);
+                    continue;
+                }
+
+                const auto memory_info = memory::get_heap_and_stack_spaces(pid);
+
+                max_heap_size_ = max(max_heap_size_, memory_info->heap_size);
+                max_stack_size_ = max(max_stack_size_, memory_info->stack_size);
+
+                f(memory_info, current_ts);
+
+                this_thread::sleep_for(sleep_clock);
+            }
         }
     }
 }

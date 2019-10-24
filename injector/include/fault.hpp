@@ -28,6 +28,10 @@ namespace chaos
             long max_heap_size_ = 0;
             long max_stack_size_ = 0;
 
+            long start_time_ = 0;
+            long timeout_time_ = 0;
+            bool timeout_ = false;
+
         public:
             /**
              * Inject the fault into the memory.
@@ -35,6 +39,11 @@ namespace chaos
              */
             virtual void inject(pid_t pid);
             void print_data() const;
+
+        protected:
+            void init_time();
+            bool check_timeout(pid_t pid, long& current_timestamp);
+            void loop(pid_t pid, long interval, std::function<void(const std::unique_ptr<memory::heap_stack>&, long)> f);
         };
 
         /**
