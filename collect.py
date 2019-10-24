@@ -34,5 +34,6 @@ for db in files[1:]:
     conn.execute('DETACH DATABASE dba')
 
 conn.close()
+os.makedirs(os.path.dirname(args.output), exist_ok=True)
 shutil.copy(combined_file, args.output)
 shutil.rmtree('result-tables')
