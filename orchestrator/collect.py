@@ -12,7 +12,7 @@ def collect(nodes: str, path: str, output: str):
 
     result_path = os.path.join(path, 'results.sqlite')
 
-    command = ['echo', '-v', '-w', nodes, '--rcopy', result_path, '--dest', 'result-tables/']
+    command = ['clush', '-v', '-w', nodes, '--rcopy', result_path, '--dest', 'result-tables/']
     print(f'Running command, {" ".join(command)}', flush=True)
     process = subprocess.Popen(command)
     process.wait()
