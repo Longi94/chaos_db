@@ -21,8 +21,9 @@ if __name__ == '__main__':
         )
 
         clush_command = ['clush', '-v', 'w', args.nodes, 'cd', 'chaos_db', '&&', 'PYTHONPATH=./orchestrator', 'python3',
-                         'orchestrator/orchestrator.py', '-d', args.database, '-q', args.query, '-w', '~/experiments/',
-                         '-i', str(args.iterations), '-t', str(args.threads), '-fr', str(args.flip_rate)]
+                         'orchestrator/orchestrator.py', '-d', args.database, '-q', args.query, '-w',
+                         args.working_directory, '-i', str(args.iterations), '-t', str(args.threads), '-fr',
+                         str(args.flip_rate)]
 
         if args.single:
             clush_command.append('--single')
@@ -47,5 +48,5 @@ if __name__ == '__main__':
         process = subprocess.Popen(clush_command)
         process.wait()
 
-        collect(nodes=args.nodes, path=f'~/experiments/{exp_name}',
-                output=os.path.join(args.output_dir, f'{exp_name}_results.sqlite'))
+        path = os.path.join(args.working_directory, exp_name)
+        collect(nodes=args.nodes, path=path, output=os.path.join(args.output_dir, f'{exp_name}_results.sqlite'))

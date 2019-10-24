@@ -27,3 +27,5 @@ parser.add_argument('-t', '--threads', required=False, default=1, type=int,
 parser.add_argument('-s', '--inject-space', dest='inject_space', type=str, choices=['heap', 'stack'],
                     required=False, help='Address space to inject the fault into.')
 parser.add_argument('--single', default=False, action='store_true', help='Inject a single fault')
+parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
+                    help='The working directory. This directory will contain all experiment output and artifacts.')

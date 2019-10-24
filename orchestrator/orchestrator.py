@@ -48,8 +48,6 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
 
 
 if __name__ == '__main__':
-    parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
-                        help='The working directory. This directory will contain all experiment output and artifacts.')
     args = parser.parse_args()
 
     if args.fault == 'flip' and args.single and args.mean_runtime is None:
