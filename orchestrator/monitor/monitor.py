@@ -23,6 +23,7 @@ class ProcessMonitor(object):
         self.max_heap_size = 0
         self.max_stack_size = 0
         self.fault_count = 0
+        self.timeout = False
 
     def monitor(self, process: Popen):
         def get_val(line: str):
@@ -46,6 +47,8 @@ class ProcessMonitor(object):
                 self.max_stack_size = int(get_val(line))
             if line.startswith('FAULT_COUNT: '):
                 self.fault_count = int(get_val(line))
+            if line.startswith('TIMEOUT: '):
+                self.timeout = get_val(line) == '1'
 
         log.info('Monitor done.')
 

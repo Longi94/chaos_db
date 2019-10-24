@@ -6,7 +6,9 @@ from queries import *
 
 class SQLiteMonitor(ProcessMonitor):
     def evaluate_result(self):
-        if self.exited:
+        if self.timeout:
+            self.result = RESULT_TIMEOUT
+        elif self.exited:
             if self.return_code == 0:
                 answer_file = None
                 if self.query == TPCH1:
