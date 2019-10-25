@@ -72,7 +72,7 @@ namespace chaos
             if (current_timestamp > timeout_time_)
             {
                 cout << pid << " timeout, killing..." << endl;
-                kill(pid, SIGTERM);
+                kill(pid, SIGKILL);
                 timeout_ = true;
             }
             return timeout_;
