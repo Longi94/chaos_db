@@ -16,12 +16,12 @@ log = logging.getLogger(__name__)
 
 
 def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_iters: Set[int]) -> Dict or None:
-    log.info('Iteration ' + str(iteration))
-    print('Iteration ' + str(iteration), flush=True)
-
     if iteration in existing_iters:
         log.info('Skipping iteration ' + str(iteration))
         return
+
+    log.info('Iteration ' + str(iteration))
+    print('Iteration ' + str(iteration), flush=True)
 
     iteration_dir = os.path.join(experiment_dir, str(iteration))
     os.makedirs(iteration_dir, exist_ok=True)
