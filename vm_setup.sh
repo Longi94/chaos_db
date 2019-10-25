@@ -2,7 +2,7 @@
 
 apt update
 apt install -y cmake build-essential gcc gdb rsync zip python3-pip
-pip3 install pandas jupyter
+pip3 install pandas jupyter matplotlib
 
 mkdir /home/vagrant/.jupyter
 cp /vagrant/jupyter/jupyter_notebook_config.py /home/vagrant/.jupyter/
