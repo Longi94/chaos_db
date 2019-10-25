@@ -63,7 +63,7 @@ namespace chaos
         void FaultInjector::init_time()
         {
             start_time_ = time::current_time_millis();
-            timeout_time_ = start_time_ + 600000; // 10 minute timeout
+            timeout_time_ = start_time_ + 300000; // 10 minute timeout
         }
 
         bool FaultInjector::check_timeout(const pid_t pid, long& current_timestamp)
