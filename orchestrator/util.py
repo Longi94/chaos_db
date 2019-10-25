@@ -19,7 +19,7 @@ def get_dir_name(database: str, query: str, fault: str, inject_space: str, flip_
         name += f'_{inject_space}'
 
     if fault == FAULT_BIT_FLIP:
-        name += f'_{flip_rate}'
+        name += '_{0:g}'.format(flip_rate)
 
         if random_flip_rate:
             name += '_randomized'
