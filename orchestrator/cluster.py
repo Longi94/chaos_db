@@ -11,6 +11,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for val in args.values:
+        val = float(val)
         exp_name = get_dir_name(
             database=args.database,
             query=args.query,
