@@ -84,7 +84,7 @@ namespace chaos
             const chrono::milliseconds sleep_clock(interval);
             this_thread::sleep_for(sleep_clock);
 
-            while (process::is_child_running(pid, process_status_))
+            while (process_status_ == 0 && process::is_child_running(pid, process_status_))
             {
                 long current_ts = 0;
                 if (check_timeout(pid, current_ts))

@@ -15,14 +15,20 @@ namespace chaos
 {
     namespace process
     {
-        int attach(const pid_t pid)
+        int attach(const pid_t pid, int& status)
         {
             // cout << "ptrace attaching to " << pid << "..." << endl;
             errno = 0;
 
             if (!ptrace(PTRACE_ATTACH, pid, 0, 0))
             {
-                waitpid(pid, nullptr, 0);
+                waitpid(pid, &status, 0);
+
+                if (!WIFSTOPPED(status))
+                {
+                    cout << "ptrace attach failed: process not stopped" << endl;
+                    return -2;
+                }
 
                 // cout << "ptrace attached to " << pid << endl;
                 return 0;
@@ -134,6 +140,7 @@ namespace chaos
         bool is_child_running(const pid_t pid, int& status)
         {
             const pid_t result = waitpid(pid, &status, WNOHANG);
+            cout << "running " << result << endl;
             return result == 0;
         }
     }

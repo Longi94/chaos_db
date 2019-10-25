@@ -22,7 +22,7 @@ namespace chaos
          * @param pid process id
          * @return 0 if successful, -1 if there was an error
          */
-        int attach(pid_t pid);
+        int attach(pid_t pid, int& status);
 
         /**
          * Execute a command by creating a child process with fork().

@@ -137,8 +137,15 @@ namespace chaos
                                         const int flip_count)
         {
             cout << "Flipping " << flip_count << " bits..." << endl;
-            if (process::attach(pid))
+
+            int status;
+            const int attach_result = process::attach(pid, status);
+            if (attach_result)
             {
+                if (attach_result == -2)
+                {
+                    process_status_ = status;
+                }
                 return -1;
             }
 
