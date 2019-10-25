@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     log_file = os.path.join(experiment_dir, 'experiment.log')
     logging.basicConfig(level=logging.DEBUG,
-                        handlers=[logging.FileHandler(log_file, mode='w')],
+                        handlers=[logging.FileHandler(log_file)],
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
     log.info('DB type: ' + args.database)
