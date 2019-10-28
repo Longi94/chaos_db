@@ -1,6 +1,3 @@
 [submodule "injector/cxxopts"]
 	path = injector/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
-[submodule "injector/cppzmq"]
-	path = injector/cppzmq
-	url = https://github.com/zeromq/cppzmq.git
