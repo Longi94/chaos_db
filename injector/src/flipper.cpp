@@ -30,7 +30,7 @@ namespace chaos
             random_flip_frequency_ = args.count("random-flip-rate") > 0;
         }
 
-        void BitFlipper::inject(const pid_t pid)
+        void BitFlipper::inject(const pid_t pid, atomic_bool& stop_flag)
         {
             if (single_fault_)
             {
@@ -51,7 +51,7 @@ namespace chaos
 
             uniform_real_distribution<double> flip_p_dist(0, 1);
 
-            loop(pid, clock, [this, pid, &flip_p_dist, &overflow, &last_flip](
+            loop(pid, clock, stop_flag, [this, pid, &flip_p_dist, &overflow, &last_flip](
                  const unique_ptr<memory::heap_stack>& memory_info, const long current_ts)
                  {
                      const auto interval = get_interval(memory_info);

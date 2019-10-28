@@ -5,7 +5,6 @@
 #include "cxxopts.hpp"
 #include "memory.hpp"
 #include <atomic>
-#include <thread>
 
 namespace chaos
 {
@@ -36,14 +35,16 @@ namespace chaos
             /**
              * Inject the fault into the memory.
              * @param pid the id of the process whose memory will be tinkered with
+             * @param stop_flag
              */
-            virtual void inject(pid_t pid);
+            virtual void inject(pid_t pid, std::atomic_bool& stop_flag);
             void print_data() const;
 
         protected:
             void init_time();
             bool check_timeout(pid_t pid, long& current_timestamp);
-            void loop(pid_t pid, long interval, std::function<void(const std::unique_ptr<memory::heap_stack>&, long)> f);
+            void loop(pid_t pid, long interval, std::atomic_bool& stop_flag,
+                      std::function<void(const std::unique_ptr<memory::heap_stack>&, long)> f);
         };
 
         /**
@@ -51,6 +52,7 @@ namespace chaos
          * @param fault_type the type of the fault that needs to be injected
          * @param rng random number generator used for randomly selecting an address
          */
-        std::unique_ptr<FaultInjector> get_injector(fault_type fault_type, cxxopts::ParseResult& args, std::mt19937& rng);
+        std::unique_ptr<FaultInjector> get_injector(fault_type fault_type, cxxopts::ParseResult& args,
+                                                    std::mt19937& rng);
     }
 }

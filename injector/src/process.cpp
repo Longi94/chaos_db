@@ -140,7 +140,6 @@ namespace chaos
         bool is_child_running(const pid_t pid, int& status)
         {
             const pid_t result = waitpid(pid, &status, WNOHANG);
-            cout << "running " << result << endl;
             return result == 0;
         }
     }

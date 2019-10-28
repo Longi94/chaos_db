@@ -2,6 +2,7 @@
 #include "fault.hpp"
 #include "process.hpp"
 #include "cxxopts.hpp"
+#include "server.hpp"
 #include <iostream>
 #include <fstream>
 #include <random>
@@ -31,14 +32,20 @@ int main(const int argc, char* argv[])
         ("f,fault", "string: The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
         ("single", "flag: inject one single fault")
         ("m,mean-runtime", "long: The mean runtime of the experiment in milliseconds.", cxxopts::value<long>())
-        ("flip-rate", "double: Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is \"flip\".",
+        ("flip-rate",
+         "double: Frequency of bit-flips in a bit/second/megabytes unit. Required if the fault type is \"flip\".",
          cxxopts::value<double>())
-        ("random-flip-rate", "flag: Randomize the frequency of bit flips keeping the flip-rate in mind. At least one flip is ensured if --mean-runtime is provided.")
-        ("stuck-rate", "double: Frequency of stuck bits in a bit/megabytes unit. Required if the fault type is \"stuck\".",
+        ("random-flip-rate",
+         "flag: Randomize the frequency of bit flips keeping the flip-rate in mind. At least one flip is ensured if --mean-runtime is provided.")
+        ("stuck-rate",
+         "double: Frequency of stuck bits in a bit/megabytes unit. Required if the fault type is \"stuck\".",
          cxxopts::value<double>())
         ("s,inject-space",
          "string: Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
-         cxxopts::value<string>());
+         cxxopts::value<string>())
+        ("p,port",
+         "integer: Enable inter-process communication using this port. The injector will wait for a message to start and stop the injection.",
+         cxxopts::value<int>());
 
     // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
@@ -76,8 +83,21 @@ int main(const int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, error, command_args);
 
-    injector->inject(pid);
+    atomic_bool start_flag(false);
+    atomic_bool stop_flag(false);
+    unique_ptr<thread> server_thread;
+    if (args.count("port"))
+    {
+        server_thread = server::start_background(args["port"].as<int>(), start_flag, stop_flag);
+    }
+
+    injector->inject(pid, stop_flag);
     injector->print_data();
+
+    if (server_thread != nullptr)
+    {
+        server_thread->join();
+    }
 
     return 0;
 }

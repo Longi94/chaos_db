@@ -9,6 +9,7 @@
 #include <chrono>
 #include <thread>
 #include <signal.h>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -44,9 +45,9 @@ namespace chaos
             }
         }
 
-        void FaultInjector::inject(const pid_t pid)
+        void FaultInjector::inject(const pid_t pid, atomic_bool& stop_flag)
         {
-            loop(pid, 100, [](const unique_ptr<memory::heap_stack>& memory_info, const long current_ts)
+            loop(pid, 100, stop_flag, [](const unique_ptr<memory::heap_stack>& memory_info, const long current_ts)
             {
             });
         }
@@ -78,13 +79,14 @@ namespace chaos
             return timeout_;
         }
 
-        void FaultInjector::loop(const pid_t pid, const long interval, const function<void(const unique_ptr<memory::heap_stack>&, long)> f)
+        void FaultInjector::loop(const pid_t pid, const long interval, atomic_bool& stop_flag,
+                                 const function<void(const unique_ptr<memory::heap_stack>&, long)> f)
         {
             init_time();
             const chrono::milliseconds sleep_clock(interval);
             this_thread::sleep_for(sleep_clock);
 
-            while (process_status_ == 0 && process::is_child_running(pid, process_status_))
+            while (!stop_flag && process_status_ == 0 && process::is_child_running(pid, process_status_))
             {
                 long current_ts = 0;
                 if (check_timeout(pid, current_ts))
@@ -101,6 +103,16 @@ namespace chaos
                 f(memory_info, current_ts);
 
                 this_thread::sleep_for(sleep_clock);
+            }
+
+            if (stop_flag)
+            {
+                kill(pid, SIGKILL);
+                waitpid(pid, &process_status_, 0);
+            }
+            else
+            {
+                stop_flag = true;
             }
         }
     }
