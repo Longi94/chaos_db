@@ -13,6 +13,7 @@ class SQLiteRunner(SqlRunner):
     def __init__(self, directory: str, args: argparse.Namespace):
         super(SQLiteRunner, self).__init__(directory, args)
         self.db_file = os.path.join(directory, 'db.sqlite')
+        self.serverless = True
 
     def init_db(self):
         log.info('Copying sqlite database to a temp file...')
@@ -31,7 +32,7 @@ class SQLiteRunner(SqlRunner):
             raise NameError(f'Unknown query: {query}')
 
         with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
-            self.process = run_injector(
+            self.query_process = run_injector(
                 output_file=os.path.join(self.directory, 'output.txt'),
                 input_file=query_file,
                 error_file=os.path.join(self.directory, 'stderr.txt'),
@@ -44,6 +45,8 @@ class SQLiteRunner(SqlRunner):
                 inject_stderr=f,
                 single=self.single
             )
+
+            self.query_process.wait()
 
     def clean(self):
         if os.path.exists(self.db_file):

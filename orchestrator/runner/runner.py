@@ -2,6 +2,7 @@ import argparse
 
 
 class SqlRunner(object):
+
     def __init__(self, directory: str, args: argparse.Namespace):
         self.directory = directory
         self.fault = args.fault
@@ -11,13 +12,21 @@ class SqlRunner(object):
         self.mean_runtime = args.mean_runtime
         self.single = args.single
         self.database_dir = args.database_path
-        self.process = None
+        self.serverless = False
+        self.server_process = None
+        self.query_process = None
 
     def init_db(self):
         """
         Initialize the TPC-H database.
         """
         raise NotImplementedError()
+
+    def start_server(self):
+        """
+        Start the database server.
+        """
+        pass
 
     def run_query(self, query: int):
         """

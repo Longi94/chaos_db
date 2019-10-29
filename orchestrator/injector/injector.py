@@ -46,10 +46,20 @@ def check_injector():
         exit(1)
 
 
-def run_injector(output_file: str, input_file: Optional[str], error_file: Optional[str],
-                 child_command: List[Any], fault: Optional[str], inject_space: Optional[str],
-                 flip_rate: float, random_flip_rate: bool, mean_runtime: float, inject_stderr,
-                 single: bool, port: int) -> subprocess.Popen:
+def run_injector(
+        child_command: List[Any],
+        output_file: str,
+        inject_stderr,
+        input_file: Optional[str] = None,
+        error_file: Optional[str] = None,
+        fault: Optional[str] = None,
+        inject_space: Optional[str] = None,
+        flip_rate: Optional[float] = None,
+        random_flip_rate: bool = False,
+        mean_runtime: Optional[float] = None,
+        single: bool = False,
+        port: Optional[int] = None
+) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file]
 
     if input_file is not None:

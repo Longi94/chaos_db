@@ -15,7 +15,7 @@ class ProcessMonitor(object):
         self.end_time = None
         self.result = None
 
-        # process completion status
+        # injector process completion status
         self.exited = False
         self.return_code = 0
         self.signaled = False
@@ -24,6 +24,9 @@ class ProcessMonitor(object):
         self.max_stack_size = 0
         self.fault_count = 0
         self.timeout = False
+
+        # query process status, if not serverless
+        self.query_return_code = 0
 
     def monitor(self, process: Popen):
         def get_val(line: str):
@@ -59,6 +62,9 @@ class ProcessMonitor(object):
     def end(self):
         self.end_time = time()
         self.evaluate_result()
+
+    def evaluate_query_process(self, process: Popen):
+        self.query_return_code = process.returncode
 
     def evaluate_result(self):
         raise NotImplementedError()
