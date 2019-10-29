@@ -6,9 +6,10 @@ from typing import Dict, Set
 from multiprocessing.pool import ThreadPool
 from functools import partial
 from injector import check_injector, init_pool
-from db import ResultsDatabase
+from db import ResultsDatabase, DB_MONETDB
 from monitor import get_monitor
 from runner import get_runner
+from runner.monetdb import init_mserver5_port_pool
 from util import get_hostname, get_dir_name
 from args import parser
 
@@ -58,6 +59,9 @@ if __name__ == '__main__':
 
     check_injector()
     init_pool(args.threads)
+
+    if args.database == DB_MONETDB:
+        init_mserver5_port_pool(args.threads)
 
     experiment_dir = get_dir_name(
         database=args.database,
