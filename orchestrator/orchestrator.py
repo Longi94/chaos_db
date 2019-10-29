@@ -5,7 +5,7 @@ import time
 from typing import Dict, Set
 from multiprocessing.pool import ThreadPool
 from functools import partial
-from injector import check_injector
+from injector import check_injector, init_pool
 from db import ResultsDatabase
 from monitor import get_monitor
 from runner import get_runner
@@ -26,7 +26,7 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     iteration_dir = os.path.join(experiment_dir, str(iteration))
     os.makedirs(iteration_dir, exist_ok=True)
 
-    runner = get_runner(args.database, iteration_dir, args)
+    runner = get_runner(args.database, iteration, iteration_dir, args)
     monitor = get_monitor(args.database, iteration_dir)
 
     runner.init_db()
@@ -57,6 +57,7 @@ if __name__ == '__main__':
         parser.error('--flip-rate is required when --fault is set to flip and --single is not given')
 
     check_injector()
+    init_pool(args.threads)
 
     experiment_dir = get_dir_name(
         database=args.database,

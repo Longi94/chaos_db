@@ -2,6 +2,7 @@ import sqlite3
 from typing import Set
 
 DB_SQLITE = 'sqlite'
+DB_MONETDB = 'monetdb'
 
 
 class ResultsDatabase(object):

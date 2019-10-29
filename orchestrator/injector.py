@@ -1,11 +1,40 @@
 import subprocess
 import logging
 import os
+from queue import Queue
 from typing import List, Any, Optional
+from thread_util import LockProxy
 
 log = logging.getLogger(__name__)
 
 INJECTOR_PATH = './build/release/injector/injector'
+
+_port_pool: Optional[Queue] = None
+
+
+def init_pool(size: int):
+    global _port_pool
+    _port_pool = Queue(size)
+    for i in range(7000, 7000 + size):
+        _port_pool.put(i)
+
+
+def reserve_port() -> int:
+    global _port_pool
+
+    if _port_pool is None:
+        raise RuntimeError('port pool not initialized')
+
+    return _port_pool.get()
+
+
+def release_port(port: int):
+    global _port_pool
+
+    if _port_pool is None:
+        raise RuntimeError('port pool not initialized')
+
+    _port_pool.put(port)
 
 
 def check_injector():
@@ -20,7 +49,7 @@ def check_injector():
 def run_injector(output_file: str, input_file: Optional[str], error_file: Optional[str],
                  child_command: List[Any], fault: Optional[str], inject_space: Optional[str],
                  flip_rate: float, random_flip_rate: bool, mean_runtime: float, inject_stderr,
-                 single: bool) -> subprocess.Popen:
+                 single: bool, port: int) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-o', output_file]
 
     if input_file is not None:
@@ -46,6 +75,9 @@ def run_injector(output_file: str, input_file: Optional[str], error_file: Option
 
     if single:
         command.append('--single')
+
+    if port is not None:
+        command.extend(['-p', str(port)])
 
     command.append('-c')
     command.extend(child_command)
