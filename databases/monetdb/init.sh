@@ -9,14 +9,20 @@ die () {
 
 MONETDB_DIR=$(realpath $1)
 DATA_DIR=$(realpath $2)
+DB_NAME=$(basename ${DATA_DIR})
 
-${MONETDB_DIR}/bin/bin/monetdbd create ${DATA_DIR}
-${MONETDB_DIR}/bin/bin/monetdbd start ${DATA_DIR}
-${MONETDB_DIR}/bin/bin/monetdb destroy tpch || true
-${MONETDB_DIR}/bin/bin/monetdb create tpch
-${MONETDB_DIR}/bin/bin/monetdb release tpch
-${MONETDB_DIR}/bin/bin/mclient -d tpch schema.sql
-python generate_load_file.py
-${MONETDB_DIR}/bin/bin/mclient -d tpch load.sql.tmp
-${MONETDB_DIR}/bin/bin/mclient -d tpch constraints.sql
-${MONETDB_DIR}/bin/bin/monetdbd stop ${DATA_DIR}
+mkdir ${DATA_DIR}
+nohup ${MONETDB_DIR}/build/bin/mserver5 --dbpath ${DATA_DIR} --daemon=yes &
+PID=$!
+
+until ${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} -s "SELECT 1"
+do
+  echo "Waiting for server..."
+  sleep 1
+done
+
+${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} schema.sql
+python3 generate_load_file.py
+${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} load.sql.tmp
+${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} constraints.sql
+kill ${PID}

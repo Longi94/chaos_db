@@ -1,4 +1,2 @@
 user=monetdb
 password=monetdb
-language=sql
-save_history=true
