@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include <condition_variable>
+#include <netdb.h>
 
 using namespace std;
 using namespace chaos;
@@ -86,12 +87,13 @@ int main(const int argc, char* argv[])
 
     atomic_bool stop_flag(false);
     unique_ptr<thread> server_thread = nullptr;
+    int sock_fd = 0;
     if (args.count("port"))
     {
         mutex m;
         condition_variable cv;
         unique_lock<mutex> lk(m);
-        server_thread = server::start_background(args["port"].as<int>(), cv, stop_flag);
+        server_thread = server::start_background(args["port"].as<int>(), cv, stop_flag, sock_fd);
 
         cout << "Waiting for start command..." << endl;
         cv.wait(lk);
@@ -100,6 +102,18 @@ int main(const int argc, char* argv[])
     cout << "Injecting fault..." << endl;
     injector->inject(pid, stop_flag);
     injector->print_data();
+
+    if (!stop_flag)
+    {
+        stop_flag = true;
+        if (sock_fd > 0)
+        {
+            if (shutdown(sock_fd, SHUT_RDWR))
+            {
+                cout << "failed to shutdown server: " << strerror(errno) << endl;
+            }
+        }
+    }
 
     if (server_thread != nullptr)
     {

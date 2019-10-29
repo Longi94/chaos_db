@@ -18,12 +18,12 @@ namespace chaos
 {
     namespace server
     {
-        void start(const int port, condition_variable& start_flag, atomic_bool& stop_flag)
+        void start(const int port, condition_variable& start_flag, atomic_bool& stop_flag, int& sockfd)
         {
             struct sockaddr_in servaddr, cli;
 
             // socket create and verification 
-            int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+            sockfd = socket(AF_INET, SOCK_STREAM, 0);
             if (sockfd == -1)
             {
                 cerr << "Socket creation failed: " << strerror(errno) << endl;
@@ -59,7 +59,7 @@ namespace chaos
             socklen_t len = sizeof cli;
 
             // Accept the data packet from client and verification 
-            int connfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&cli), &len);
+            auto connfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&cli), &len);
             if (connfd < 0)
             {
                 cerr << "Server accept failed: " << strerror(errno) << endl;
@@ -101,9 +101,9 @@ namespace chaos
             close(sockfd);
         }
 
-        unique_ptr<thread> start_background(const int port, condition_variable& start_flag, atomic_bool& stop_flag)
+        unique_ptr<thread> start_background(const int port, condition_variable& start_flag, atomic_bool& stop_flag, int& sock_fd)
         {
-            return unique_ptr<thread>(new thread(&start, port, ref(start_flag), ref(stop_flag)));
+            return unique_ptr<thread>(new thread(&start, port, ref(start_flag), ref(stop_flag), ref(sock_fd)));
         }
     }
 }

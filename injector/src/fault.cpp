@@ -8,7 +8,7 @@
 #include <random>
 #include <chrono>
 #include <thread>
-#include <signal.h>
+#include <csignal>
 #include <sys/wait.h>
 
 using namespace std;
@@ -109,10 +109,6 @@ namespace chaos
             {
                 kill(pid, SIGKILL);
                 waitpid(pid, &process_status_, 0);
-            }
-            else
-            {
-                stop_flag = true;
             }
         }
     }
