@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <chrono>
 #include <thread>
+#include <condition_variable>
 
 using namespace std;
 using namespace chaos;
@@ -83,14 +84,20 @@ int main(const int argc, char* argv[])
 
     const pid_t pid = process::execute(path, output, input, error, command_args);
 
-    atomic_bool start_flag(false);
     atomic_bool stop_flag(false);
-    unique_ptr<thread> server_thread;
+    unique_ptr<thread> server_thread = nullptr;
     if (args.count("port"))
     {
-        server_thread = server::start_background(args["port"].as<int>(), start_flag, stop_flag);
+        mutex m;
+        condition_variable cv;
+        unique_lock<mutex> lk(m);
+        server_thread = server::start_background(args["port"].as<int>(), cv, stop_flag);
+
+        cout << "Waiting for start command..." << endl;
+        cv.wait(lk);
     }
 
+    cout << "Injecting fault..." << endl;
     injector->inject(pid, stop_flag);
     injector->print_data();
 

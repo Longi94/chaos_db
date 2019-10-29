@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <csignal>
+#include <condition_variable>
 
 
 using namespace std;
@@ -17,7 +18,7 @@ namespace chaos
 {
     namespace server
     {
-        void start(const int port, atomic_bool& start_flag, atomic_bool& stop_flag)
+        void start(const int port, condition_variable& start_flag, atomic_bool& stop_flag)
         {
             struct sockaddr_in servaddr, cli;
 
@@ -67,28 +68,27 @@ namespace chaos
 
             cout << "Server accepted the client." << endl;
 
-            char buff[254];
+            char buff[buffer_size];
             int read_bytes;
 
             // Function for chatting between client and server 
             while (!stop_flag)
             {
-                bzero(buff, 256);
+                bzero(buff, buffer_size);
 
                 // read the message from client and copy it in buffer 
-                read_bytes = recv(connfd, buff, 255, 0);
+                read_bytes = recv(connfd, buff, buffer_size, 0);
 
                 if (read_bytes > 0)
                 {
-                    buff[256] = '\0';
-                    cout << "Message received: " << buff << endl;
-
-                    if (strcmp(buff, "start") == 0)
+                    if (buff[0] == message_start)
                     {
-                        start_flag = true;
+                        cout << "Received start message" << endl;
+                        start_flag.notify_one();
                     }
-                    else if (strcmp(buff, "stop") == 0)
+                    else if (buff[0] == message_stop)
                     {
+                        cout << "Received stop message" << endl;
                         stop_flag = true;
                     }
                 }
@@ -101,7 +101,7 @@ namespace chaos
             close(sockfd);
         }
 
-        unique_ptr<thread> start_background(const int port, atomic_bool& start_flag, atomic_bool& stop_flag)
+        unique_ptr<thread> start_background(const int port, condition_variable& start_flag, atomic_bool& stop_flag)
         {
             return unique_ptr<thread>(new thread(&start, port, ref(start_flag), ref(stop_flag)));
         }
