@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 git clone https://github.com/gregrahn/tpch-kit
 cd tpch-kit/dbgen
 make
