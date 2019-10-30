@@ -1,6 +1,6 @@
 import argparse
 from queries import *
-from db import DB_SQLITE, DB_MONETDB
+from db import DB_SQLITE, DB_MONETDB, DB_DUCKDB
 from fault_type import *
 
 parser = argparse.ArgumentParser()
@@ -8,7 +8,7 @@ parser.add_argument('-i', '--iterations', type=int, default=1, required=False,
                     help='Number of times to run the experiment')
 parser.add_argument('-q', '--query', choices=[TPCH1, TPCH3, INSERTS, UPDATES], type=str, required=True,
                     help='The TPC-H query to run')
-parser.add_argument('-d', '--database', type=str, choices=[DB_SQLITE, DB_MONETDB], required=True,
+parser.add_argument('-d', '--database', type=str, choices=[DB_SQLITE, DB_MONETDB, DB_DUCKDB], required=True,
                     help='Database to run the experiment on')
 parser.add_argument('-dp', '--database-path', type=str, required=False, dest='database_path', default='',
                     help='Path to database resources (binaries, pre-filled dbs)')

@@ -3,6 +3,7 @@ from typing import Set
 
 DB_SQLITE = 'sqlite'
 DB_MONETDB = 'monetdb'
+DB_DUCKDB = 'duckdb'
 
 
 class ResultsDatabase(object):

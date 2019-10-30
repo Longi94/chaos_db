@@ -12,5 +12,6 @@ die () {
 DUCKDB_DIR=$(realpath $1)
 DB_PATH=$(realpath $2)
 
-./${DUCKDB_DIR}/build/release/tools/shell/shell ${DB_PATH} < schema.sql
-./${DUCKDB_DIR}/build/release/tools/shell/shell ${DB_PATH} < load.sql
+${DUCKDB_DIR}/build/release/tools/shell/shell ${DB_PATH} < schema.sql
+${DUCKDB_DIR}/build/release/tools/shell/shell ${DB_PATH} < load.sql
+${DUCKDB_DIR}/build/release/tools/shell/shell ${DB_PATH} <<< "select 1"
