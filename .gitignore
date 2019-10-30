@@ -631,6 +631,8 @@ build/
 
 *.sqlite
 *.db
+*.duckdb
+*.wal
 !databases/*/answers/q*.out
 results.csv
 databases/tpch/*/
