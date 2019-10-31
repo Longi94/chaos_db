@@ -19,9 +19,9 @@ fi
 
 tar xvf ${DIR}/${POSTGRES_DIR}.tar.bz2 -C ${DIR}/
 
-mkdir ${DIR}/bin
-cd ${POSTGRES_DIR}
-./configure --prefix ${DIR}/bin/ --disable-debug --disable-cassert CFLAGS="-O3"
+mkdir ${DIR}/build 2>/dev/null || true
+cd ${DIR}/${POSTGRES_DIR}
+./configure --prefix ${DIR}/build/ --disable-debug --disable-cassert CFLAGS="-O3"
 make
 make install
 
