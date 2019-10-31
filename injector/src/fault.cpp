@@ -47,6 +47,7 @@ namespace chaos
 
         void FaultInjector::inject(const pid_t pid, atomic_bool& stop_flag)
         {
+            init_time();
             loop(pid, 100, stop_flag, [](const unique_ptr<memory::heap_stack>& memory_info, const long current_ts)
             {
             });
@@ -82,7 +83,6 @@ namespace chaos
         void FaultInjector::loop(const pid_t pid, const long interval, atomic_bool& stop_flag,
                                  const function<void(const unique_ptr<memory::heap_stack>&, long)> f)
         {
-            init_time();
             const chrono::milliseconds sleep_clock(interval);
             this_thread::sleep_for(sleep_clock);
 

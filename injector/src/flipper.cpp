@@ -46,6 +46,7 @@ namespace chaos
                 return;
             }
 
+            init_time();
             auto last_flip = start_time_;
             double overflow = 0;
 
@@ -64,7 +65,6 @@ namespace chaos
 
                      // cerr << "Interval: " << interval << endl;
                      double p_flip = clock / interval;
-
                      if (p_flip >= 1.0)
                      {
                          const double n = clock / interval + overflow;
@@ -75,7 +75,7 @@ namespace chaos
                      }
                      else if (random_flip_frequency_)
                      {
-                         if (last_flip == start_time_ && mean_runtime_ > 0 && p_flip < 1.0)
+                         if (last_flip == start_time_ && mean_runtime_ > 0)
                          {
                              // there were no flips yet, give a probability boost to inject a flip at least once
                              // the boost increases over time, P will reach 1 once the current run-time reaches 3/4 of the mean runtime
@@ -97,7 +97,18 @@ namespace chaos
                      }
                      else
                      {
-                         if (current_ts - interval > last_flip)
+                         long dt = current_ts - last_flip;
+                         bool do_flip = dt >= interval;
+
+                         // randomize flip start, also ensure at least one flip
+                         if (!do_flip && last_flip == start_time_ && mean_runtime_)
+                         {
+                             p_flip = static_cast<double>(dt) / interval *
+                                 (static_cast<double>(current_ts - start_time_) / (mean_runtime_ * 0.75));
+                             do_flip = flip_p_dist(rng_) <= p_flip;
+                         }
+
+                         if (do_flip)
                          {
                              flip_random_bit(pid, memory_info, 1);
                              last_flip = current_ts;
