@@ -12,7 +12,7 @@ from db import ResultsDatabase, DB_MONETDB
 from monitor import get_monitor
 from runner import get_runner
 from runner.monetdb import init_mserver5_port_pool
-from util import get_hostname, get_dir_name
+from util import get_hostname, get_dir_name, kill_family
 from args import parser
 
 log = logging.getLogger(__name__)
@@ -61,9 +61,9 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     except Exception as e:
         log.error('Error while running query', exc_info=e)
         if runner.query_process is not None:
-            os.killpg(os.getpgid(runner.query_process.pid), signal.SIGKILL)
+            kill_family(runner.query_process.pid, signal.SIGKILL)
         if runner.server_process is not None:
-            os.killpg(os.getpgid(runner.server_process.pid), signal.SIGKILL)
+            kill_family(runner.server_process.pid, signal.SIGKILL)
 
         return None
     finally:

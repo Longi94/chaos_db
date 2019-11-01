@@ -1,6 +1,6 @@
 import os
 import platform
-import argparse
+import subprocess
 from fault_type import FAULT_BIT_FLIP
 
 
@@ -25,3 +25,21 @@ def get_dir_name(database: str, query: str, fault: str, inject_space: str, flip_
             name += '_randomized'
 
     return name
+
+
+def kill_family(pid: int, signal: int):
+    try:
+        pid_str = subprocess.check_output(['pgrep', '-P', str(pid)]).decode('utf-8').strip()
+    except subprocess.CalledProcessError:
+        os.kill(pid, signal)
+        return
+
+    if len(pid_str) == 0:
+        return
+
+    children = list(map(int, pid_str.split('\n')))
+
+    for child in children:
+        kill_family(child, signal)
+
+    os.kill(pid, signal)
