@@ -1,4 +1,8 @@
+import logging
+import time
 from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
+
+log = logging.getLogger(__name__)
 
 
 class InjectorClient(object):
@@ -10,7 +14,20 @@ class InjectorClient(object):
 
     def connect(self):
         self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
+        attempt = 0
+        while attempt < 12:
+            try:
+                self.socket.connect((self.host, self.port))
+                break
+            except ConnectionRefusedError as e:
+                attempt += 1
+
+                if attempt == 12:
+                    log.error('Reached connection attempt limit.')
+                    raise e
+                else:
+                    log.info('Connection failed. Retrying in 5 seconds...')
+                    time.sleep(5)
 
     def send_start(self):
         self.socket.sendall(bytearray([1]))
