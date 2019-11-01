@@ -3,7 +3,6 @@ import logging
 import os
 from queue import Queue
 from typing import List, Any, Optional
-from thread_util import LockProxy
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +14,7 @@ _port_pool: Optional[Queue] = None
 def init_pool(size: int):
     global _port_pool
     _port_pool = Queue(size)
-    for i in range(7000, 7000 + size):
+    for i in range(7000, 7000 + size * 2):
         _port_pool.put(i)
 
 
