@@ -106,6 +106,7 @@ namespace chaos
 
             // After chatting close the socket 
             close(connfd);
+            shutdown(sockfd, SHUT_RDWR);
             close(sockfd);
         }
 
