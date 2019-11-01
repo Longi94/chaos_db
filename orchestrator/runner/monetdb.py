@@ -110,7 +110,8 @@ class MonetDBRunner(SqlRunner):
 
         with open(os.path.join(self.directory, 'output.txt'), 'w') as output_file:
             with open(os.path.join(self.directory, 'stderr.txt'), 'w') as error_file:
-                self.query_process = subprocess.Popen(query_command, stdout=output_file, stderr=error_file)
+                self.query_process = subprocess.Popen(query_command, stdout=output_file, stderr=error_file,
+                                                      preexec_fn=os.setsid)
 
                 self.injector_client.send_start()
 

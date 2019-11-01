@@ -92,6 +92,6 @@ def run_injector(
     command.extend(child_command)
 
     log.info('Running command: ' + ' '.join(command))
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=inject_stderr)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=inject_stderr, preexec_fn=os.setsid)
 
     return p
