@@ -38,11 +38,19 @@ namespace chaos
             servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
             servaddr.sin_port = htons(port);
 
-            // Binding newly created socket to given IP and verification 
-            if (bind(sockfd, reinterpret_cast<struct sockaddr*>(&servaddr), sizeof servaddr) != 0)
+            // Binding newly created socket to given IP and verification
+            while (bind(sockfd, reinterpret_cast<struct sockaddr*>(&servaddr), sizeof servaddr) != 0)
             {
-                cerr << "Socket bind failed: " << strerror(errno) << endl;
-                return;
+                if (errno == 98)
+                {
+                    cout << "Port in use, retrying..." << endl;
+                    this_thread::sleep_for(chrono::milliseconds(1000));
+                }
+                else
+                {
+                    cerr << "Socket bind failed: " << strerror(errno) << endl;
+                    return;
+                }
             }
 
             cout << "Socket successfully bound.." << endl;
