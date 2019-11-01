@@ -76,6 +76,7 @@ namespace chaos
                 cout << pid << " timeout, killing..." << endl;
                 kill(pid, SIGKILL);
                 timeout_ = true;
+                waitpid(pid, &process_status_, 0);
             }
             return timeout_;
         }
@@ -91,7 +92,6 @@ namespace chaos
                 long current_ts = 0;
                 if (check_timeout(pid, current_ts))
                 {
-                    this_thread::sleep_for(sleep_clock);
                     continue;
                 }
 
