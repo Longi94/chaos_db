@@ -59,6 +59,11 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
 
     except Exception as e:
         log.error('Error while running query', exc_info=e)
+        if runner.query_process is not None:
+            runner.query_process.kill()
+        if runner.server_process is not None:
+            runner.server_process.kill()
+
         return None
     finally:
         runner.clean()
