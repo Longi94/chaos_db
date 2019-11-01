@@ -36,6 +36,9 @@ class SqlRunner(object):
         """
         raise NotImplementedError()
 
+    def finish_query(self):
+        pass
+
     def clean(self):
         """
         Clean up the database

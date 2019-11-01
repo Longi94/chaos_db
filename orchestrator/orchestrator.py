@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import time
+import threading
 from typing import Dict, Set
 from multiprocessing.pool import ThreadPool
 from functools import partial
@@ -35,9 +36,23 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
         if not runner.serverless:
             runner.start_server()
 
-        monitor.start(args.query)
-        runner.run_query(args.query)
-        monitor.monitor(runner.query_process if runner.serverless else runner.server_process)
+            monitor_thread = threading.Thread(target=monitor.monitor, args=(runner.server_process,))
+            monitor_thread.start()
+
+            monitor.start(args.query)
+            runner.run_query(args.query)
+        else:
+            monitor.start(args.query)
+            runner.run_query(args.query)
+
+            monitor_thread = threading.Thread(target=monitor.monitor, args=(runner.query_process,))
+            monitor_thread.start()
+
+        runner.query_process.wait()
+        runner.finish_query()
+
+        monitor_thread.join()
+
     except Exception as e:
         log.error('Error while running query', exc_info=e)
 

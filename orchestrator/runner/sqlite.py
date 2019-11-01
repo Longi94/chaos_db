@@ -46,8 +46,6 @@ class SQLiteRunner(SqlRunner):
                 single=self.single
             )
 
-            self.query_process.wait()
-
     def clean(self):
         if os.path.exists(self.db_file):
             os.remove(self.db_file)

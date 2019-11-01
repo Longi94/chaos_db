@@ -113,8 +113,8 @@ class MonetDBRunner(SqlRunner):
                 self.query_process = subprocess.Popen(query_command, stdout=output_file, stderr=error_file)
 
                 self.injector_client.send_start()
-                self.query_process.wait()
 
+    def finish_query(self):
         self.injector_client.send_stop()
         self.injector_client.close()
 
