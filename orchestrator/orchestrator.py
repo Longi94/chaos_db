@@ -61,9 +61,9 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     except Exception as e:
         log.error('Error while running query', exc_info=e)
         if runner.query_process is not None:
-            os.killpg(os.getpgid(runner.query_process.pid), signal.SIGTERM)
+            os.killpg(os.getpgid(runner.query_process.pid), signal.SIGKILL)
         if runner.server_process is not None:
-            os.killpg(os.getpgid(runner.server_process.pid), signal.SIGTERM)
+            os.killpg(os.getpgid(runner.server_process.pid), signal.SIGKILL)
 
         return None
     finally:

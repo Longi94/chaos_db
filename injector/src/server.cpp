@@ -30,6 +30,11 @@ namespace chaos
                 return;
             }
 
+            // since we can end up binding to the same address frequently that can cause the
+            // port in use error, we set this flag to try and reuse said address
+            int option = 1;
+            setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof option);
+
             cout << "Socket successfully created" << endl;
             bzero(&servaddr, sizeof servaddr);
 
