@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import threading
+import signal
 from typing import Dict, Set
 from multiprocessing.pool import ThreadPool
 from functools import partial
@@ -60,9 +61,9 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     except Exception as e:
         log.error('Error while running query', exc_info=e)
         if runner.query_process is not None:
-            runner.query_process.kill()
+            os.killpg(os.getpgid(runner.query_process.pid), signal.SIGTERM)
         if runner.server_process is not None:
-            runner.server_process.kill()
+            os.killpg(os.getpgid(runner.server_process.pid), signal.SIGTERM)
 
         return None
     finally:
