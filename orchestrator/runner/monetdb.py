@@ -18,7 +18,7 @@ mserver5_port_pool = None
 
 def init_mserver5_port_pool(size: int):
     global mserver5_port_pool
-    mserver5_port_pool = Queue(size)
+    mserver5_port_pool = Queue(size * 2)
     for i in range(50001, 50001 + size * 2):
         mserver5_port_pool.put(i)
 

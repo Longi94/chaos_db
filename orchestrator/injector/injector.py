@@ -13,7 +13,7 @@ _port_pool: Optional[Queue] = None
 
 def init_pool(size: int):
     global _port_pool
-    _port_pool = Queue(size)
+    _port_pool = Queue(size * 2)
     for i in range(7000, 7000 + size * 2):
         _port_pool.put(i)
 
