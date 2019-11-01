@@ -53,14 +53,15 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
 
         monitor_thread.join()
 
+        if not runner.serverless:
+            monitor.evaluate_query_process(runner.query_process)
+        monitor.end()
+
     except Exception as e:
         log.error('Error while running query', exc_info=e)
-
-    if not runner.serverless:
-        monitor.evaluate_query_process(runner.query_process)
-
-    monitor.end()
-    runner.clean()
+        return None
+    finally:
+        runner.clean()
 
     result = monitor.to_dict()
     result['iteration'] = iteration
