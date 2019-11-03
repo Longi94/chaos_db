@@ -21,10 +21,14 @@ if __name__ == '__main__':
             random_flip_rate=args.random_flip_rate
         )
 
-        clush_command = ['clush', '-v', '-w', args.nodes, 'cd', 'chaos_db', '&&', 'PYTHONPATH=./orchestrator', 'python3',
-                         'orchestrator/orchestrator.py', '-d', args.database, '-q', args.query, '-w',
+        clush_command = ['clush', '-v', '-w', args.nodes, 'cd', 'chaos_db', '&&', 'PYTHONPATH=./orchestrator',
+                         'python3', 'orchestrator/orchestrator.py', '-d', args.database, '-q', args.query, '-w',
                          args.working_directory, '-i', str(args.iterations), '-t', str(args.threads), '-fr',
                          str(val)]
+
+        if args.database_path is not None:
+            clush_command.append('-dp')
+            clush_command.append(args.database_path)
 
         if args.single:
             clush_command.append('--single')
