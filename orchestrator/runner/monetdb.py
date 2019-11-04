@@ -55,6 +55,8 @@ class MonetDBRunner(SqlRunner):
                     '--set',
                     'gdk_mmap_minsize=1000000000000',  # force monetdb to use malloc instead of mmap
                     '--set',
+                    'sql_optimizer=sequential_pipe',  # disable parallelism to avoid non deterministic output
+                    '--set',
                     f'mapi_port={self.server_port}'
                 ],
                 fault=self.fault,
@@ -75,6 +77,9 @@ class MonetDBRunner(SqlRunner):
             'SELECT 1',
             self.db_name
         ]
+
+        # a bit of time for the tcp socket to initialize
+        time.sleep(0.2)
 
         while True:
             p = subprocess.Popen(test_query, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
