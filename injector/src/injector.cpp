@@ -51,7 +51,10 @@ int main(const int argc, char* argv[])
 
     // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
-    char** argv_copy = argv;
+    auto argv_copy = new char*[argc + 1];
+    for (int i = 0; i <= argc; i++) {
+        argv_copy[i] = argv[i];
+    }
 
     auto args = options.parse(argc_copy, argv_copy);
 
