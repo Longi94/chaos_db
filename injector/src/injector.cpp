@@ -86,6 +86,7 @@ int main(const int argc, char* argv[])
     const pid_t pid = process::execute(path, output, input, error, command_args);
 
     atomic_bool stop_flag(false);
+    atomic_bool start_flag(false);
     unique_ptr<thread> server_thread = nullptr;
     int sock_fd = 0;
     if (args.count("port"))
@@ -93,10 +94,10 @@ int main(const int argc, char* argv[])
         mutex m;
         condition_variable cv;
         unique_lock<mutex> lk(m);
-        server_thread = server::start_background(args["port"].as<int>(), cv, stop_flag, sock_fd);
+        server_thread = server::start_background(args["port"].as<int>(), cv, start_flag, stop_flag, sock_fd);
 
         cout << "Waiting for start command..." << endl;
-        cv.wait(lk);
+        cv.wait(lk, [&start_flag] { return start_flag == true; });
     }
 
     cout << "Injecting fault..." << endl;

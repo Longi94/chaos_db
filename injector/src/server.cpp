@@ -18,7 +18,7 @@ namespace chaos
 {
     namespace server
     {
-        void start(const int port, condition_variable& start_flag, atomic_bool& stop_flag, int& sockfd)
+        void start(const int port, condition_variable& start_cv, atomic_bool& start_flag, atomic_bool& stop_flag, int& sockfd)
         {
             struct sockaddr_in servaddr, cli;
 
@@ -97,7 +97,8 @@ namespace chaos
                     if (buff[0] == message_start)
                     {
                         cout << "Received start message" << endl;
-                        start_flag.notify_one();
+                        start_flag = true;
+                        start_cv.notify_all();
                     }
                     else if (buff[0] == message_stop)
                     {
@@ -115,9 +116,9 @@ namespace chaos
             close(sockfd);
         }
 
-        unique_ptr<thread> start_background(const int port, condition_variable& start_flag, atomic_bool& stop_flag, int& sock_fd)
+        unique_ptr<thread> start_background(const int port, condition_variable& start_cv, atomic_bool& start_flag, atomic_bool& stop_flag, int& sock_fd)
         {
-            return unique_ptr<thread>(new thread(&start, port, ref(start_flag), ref(stop_flag), ref(sock_fd)));
+            return unique_ptr<thread>(new thread(&start, port, ref(start_cv), ref(start_flag), ref(stop_flag), ref(sock_fd)));
         }
     }
 }

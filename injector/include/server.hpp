@@ -11,8 +11,11 @@ namespace chaos
         constexpr char message_stop = 2;
         constexpr int buffer_size = 16;
 
-        void start(int port, std::condition_variable& start_flag, std::atomic_bool& stop_flag, int& sock_fd);
-        std::unique_ptr<std::thread> start_background(int port, std::condition_variable& start_flag,
-                                                      std::atomic_bool& stop_flag, int& sock_fd);
+        void start(int port, std::condition_variable& start_cv, std::atomic_bool& start_flag,
+                   std::atomic_bool& stop_flag, int& sock_fd);
+        std::unique_ptr<std::thread> start_background(
+            int port, std::condition_variable& start_cv, std::atomic_bool& start_flag, std::atomic_bool& stop_flag,
+            int& sock_fd
+        );
     }
 }
