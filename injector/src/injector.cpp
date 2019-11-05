@@ -52,7 +52,8 @@ int main(const int argc, char* argv[])
     // cxxopts modifies argc and argv (removing parsed arguments) so we make a copy to make it easier to manually parse later
     int argc_copy = argc;
     auto argv_copy = new char*[argc + 1];
-    for (int i = 0; i <= argc; i++) {
+    for (int i = 0; i <= argc; i++)
+    {
         argv_copy[i] = argv[i];
     }
 
@@ -97,10 +98,13 @@ int main(const int argc, char* argv[])
         mutex m;
         condition_variable cv;
         unique_lock<mutex> lk(m);
-        server_thread = server::start_background(args["port"].as<int>(), cv, start_flag, stop_flag, sock_fd);
+        server_thread = server::start_background(args["port"].as<int>(), m, cv, start_flag, stop_flag, sock_fd);
 
         cout << "Waiting for start command..." << endl;
-        cv.wait(lk, [&start_flag] { return start_flag == true; });
+        while (!start_flag)
+        {
+            cv.wait(lk);
+        }
     }
 
     cout << "Injecting fault..." << endl;

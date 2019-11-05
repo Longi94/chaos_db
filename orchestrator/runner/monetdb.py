@@ -81,13 +81,19 @@ class MonetDBRunner(SqlRunner):
         # a bit of time for the tcp socket to initialize
         time.sleep(0.2)
 
+        wait_attempt = 0
+
         while True:
             p = subprocess.Popen(test_query, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
             p.wait()
             if p.returncode == 0:
                 break
             else:
+                if wait_attempt >= 60:
+                    # 1 minute timeout
+                    raise TimeoutError('mserver5 start timeout')
                 log.info('Waiting for mserver5...')
+                wait_attempt += 1
                 time.sleep(1)
 
     def run_query(self, query: int):
