@@ -14,3 +14,6 @@ apt install -y libc6:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386
 
 # postgres
 apt install -y libreadline-dev zlib1g-dev
+
+# AHEAD
+apt install -y libboost-all-dev libsparsehash-dev libffi-dev libncurses5-dev
