@@ -39,6 +39,7 @@ ln -s supplier.tbl supplierAN.tbl
 
 ${AHEAD_DIR}/build/Release/ssbm-dbsize_scalar -d .
 
-rm -rf *.tbl
+rm *.tbl
+rm -rf database
 
 popd
