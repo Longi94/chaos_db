@@ -4,6 +4,11 @@ from typing import Set
 DB_SQLITE = 'sqlite'
 DB_MONETDB = 'monetdb'
 DB_DUCKDB = 'duckdb'
+AHEAD_NORMAL = 'ahead_normal'
+AHEAD_CONT = 'ahead_normal'
+AHEAD_CONT_REENC = 'ahead_normal'
+AHEAD_LATE = 'ahead_normal'
+AHEAD_EARLY = 'ahead_normal'
 
 
 class ResultsDatabase(object):

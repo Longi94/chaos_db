@@ -5,6 +5,7 @@ from .runner import SqlRunner
 from .sqlite import SQLiteRunner
 from .monetdb import MonetDBRunner
 from .duckdb import DuckDBRunner
+from .ahead import AheadRunner
 
 
 def get_runner(db, iteration: int, directory: str, args: argparse.Namespace) -> Optional[SqlRunner]:
@@ -14,4 +15,6 @@ def get_runner(db, iteration: int, directory: str, args: argparse.Namespace) -> 
         return MonetDBRunner(iteration, directory, args)
     if db == DB_DUCKDB:
         return DuckDBRunner(directory, args)
+    if db in (AHEAD_CONT_REENC, AHEAD_CONT, AHEAD_EARLY, AHEAD_LATE, AHEAD_NORMAL):
+        return AheadRunner(directory, db, args)
     return None

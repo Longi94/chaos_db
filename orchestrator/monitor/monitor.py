@@ -1,8 +1,11 @@
+import os
 import filecmp
 import logging
 from subprocess import Popen
 from typing import Dict, Any
 from time import time
+from result import *
+from queries import *
 
 log = logging.getLogger(__name__)
 
@@ -84,3 +87,37 @@ class ProcessMonitor(object):
 
     def compare_files(self, file1: str, file2: str) -> bool:
         return filecmp.cmp(file1, file2)
+
+
+class ServerlessProcessMonitor(ProcessMonitor):
+
+    def __init__(self, directory: str, db: str):
+        super().__init__(directory)
+        self.db = db
+
+    def evaluate_result(self):
+        if self.timeout:
+            self.result = RESULT_TIMEOUT
+        elif self.exited:
+            if self.return_code == 0:
+                answer_file = f'databases/{self.db}/answers'
+                if self.query == TPCH1:
+                    answer_file += '/q1.out'
+                elif self.query == TPCH3:
+                    answer_file += '/q3.out'
+                elif self.query == SSB11:
+                    answer_file += '/ssb11.out'
+                elif self.query == SSB41:
+                    answer_file += '/ssb41.out'
+
+                if answer_file is not None and \
+                        self.compare_files(os.path.join(self.directory, 'output.txt'), answer_file):
+                    self.result = RESULT_OK
+                else:
+                    self.result = RESULT_INCORRECT_OUTPUT
+            else:
+                self.result = RESULT_ABNORMAL_BEHAVIOR
+        elif self.signaled:
+            self.result = RESULT_CRASH
+        else:
+            self.result = RESULT_UNKNOWN
