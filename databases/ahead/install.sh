@@ -9,15 +9,20 @@ die () {
 
 [[ $# -ge 1 ]] || die "1 argument required, $# provided"
 
-VERSION=cec5c8f7258b84aa37230ff2095ec4f55da3c56a
+VERSION=20e0f9c6b99daff0ab36e942310ffefc3d93751e
 DIR=$(realpath $1)
 
-cd ${DIR}
+pushd ${DIR}
 git clone https://github.com/Longi94/AHEAD.git
-cd AHEAD
+pushd AHEAD
+git submodule update --init --recursive
 git checkout ${VERSION} -b ${VERSION}
 
 ./bootstrap.sh
 
-cd build/Release
+pushd build/Release
 cmake --build .
+
+popd
+popd
+popd

@@ -37,7 +37,7 @@ ln -s lineorder.tbl lineorderAN.tbl
 ln -s part.tbl partAN.tbl
 ln -s supplier.tbl supplierAN.tbl
 
-${AHEAD_DIR}/build/Release/ssbm-dbsize_scalar -d .
+${AHEAD_DIR}/build/Release/ssbm-init -d .
 
 rm *.tbl
 rm -rf database
