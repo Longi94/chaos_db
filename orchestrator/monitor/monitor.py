@@ -11,8 +11,9 @@ log = logging.getLogger(__name__)
 
 
 class ProcessMonitor(object):
-    def __init__(self, directory: str):
+    def __init__(self, directory: str, database_dir: str):
         self.directory = directory
+        self.database_dir = database_dir
         self.query = None
         self.start_time = None
         self.end_time = None
@@ -91,8 +92,8 @@ class ProcessMonitor(object):
 
 class ServerlessProcessMonitor(ProcessMonitor):
 
-    def __init__(self, directory: str, db: str):
-        super().__init__(directory)
+    def __init__(self, directory: str, database_dir: str, db: str):
+        super().__init__(directory, database_dir)
         self.db = db
 
     def evaluate_result(self):

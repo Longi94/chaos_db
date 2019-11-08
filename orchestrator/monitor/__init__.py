@@ -5,13 +5,13 @@ from .monetdb import MonetDBMonitor
 from .sqlite import SQLiteMonitor
 
 
-def get_monitor(db: str, directory: str) -> Optional[ProcessMonitor]:
+def get_monitor(db: str, database_dir: str, directory: str) -> Optional[ProcessMonitor]:
     if db == DB_SQLITE:
-        return SQLiteMonitor(directory)
+        return SQLiteMonitor(directory, database_dir)
     if db == DB_MONETDB:
-        return MonetDBMonitor(directory)
+        return MonetDBMonitor(directory, database_dir)
     if db == DB_DUCKDB:
-        return ServerlessProcessMonitor(directory, 'duckdb')
+        return ServerlessProcessMonitor(directory, database_dir, 'duckdb')
     if db in (AHEAD_CONT_REENC, AHEAD_CONT, AHEAD_EARLY, AHEAD_LATE, AHEAD_NORMAL):
-        return ServerlessProcessMonitor(directory, 'ahead')
+        return ServerlessProcessMonitor(directory, database_dir, 'ahead')
     return None

@@ -30,7 +30,7 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     os.makedirs(iteration_dir, exist_ok=True)
 
     runner = get_runner(args.database, iteration, iteration_dir, args)
-    monitor = get_monitor(args.database, iteration_dir)
+    monitor = get_monitor(args.database, args.database_path, iteration_dir)
 
     runner.init_db()
     try:
