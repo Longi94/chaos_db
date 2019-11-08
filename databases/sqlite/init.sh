@@ -9,7 +9,7 @@ die () {
 
 [[ $# -ge 1 ]] || die "1 argument required, $# provided"
 
-python3 ../../orchestrator/generate_sql_file.py update.sql update.sql.tmp
+python3 ../../orchestrator/generate_sql_file.py -i update.sql -o update.sql.tmp
 
 # the trailing separators cause a lot of warning logs
 ./bin/sqlite3 "$1" < schema.sql

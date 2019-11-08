@@ -24,7 +24,7 @@ do
 done
 
 ${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} schema.sql
-python3 generate_load_file.py
+python3 ../../orchestrator/generate_sql_file.py -i load.sql -o load.sql.tmp
 ${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} load.sql.tmp
 ${MONETDB_DIR}/build/bin/mclient -d ${DB_NAME} constraints.sql
 kill ${PID}
