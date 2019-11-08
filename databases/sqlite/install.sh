@@ -18,7 +18,7 @@ if [[ ! -f ${DIR}/${ZIP_SOURCE}.zip ]]; then
 fi
 
 unzip ${DIR}/${ZIP_SOURCE}.zip -d ${DIR}/
-mkdir ${DIR}/bin
-gcc ${DIR}/${ZIP_SOURCE}/shell.c ${DIR}/${ZIP_SOURCE}/sqlite3.c -lpthread -ldl -o bin/sqlite3
+mkdir ${DIR}/bin || true
+gcc ${DIR}/${ZIP_SOURCE}/shell.c ${DIR}/${ZIP_SOURCE}/sqlite3.c -lpthread -ldl -o ${DIR}/bin/sqlite3
 
 rm -rf ${DIR}/${ZIP_SOURCE}

@@ -18,7 +18,7 @@ class SQLiteRunner(SqlRunner):
     def init_db(self):
         log.info('Copying sqlite database to a temp file...')
         log.info('Temp file name: ' + self.db_file)
-        copyfile('databases/sqlite/tpc-h.sqlite', self.db_file)
+        copyfile(os.path.join(self.database_dir, 'tpc-h.sqlite'), self.db_file)
 
     def run_query(self, query: int):
         query_file = None
@@ -27,6 +27,8 @@ class SQLiteRunner(SqlRunner):
             query_file = 'databases/sqlite/queries/1.sql'
         elif query == TPCH3:
             query_file = 'databases/sqlite/queries/3.sql'
+        elif query == TPCH_UPDATES:
+            query_file = 'databases/sqlite/update.sql'
 
         if query_file is None:
             raise NameError(f'Unknown query: {query}')
@@ -36,7 +38,7 @@ class SQLiteRunner(SqlRunner):
                 output_file=os.path.join(self.directory, 'output.txt'),
                 input_file=query_file,
                 error_file=os.path.join(self.directory, 'stderr.txt'),
-                child_command=['databases/sqlite/bin/sqlite3', self.db_file],
+                child_command=[os.path.join(self.database_dir, 'bin/sqlite3'), self.db_file],
                 fault=self.fault,
                 inject_space=self.inject_space,
                 flip_rate=self.flip_rate,
