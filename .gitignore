@@ -633,7 +633,7 @@ build/
 *.db
 *.duckdb
 *.wal
-!databases/*/answers/q*.out
+!databases/*/answers/*.out
 results.csv
 databases/tpch/*/
 
