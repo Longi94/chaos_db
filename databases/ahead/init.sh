@@ -16,11 +16,19 @@ mkdir -p ${DB_PATH}
 
 pushd ${AHEAD_DIR}/database
 
-${AHEAD_DIR}/database/dbgen -s 1 -T c -v -f
-${AHEAD_DIR}/database/dbgen -s 1 -T d -v -f
-${AHEAD_DIR}/database/dbgen -s 1 -T l -v -f
-${AHEAD_DIR}/database/dbgen -s 1 -T p -v -f
-${AHEAD_DIR}/database/dbgen -s 1 -T s -v -f
+echo "Generating customers table..."
+${AHEAD_DIR}/database/dbgen -s 1 -T c -f 1>/dev/null 2>/dev/null
+echo "Generating date table..."
+${AHEAD_DIR}/database/dbgen -s 1 -T d -f 1>/dev/null 2>/dev/null
+echo "Generating lineitems table..."
+${AHEAD_DIR}/database/dbgen -s 1 -T l -f 1>/dev/null 2>/dev/null
+echo "Generating parts table..."
+${AHEAD_DIR}/database/dbgen -s 1 -T p -f 1>/dev/null 2>/dev/null
+echo "Generating suppliers table..."
+${AHEAD_DIR}/database/dbgen -s 1 -T s -f 1>/dev/null 2>/dev/null
+
+# For some reason, files can randomly have 101
+chmod 644 *tbl
 
 popd
 
