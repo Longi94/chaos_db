@@ -5,10 +5,10 @@ DB_SQLITE = 'sqlite'
 DB_MONETDB = 'monetdb'
 DB_DUCKDB = 'duckdb'
 AHEAD_NORMAL = 'ahead_normal'
-AHEAD_CONT = 'ahead_normal'
-AHEAD_CONT_REENC = 'ahead_normal'
-AHEAD_LATE = 'ahead_normal'
-AHEAD_EARLY = 'ahead_normal'
+AHEAD_CONT = 'ahead_cont'
+AHEAD_CONT_REENC = 'ahead_cont_reenc'
+AHEAD_LATE = 'ahead_late'
+AHEAD_EARLY = 'ahead_early'
 
 
 class ResultsDatabase(object):
