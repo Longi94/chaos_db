@@ -31,7 +31,10 @@ def kill_family(pid: int, signal: int):
     try:
         pid_str = subprocess.check_output(['pgrep', '-P', str(pid)]).decode('utf-8').strip()
     except subprocess.CalledProcessError:
-        os.kill(pid, signal)
+        try:
+            os.kill(pid, signal)
+        except ProcessLookupError:
+            pass
         return
 
     if len(pid_str) == 0:
@@ -42,4 +45,7 @@ def kill_family(pid: int, signal: int):
     for child in children:
         kill_family(child, signal)
 
-    os.kill(pid, signal)
+    try:
+        os.kill(pid, signal)
+    except ProcessLookupError:
+        pass
