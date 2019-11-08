@@ -28,7 +28,7 @@ class AheadRunner(SqlRunner):
 
         if query == SSB11:
             binary_file += '-q11'
-        elif query == TPCH3:
+        elif query == SSB41:
             binary_file += '-q41'
         else:
             raise ValueError(f'Unsupported query: {query}')
