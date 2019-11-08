@@ -28,7 +28,7 @@ class SQLiteRunner(SqlRunner):
         elif query == TPCH3:
             query_file = 'databases/sqlite/queries/3.sql'
         elif query == TPCH_UPDATES:
-            query_file = 'databases/sqlite/update.sql'
+            query_file = 'databases/sqlite/update.sql.tmp'
 
         if query_file is None:
             raise NameError(f'Unknown query: {query}')
