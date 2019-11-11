@@ -64,7 +64,7 @@ def run_injector(
     if input_file is not None:
         command.extend(['-i', input_file])
 
-    if input_file is not None:
+    if error_file is not None:
         command.extend(['-e', error_file])
 
     if fault is not None:
