@@ -8,7 +8,7 @@ parser.add_argument('-i', '--iterations', type=int, default=1, required=False,
                     help='Number of times to run the experiment')
 parser.add_argument('-q', '--query', choices=[TPCH1, TPCH3, TPCH_UPDATES, SSB11, SSB41], type=str, required=True,
                     help='The TPC-H query to run')
-parser.add_argument('-d', '--database', type=str, required=True,
+parser.add_argument('-d', '--database', nargs='+', type=str, required=True,
                     choices=[DB_SQLITE, DB_MONETDB, DB_DUCKDB, AHEAD_NORMAL, AHEAD_CONT, AHEAD_CONT_REENC, AHEAD_EARLY,
                              AHEAD_LATE],
                     help='Database to run the experiment on')

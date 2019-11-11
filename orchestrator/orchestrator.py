@@ -88,11 +88,11 @@ if __name__ == '__main__':
     check_injector()
     init_pool(args.threads)
 
-    if args.database == DB_MONETDB:
+    if args.database[0] == DB_MONETDB:
         init_mserver5_port_pool(args.threads)
 
     experiment_dir = get_dir_name(
-        database=args.database,
+        database=args.database[0],
         query=args.query,
         fault=args.fault,
         inject_space=args.inject_space,
@@ -117,7 +117,7 @@ if __name__ == '__main__':
                         handlers=handlers,
                         format='%(asctime)s %(levelname)7s %(name)s [%(threadName)s] : %(message)s')
 
-    log.info('DB type: ' + args.database)
+    log.info('DB type: ' + args.database[0])
     log.info('Putting everything into ' + experiment_dir)
 
     thread_count = max(1, args.threads)
