@@ -55,6 +55,10 @@ class MonetDBRunner(SqlRunner):
                     '--set',
                     'gdk_mmap_minsize=1000000000000',  # force monetdb to use malloc instead of mmap
                     '--set',
+                    'gdk_mmap_minsize_persistent=1000000000000',
+                    '--set',
+                    'gdk_mmap_minsize_transient=1000000000000',
+                    '--set',
                     'sql_optimizer=sequential_pipe',  # disable parallelism to avoid non deterministic output
                     '--set',
                     f'mapi_port={self.server_port}'
