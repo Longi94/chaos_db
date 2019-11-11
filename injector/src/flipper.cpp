@@ -97,14 +97,14 @@ namespace chaos
                      }
                      else
                      {
-                         long dt = current_ts - last_flip;
+                         const long dt = current_ts - last_flip;
                          bool do_flip = dt >= interval;
 
                          // randomize flip start, also ensure at least one flip
                          if (!do_flip && last_flip == start_time_ && mean_runtime_)
                          {
-                             p_flip = static_cast<double>(dt) / interval *
-                                 (static_cast<double>(current_ts - start_time_) / (mean_runtime_ * 0.75));
+                             p_flip = static_cast<double>(current_ts - start_time_) / (mean_runtime_ * 0.75);
+                             cout << interval << "|" << current_ts << "|" << last_flip << "|" << start_time_ << "|" << p_flip << endl;
                              do_flip = flip_p_dist(rng_) <= p_flip;
                          }
 
