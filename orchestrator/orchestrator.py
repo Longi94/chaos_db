@@ -29,8 +29,8 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     iteration_dir = os.path.join(experiment_dir, str(iteration))
     os.makedirs(iteration_dir, exist_ok=True)
 
-    runner = get_runner(args.database, iteration, iteration_dir, args)
-    monitor = get_monitor(args.database, args.database_path, iteration_dir)
+    runner = get_runner(args.database[0], iteration, iteration_dir, args)
+    monitor = get_monitor(args.database[0], args.database_path, iteration_dir)
 
     runner.init_db()
     try:
