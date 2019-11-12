@@ -145,7 +145,8 @@ if __name__ == '__main__':
                     result['runtime'],
                     result['fault_count'],
                     result['max_heap_size'],
-                    result['max_stack_size']
+                    result['max_stack_size'],
+                    result['detected']
                 ))
 
     db.close()

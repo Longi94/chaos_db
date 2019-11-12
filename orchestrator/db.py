@@ -28,7 +28,8 @@ class ResultsDatabase(object):
                    runtime        REAL    NOT NULL,
                    fault_count    INTEGER NOT NULL,
                    max_heap_size  INTEGER NOT NULL,
-                   max_stack_size INTEGER NOT NULL
+                   max_stack_size INTEGER NOT NULL,
+                   detected       INTEGER NOT NULL
                )'''
         )
         self.connection.commit()
@@ -37,7 +38,7 @@ class ResultsDatabase(object):
     def insert_result(self, result):
         cursor = self.connection.cursor()
         cursor.execute('''INSERT INTO result VALUES 
-                          (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', result)
+                          (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', result)
         self.connection.commit()
         cursor.close()
 

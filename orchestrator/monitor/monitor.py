@@ -28,6 +28,7 @@ class ProcessMonitor(object):
         self.max_stack_size = 0
         self.fault_count = 0
         self.timeout = False
+        self.detected = False
 
         # query process status, if not serverless
         self.query_return_code = 0
@@ -84,6 +85,7 @@ class ProcessMonitor(object):
             'max_heap_size': self.max_heap_size,
             'max_stack_size': self.max_stack_size,
             'fault_count': self.fault_count,
+            'detected': self.detected
         }
 
     def compare_files(self, file1: str, file2: str) -> bool:

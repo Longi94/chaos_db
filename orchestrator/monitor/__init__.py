@@ -3,6 +3,7 @@ from db import *
 from .monitor import ProcessMonitor, ServerlessProcessMonitor
 from .monetdb import MonetDBMonitor
 from .sqlite import SQLiteMonitor
+from .ahead import AheadMonitor
 
 
 def get_monitor(db: str, database_dir: str, directory: str) -> Optional[ProcessMonitor]:
@@ -13,5 +14,5 @@ def get_monitor(db: str, database_dir: str, directory: str) -> Optional[ProcessM
     if db == DB_DUCKDB:
         return ServerlessProcessMonitor(directory, database_dir, 'duckdb')
     if db in (AHEAD_CONT_REENC, AHEAD_CONT, AHEAD_EARLY, AHEAD_LATE, AHEAD_NORMAL):
-        return ServerlessProcessMonitor(directory, database_dir, 'ahead')
+        return AheadMonitor(directory, database_dir)
     return None
