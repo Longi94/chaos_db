@@ -18,11 +18,24 @@ class SQLiteMonitor(ServerlessProcessMonitor):
 
         if self.query == TPCH_UPDATES:
             db_file = os.path.join(self.directory, 'db.sqlite')
+            integrity_stdout = os.path.join(self.directory, 'integrity_stdout.txt')
+            integrity_stderr = os.path.join(self.directory, 'integrity_stderr.txt')
 
             # check for corruption
-            integrity_check = subprocess.check_output(
-                [os.path.join(self.database_dir, 'bin/sqlite3'), db_file, 'pragma integrity_check']) \
-                .decode('utf-8').strip()
+            with open(integrity_stdout, 'w') as f:
+                with open(integrity_stderr, 'w') as e:
+                    p = subprocess.Popen(
+                        [os.path.join(self.database_dir, 'bin/sqlite3'), db_file, 'pragma integrity_check'],
+                        stdout=f, stderr=e)
+
+            p.wait()
+
+            if p.returncode != 0:
+                self.result = RESULT_DB_CORRUPTED
+                return
+
+            with open(integrity_stdout, 'r') as f:
+                integrity_check = f.read().strip()
 
             if integrity_check != 'ok':
                 self.result = RESULT_DB_CORRUPTED
