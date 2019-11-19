@@ -104,7 +104,7 @@ namespace chaos
                          if (!do_flip && last_flip == start_time_ && mean_runtime_)
                          {
                              p_flip = static_cast<double>(current_ts - start_time_) / (mean_runtime_ * 0.75);
-                             cout << interval << "|" << current_ts << "|" << last_flip << "|" << start_time_ << "|" << p_flip << endl;
+                             // cout << interval << "|" << current_ts << "|" << last_flip << "|" << start_time_ << "|" << p_flip << endl;
                              do_flip = flip_p_dist(rng_) <= p_flip;
                          }
 
