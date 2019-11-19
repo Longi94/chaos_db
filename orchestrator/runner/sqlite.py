@@ -54,3 +54,8 @@ class SQLiteRunner(SqlRunner):
             os.remove(self.db_file)
         if os.path.exists(self.db_journal):
             os.remove(self.db_journal)
+
+        # remove big output files, infinite loops can cause gigantic files to be generated
+        output_file = os.path.join(self.directory, 'output.txt')
+        if os.path.getsize(output_file) > 1000000:
+            os.remove(output_file)
