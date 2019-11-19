@@ -15,6 +15,6 @@ for exp_name in os.listdir('.'):
         if db == 'sqlite':
             output_file = os.path.join(exp_name, iteration, 'output.txt')
 
-            if os.path.getsize(output_file) > 1000000:
+            if os.path.exists(output_file) and os.path.getsize(output_file) > 1000000:
                 print(f'Removing {output_file}...')
                 os.remove(output_file)
