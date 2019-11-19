@@ -13,6 +13,7 @@ class SQLiteRunner(SqlRunner):
     def __init__(self, directory: str, args: argparse.Namespace):
         super(SQLiteRunner, self).__init__(directory, args)
         self.db_file = os.path.join(directory, 'db.sqlite')
+        self.db_journal = os.path.join(directory, 'db.sqlite-journal')
         self.serverless = True
 
     def init_db(self):
@@ -51,3 +52,5 @@ class SQLiteRunner(SqlRunner):
     def clean(self):
         if os.path.exists(self.db_file):
             os.remove(self.db_file)
+        if os.path.exists(self.db_journal):
+            os.remove(self.db_journal)

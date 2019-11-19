@@ -13,6 +13,7 @@ class DuckDBRunner(SqlRunner):
     def __init__(self, directory: str, args: argparse.Namespace):
         super(DuckDBRunner, self).__init__(directory, args)
         self.db_file = os.path.join(directory, 'db.duckdb')
+        self.wal_file = os.path.join(directory, 'db.duckdb.wal')
         self.serverless = True
 
     def init_db(self):
@@ -49,3 +50,5 @@ class DuckDBRunner(SqlRunner):
     def clean(self):
         if os.path.exists(self.db_file):
             os.remove(self.db_file)
+        if os.path.exists(self.wal_file):
+            os.remove(self.wal_file)
