@@ -1,5 +1,10 @@
 import sqlite3
-from typing import Set
+from typing import Set, List
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 DB_SQLITE = 'sqlite'
 DB_MONETDB = 'monetdb'
@@ -11,43 +16,45 @@ AHEAD_LATE = 'ahead_late'
 AHEAD_EARLY = 'ahead_early'
 
 
+class Result(Base):
+    __tablename__ = 'result'
+    iteration = Column(Integer, primary_key=True, nullable=False)
+    hostname = Column(String, primary_key=True, nullable=False)
+    result = Column(Integer)
+    exited = Column(Integer, nullable=False)
+    return_code = Column(Integer, nullable=False)
+    signaled = Column(Integer, nullable=False)
+    term_sig = Column(Integer, nullable=False)
+    runtime = Column(Float, nullable=False)
+    fault_count = Column(Integer, nullable=False)
+    max_heap_size = Column(Integer, nullable=False)
+    max_stack_size = Column(Integer, nullable=False)
+    detected = Column(Boolean, nullable=False)
+    stdout = Column(String)
+    stderr = Column(String)
+    inject_stderr = Column(String)
+
+
 class ResultsDatabase(object):
 
     def __init__(self, file):
-        self.connection = sqlite3.connect(file)
-        cursor = self.connection.cursor()
-        cursor.execute(
-            '''CREATE TABLE IF NOT EXISTS result (
-                   iteration      INTEGER NOT NULL,
-                   hostname       TEXT    NOT NULL,
-                   result         INTEGER NOT NULL,
-                   exited         INTEGER NOT NULL,
-                   return_code    INTEGER NOT NULL,
-                   signaled       INTEGER NOT NULL,
-                   term_sig       INTEGER NOT NULL,
-                   runtime        REAL    NOT NULL,
-                   fault_count    INTEGER NOT NULL,
-                   max_heap_size  INTEGER NOT NULL,
-                   max_stack_size INTEGER NOT NULL,
-                   detected       INTEGER NOT NULL
-               )'''
-        )
-        self.connection.commit()
-        cursor.close()
+        self.engine = create_engine(f'sqlite:///{file}')
+        Base.metadata.create_all(self.engine)
+        self.Session = sessionmaker(bind=self.engine)
 
-    def insert_result(self, result):
-        cursor = self.connection.cursor()
-        cursor.execute('''INSERT INTO result VALUES 
-                          (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', result)
-        self.connection.commit()
-        cursor.close()
+    def insert_result(self, result: Result):
+        self.Session().add(result)
 
     def get_iterations(self) -> Set[int]:
-        cursor = self.connection.cursor()
-        cursor.execute('''SELECT iteration FROM result''')
-        iterations = set(map(lambda row: row[0], cursor.fetchall()))
-        cursor.close()
-        return iterations
+        session = self.Session()
+        return set(session.query(Result.iteration))
+
+    def get_results(self) -> List[Result]:
+        session = self.Session()
+        return session.query(Result)
 
     def close(self):
-        self.connection.close()
+        self.Session().close()
+
+    def commit(self):
+        self.Session().commit()

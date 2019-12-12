@@ -1,20 +1,73 @@
 import os
+from db import ResultsDatabase
+from shutil import rmtree
+from result import *
+from sqlalchemy.exc import OperationalError
 
 for exp_name in os.listdir('.'):
 
+    print(f'Cleaning {exp_name}')
+
     db = exp_name.split('_')[0]
 
-    if db not in ('sqlite',):
-        continue
+    results_db = ResultsDatabase(os.path.join(exp_name, 'results.sqlite'))
 
-    for iteration in os.listdir(exp_name):
+    try:
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN stdout TEXT''')
+        print('Added column stdout')
+    except OperationalError:
+        print('Column stdout already exists')
 
-        if iteration in ('experiment.log', 'results.sqlite'):
+    try:
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN stderr TEXT''')
+        print('Added column stderr')
+    except OperationalError:
+        print('Column stderr already exists')
+
+    try:
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN inject_stderr TEXT''')
+        print('Added column inject_stderr')
+    except OperationalError:
+        print('Column inject_stderr already exists')
+
+    results = results_db.get_results()
+
+    for row in results:
+        iteration_dir = os.path.join(exp_name, str(row.iteration))
+
+        if not os.path.exists(iteration_dir):
             continue
 
-        if db == 'sqlite':
-            output_file = os.path.join(exp_name, iteration, 'output.txt')
+        print(f'Cleaning {iteration_dir}')
 
-            if os.path.exists(output_file) and os.path.getsize(output_file) > 1000000:
-                print(f'Removing {output_file}...')
-                os.remove(output_file)
+        if row.result == RESULT_OK:
+            # remove dir, everything in there is useless
+            rmtree(iteration_dir)
+            continue
+
+        if row.result == RESULT_TIMEOUT:
+            os.remove(os.path.join(iteration_dir, 'output.txt'))
+
+        try:
+            with open(os.path.join(iteration_dir, 'inject_stderr.txt'), 'r') as f:
+                row.inject_stderr = f.read()
+        except FileNotFoundError:
+            pass
+
+        try:
+            with open(os.path.join(iteration_dir, 'output.txt'), 'r') as f:
+                row.stdout = f.read()
+        except FileNotFoundError:
+            pass
+
+        try:
+            with open(os.path.join(iteration_dir, 'stderr.txt'), 'r') as f:
+                row.stderr = f.read()
+        except FileNotFoundError:
+            pass
+
+        results_db.commit()
+
+        rmtree(iteration_dir)
+
+    results_db.close()
