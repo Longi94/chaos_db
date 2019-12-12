@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 apt update
-apt install -y cmake build-essential gcc gdb rsync zip python3-pip
+apt install -y cmake build-essential gcc gdb rsync zip python3-pip libsqlite3-dev
 pip3 install pandas jupyter matplotlib
 
 mkdir /home/vagrant/.jupyter

@@ -22,7 +22,8 @@
                 ".vagrant",
                 ".idea",
                 "out",
-                "build"
+                "build",
+                "jupyter"
             ],
             "rsyncCommandArgs": "-t --delete --delete-excluded",
             "remoteCopyBuildOutput": false,
