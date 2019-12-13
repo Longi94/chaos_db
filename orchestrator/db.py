@@ -1,4 +1,3 @@
-import sqlite3
 from typing import Set, List
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean
 from sqlalchemy.orm import sessionmaker
@@ -21,15 +20,15 @@ class Result(Base):
     iteration = Column(Integer, primary_key=True, nullable=False)
     hostname = Column(String, primary_key=True, nullable=False)
     result = Column(Integer)
-    exited = Column(Integer, nullable=False)
-    return_code = Column(Integer, nullable=False)
-    signaled = Column(Integer, nullable=False)
-    term_sig = Column(Integer, nullable=False)
-    runtime = Column(Float, nullable=False)
-    fault_count = Column(Integer, nullable=False)
-    max_heap_size = Column(Integer, nullable=False)
-    max_stack_size = Column(Integer, nullable=False)
-    detected = Column(Boolean, nullable=False)
+    exited = Column(Integer)
+    return_code = Column(Integer)
+    signaled = Column(Integer)
+    term_sig = Column(Integer)
+    runtime = Column(Float)
+    fault_count = Column(Integer)
+    max_heap_size = Column(Integer)
+    max_stack_size = Column(Integer)
+    detected = Column(Boolean)
     stdout = Column(String)
     stderr = Column(String)
     inject_stderr = Column(String)

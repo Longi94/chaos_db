@@ -12,6 +12,22 @@ namespace chaos
     {
         enum fault_type { none, flip, stuck };
 
+        struct result
+        {
+            int iteration = 0;
+            const char* hostname = nullptr;
+            int exited = 0;
+            int return_code = 0;
+            int signaled = 0;
+            int term_sig = 0;
+            int fault_count = 0;
+            long max_heap_size = 0;
+            long max_stack_size = 0;
+            int timeout = 0;
+            const char* stdout = nullptr;
+            const char* stderr = nullptr;
+        };
+
         class FaultInjector
         {
         public:
@@ -38,7 +54,7 @@ namespace chaos
              * @param stop_flag
              */
             virtual void inject(pid_t pid, std::atomic_bool& stop_flag);
-            void print_data() const;
+            void get_result(std::unique_ptr<result>& result) const;
 
         protected:
             void init_time();

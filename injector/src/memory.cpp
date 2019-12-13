@@ -30,12 +30,12 @@ namespace chaos
 
             if (bytes_read < 0)
             {
-                cout << "Error while reading bytes: " << strerror(errno) << endl;
+                cerr << "Error while reading bytes: " << strerror(errno) << endl;
                 return -1;
             }
             if (bytes_read == 0)
             {
-                cout << "Read 0 bytes" << endl;
+                cerr << "Read 0 bytes" << endl;
                 return -1;
             }
 
@@ -48,12 +48,12 @@ namespace chaos
 
             if (bytes_written < 0)
             {
-                cout << "Error while writing bytes: " << strerror(errno) << endl;
+                cerr << "Error while writing bytes: " << strerror(errno) << endl;
                 return -1;
             }
             if (bytes_written == 0)
             {
-                cout << "Read 0 bytes" << endl;
+                cerr << "Written 0 bytes" << endl;
                 return -1;
             }
 
@@ -66,7 +66,7 @@ namespace chaos
 
             if (maps == nullptr)
             {
-                cout << "cannot parse the memory map of " << pid << endl;
+                cerr << "cannot parse the memory map of " << pid << endl;
                 return nullptr;
             }
 

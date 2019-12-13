@@ -53,7 +53,7 @@ namespace chaos
             return 0;
         }
 
-        pid_t execute(string& path, string& output, string& input, string& error, char** arguments)
+        pid_t execute(string& path, string& input, char** arguments)
         {
             cout << "Forking to run:";
             for (char** p = arguments; *p != nullptr; p++)
@@ -71,31 +71,31 @@ namespace chaos
             case 0:
                 {
                     // redirect stdout to file
-                    const int fdout = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                    if (fdout == -1)
-                    {
-                        cerr << "Failed to open fdout " << output << ": " << strerror(errno) << endl;
-                    }
-                    else
-                    {
-                        dup2(fdout, pipe_write);
-                        close(fdout);
-                    }
-
-                    // redirect stderr to file
-                    if (!error.empty())
-                    {
-                        const int fderr = open(error.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                        if (fdout == -1)
-                        {
-                            cerr << "Failed to open fderr " << error << ": " << strerror(errno) << endl;
-                        }
-                        else
-                        {
-                            dup2(fderr, pipe_error);
-                            close(fderr);
-                        }
-                    }
+                    // const int fdout = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                    // if (fdout == -1)
+                    // {
+                    //     cerr << "Failed to open fdout " << output << ": " << strerror(errno) << endl;
+                    // }
+                    // else
+                    // {
+                    //     dup2(fdout, pipe_write);
+                    //     close(fdout);
+                    // }
+                    //
+                    // // redirect stderr to file
+                    // if (!error.empty())
+                    // {
+                    //     const int fderr = open(error.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                    //     if (fdout == -1)
+                    //     {
+                    //         cerr << "Failed to open fderr " << error << ": " << strerror(errno) << endl;
+                    //     }
+                    //     else
+                    //     {
+                    //         dup2(fderr, pipe_error);
+                    //         close(fderr);
+                    //     }
+                    // }
 
                     // pipe file into stdin
                     if (!input.empty())
@@ -124,17 +124,6 @@ namespace chaos
                 cout << "Child process id from parent: " << pid << endl;
                 return pid;
             }
-        }
-
-        void print_process_status(const int status)
-        {
-            cout << "WIFEXITED: " << WIFEXITED(status) << endl;
-            cout << "WEXITSTATUS: " << WEXITSTATUS(status) << endl;
-            cout << "WIFSIGNALED: " << WIFSIGNALED(status) << endl;
-            cout << "WTERMSIG: " << WTERMSIG(status) << endl;
-            cout << "WCOREDUMP: " << WCOREDUMP(status) << endl;
-            cout << "WIFSTOPPED: " << WIFSTOPPED(status) << endl;
-            cout << "WSTOPSIG: " << WSTOPSIG(status) << endl;
         }
 
         bool is_child_running(const pid_t pid, int& status)

@@ -3,6 +3,7 @@
 #include "process.hpp"
 #include "cxxopts.hpp"
 #include "server.hpp"
+#include "database.hpp"
 #include <iostream>
 #include <fstream>
 #include <random>
@@ -19,7 +20,7 @@ int main(const int argc, char* argv[])
 {
     cxxopts::Options options(
         "injector",
-        "Inject bit flips into a child process. Example usage: injector -o q1.out -i queries/sqlite/1.sql -m 5000 -c /usr/bin/sqlite3 tpc-h.sqlite"
+        "Inject bit flips into a child process. Example usage: injector -d results.sqlite -i queries/sqlite/1.sql -m 5000 -c /usr/bin/sqlite3 tpc-h.sqlite"
     );
     options
         .allow_unrecognised_options()
@@ -28,8 +29,9 @@ int main(const int argc, char* argv[])
         ("c,command",
          "The command the child process should run. This should be the last option as anything after this will be interpreted as the command.",
          cxxopts::value<string>())
-        ("o,output", "string: Redirect stdout of the child process into this file", cxxopts::value<string>())
-        ("e,error", "string: Redirect stderr of the child process into this file", cxxopts::value<string>())
+        ("d,database", "string: The SQLite database to save the result into.", cxxopts::value<string>())
+        ("a,iteration", "Iteration number", cxxopts::value<int>())
+        ("b,hostname", "Host machine name", cxxopts::value<string>())
         ("i,input", "string: File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
         ("f,fault", "string: The type of fault to inject. Can be \"flip\", \"stuck\".", cxxopts::value<string>())
         ("single", "flag: inject one single fault")
@@ -65,7 +67,7 @@ int main(const int argc, char* argv[])
         exit(0);
     }
 
-    args::check_required(args, {"command", "output"});
+    args::check_required(args, {"command", "database", "iteration", "hostname"});
     args::check_depend(args, "fault", "stuck", "stuck-rate");
 
     // Init random
@@ -73,13 +75,14 @@ int main(const int argc, char* argv[])
     mt19937 rng(dev());
 
     auto path = args["command"].as<string>();
-    auto output = args["output"].as<string>();
     auto input = args["input"].as<string>();
-    string error = string();
+    auto database_name = args["database"].as<string>();
+    auto hostname = args["hostname"].as<string>();
+    auto iteration = 0;
 
-    if (args.count("error"))
+    if (args.count("iteration"))
     {
-        error = args["error"].as<string>();
+        iteration = args["iteration"].as<int>();
     }
 
     const auto fault_type = args::get_fault_type(args);
@@ -87,7 +90,10 @@ int main(const int argc, char* argv[])
 
     const auto injector = get_injector(fault_type, args, rng);
 
-    const pid_t pid = process::execute(path, output, input, error, command_args);
+    const pid_t pid = process::execute(path, input, command_args);
+    unique_ptr<fault::result> result(new fault::result());
+    result->iteration = iteration;
+    result->hostname = hostname.c_str();
 
     atomic_bool stop_flag(false);
     atomic_bool start_flag(false);
@@ -109,7 +115,7 @@ int main(const int argc, char* argv[])
 
     cout << "Injecting fault..." << endl;
     injector->inject(pid, stop_flag);
-    injector->print_data();
+    injector->get_result(result);
 
     if (!stop_flag)
     {
@@ -127,6 +133,8 @@ int main(const int argc, char* argv[])
     {
         server_thread->join();
     }
+
+    database::save_result(database_name, result);
 
     return 0;
 }

@@ -53,13 +53,16 @@ namespace chaos
             });
         }
 
-        void FaultInjector::print_data() const
+        void FaultInjector::get_result(unique_ptr<result>& result) const
         {
-            process::print_process_status(process_status_);
-            cout << "FAULT_COUNT: " << fault_count_ << endl;
-            cout << "MAX_HEAP_SIZE: " << max_heap_size_ << endl;
-            cout << "MAX_STACK_SIZE: " << max_stack_size_ << endl;
-            cout << "TIMEOUT: " << timeout_ << endl;
+            result->exited = WIFEXITED(process_status_);
+            result->return_code = WEXITSTATUS(process_status_);
+            result->signaled = WIFSIGNALED(process_status_);
+            result->term_sig = WTERMSIG(process_status_);
+            result->fault_count = fault_count_;
+            result->max_heap_size = max_heap_size_;
+            result->max_stack_size = max_stack_size_;
+            result->timeout = timeout_;
         }
 
         void FaultInjector::init_time()

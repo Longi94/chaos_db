@@ -27,18 +27,11 @@ namespace chaos
         /**
          * Execute a command by creating a child process with fork().
          * @param path path to the binary
-         * @param output file to write the stdout of the child process to
          * @param input file to pipe into the stdin of the child process
-         * @param error file to pipe into the stderr of the child process
          * @param arguments command line arguments for the child process
          * @return the process id of the child process
          */
-        pid_t execute(std::string& path, std::string& output, std::string& input, std::string& error, char** arguments);
-
-        /**
-         * Prints out information about process.
-         */
-        void print_process_status(int status);
+        pid_t execute(std::string& path, std::string& input, char** arguments);
 
         /**
          * Check if a child process is running.
