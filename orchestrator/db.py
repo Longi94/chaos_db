@@ -1,6 +1,6 @@
 from typing import Set, List
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -24,6 +24,7 @@ class Result(Base):
     return_code = Column(Integer)
     signaled = Column(Integer)
     term_sig = Column(Integer)
+    timeout = Column(Boolean)
     runtime = Column(Float)
     fault_count = Column(Integer)
     max_heap_size = Column(Integer)
@@ -39,14 +40,15 @@ class ResultsDatabase(object):
     def __init__(self, file):
         self.engine = create_engine(f'sqlite:///{file}')
         Base.metadata.create_all(self.engine)
-        self.Session = sessionmaker(bind=self.engine)
-
-    def insert_result(self, result: Result):
-        self.Session().add(result)
+        self.Session = scoped_session(sessionmaker(bind=self.engine))
 
     def get_iterations(self) -> Set[int]:
         session = self.Session()
         return set(session.query(Result.iteration))
+
+    def get_iteration(self, iteration: int) -> Result:
+        session = self.Session()
+        return session.query(Result).filter(Result.iteration == iteration).one()
 
     def get_results(self) -> List[Result]:
         session = self.Session()
@@ -54,6 +56,7 @@ class ResultsDatabase(object):
 
     def close(self):
         self.Session().close()
+        self.engine.dispose()
 
     def commit(self):
         self.Session().commit()

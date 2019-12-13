@@ -47,10 +47,11 @@ def check_injector():
 
 def run_injector(
         child_command: List[Any],
-        output_file: str,
+        database: str,
+        iteration: int,
+        hostname: str,
         inject_stderr,
         input_file: Optional[str] = None,
-        error_file: Optional[str] = None,
         fault: Optional[str] = None,
         inject_space: Optional[str] = None,
         flip_rate: Optional[float] = None,
@@ -59,13 +60,10 @@ def run_injector(
         single: bool = False,
         port: Optional[int] = None
 ) -> subprocess.Popen:
-    command = [INJECTOR_PATH, '-o', output_file]
+    command = [INJECTOR_PATH, '-d', database, '-a', str(iteration), '-b', hostname]
 
     if input_file is not None:
         command.extend(['-i', input_file])
-
-    if error_file is not None:
-        command.extend(['-e', error_file])
 
     if fault is not None:
         command.extend(['-f', fault])

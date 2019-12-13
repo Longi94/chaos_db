@@ -2,7 +2,6 @@ import argparse
 import logging
 import os
 import time
-import threading
 import signal
 from typing import Dict, Set
 from multiprocessing.pool import ThreadPool
@@ -18,7 +17,8 @@ from args import parser
 log = logging.getLogger(__name__)
 
 
-def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_iters: Set[int]) -> Dict or None:
+def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_iters: Set[int],
+        hostname: str) -> Dict or None:
     if iteration in existing_iters:
         log.info('Skipping iteration ' + str(iteration))
         return
@@ -27,9 +27,10 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     print('Iteration ' + str(iteration), flush=True)
 
     iteration_dir = os.path.join(experiment_dir, str(iteration))
+    db_path = os.path.join(experiment_dir, 'results.sqlite')
     os.makedirs(iteration_dir, exist_ok=True)
 
-    runner = get_runner(args.database[0], iteration, iteration_dir, args)
+    runner = get_runner(args.database[0], iteration, iteration_dir, args, hostname, db_path)
     monitor = get_monitor(args.database[0], args.database_path, iteration_dir)
 
     runner.init_db()
@@ -37,26 +38,23 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
         if not runner.serverless:
             runner.start_server()
 
-            monitor_thread = threading.Thread(target=monitor.monitor, args=(runner.server_process,))
-            monitor_thread.start()
-
             monitor.start(args.query)
             runner.run_query(args.query)
         else:
             monitor.start(args.query)
             runner.run_query(args.query)
 
-            monitor_thread = threading.Thread(target=monitor.monitor, args=(runner.query_process,))
-            monitor_thread.start()
-
         runner.query_process.wait()
         runner.finish_query()
 
-        monitor_thread.join()
-
         if not runner.serverless:
             monitor.evaluate_query_process(runner.query_process)
-        monitor.end()
+
+        db = ResultsDatabase(db_path)
+        result = db.get_iteration(iteration)
+        monitor.end(result)
+        db.commit()
+        db.close()
 
     except Exception as e:
         log.error('Error while running query', exc_info=e)
@@ -68,11 +66,6 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
         return None
     finally:
         runner.clean()
-
-    result = monitor.to_dict()
-    result['iteration'] = iteration
-
-    return result
 
 
 if __name__ == '__main__':
@@ -105,6 +98,7 @@ if __name__ == '__main__':
 
     db = ResultsDatabase(os.path.join(experiment_dir, 'results.sqlite'))
     existing = db.get_iterations()
+    db.close()
 
     log_file = os.path.join(experiment_dir, 'experiment.log')
 
@@ -124,32 +118,14 @@ if __name__ == '__main__':
     log.info(f'Running on {thread_count} threads')
 
     start_ts = time.time()
-
-    results_file = os.path.join(experiment_dir, 'results.csv')
-    resumed = os.path.exists(results_file)
     hostname = get_hostname()
 
     with ThreadPool(thread_count) as p:
-        for result in p.imap_unordered(partial(run, args=args, experiment_dir=experiment_dir,
-                                               existing_iters=existing),
-                                       range(args.iterations)):
-            if result is not None:
-                db.insert_result((
-                    result['iteration'],
-                    hostname,
-                    result['result'],
-                    result['exited'],
-                    result['return_code'],
-                    result['signaled'],
-                    result['term_sig'],
-                    result['runtime'],
-                    result['fault_count'],
-                    result['max_heap_size'],
-                    result['max_stack_size'],
-                    result['detected']
-                ))
-
-    db.close()
+        for _ in p.imap_unordered(
+                partial(run, args=args, experiment_dir=experiment_dir, existing_iters=existing,
+                        hostname=hostname),
+                range(args.iterations)):
+            pass
 
     end_ts = time.time()
 

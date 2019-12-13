@@ -3,7 +3,10 @@ import argparse
 
 class SqlRunner(object):
 
-    def __init__(self, directory: str, args: argparse.Namespace):
+    def __init__(self, directory: str, args: argparse.Namespace, iteration: int, hostname: str, results_db: str):
+        self.results_db = results_db
+        self.hostname = hostname
+        self.iteration = iteration
         self.directory = directory
         self.fault = args.fault
         self.inject_space = args.inject_space

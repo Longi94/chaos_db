@@ -3,6 +3,7 @@ import subprocess
 from result import *
 from queries import TPCH_UPDATES
 from .monitor import ServerlessProcessMonitor
+from db import Result
 
 SHA_ORIGINAL = '6fb06d65d5a30e858ed567936c64be5401e3952f'
 SHA_UPDATED = 'bd74cffaade77656453c85bcd02952af7b3f0c08'
@@ -13,8 +14,8 @@ class SQLiteMonitor(ServerlessProcessMonitor):
     def __init__(self, directory: str, database_dir: str):
         super().__init__(directory, database_dir, 'sqlite')
 
-    def evaluate_result(self):
-        super().evaluate_result()
+    def evaluate_result(self, result: Result):
+        super().evaluate_result(result)
 
         if self.query == TPCH_UPDATES:
             db_file = os.path.join(self.directory, 'db.sqlite')
@@ -36,17 +37,17 @@ class SQLiteMonitor(ServerlessProcessMonitor):
             p.wait()
 
             if p.returncode != 0:
-                self.result = RESULT_DB_CORRUPTED
+                result.result = RESULT_DB_CORRUPTED
                 return
 
             with open(integrity_stdout, 'r') as f:
                 integrity_check = f.read().strip()
 
             if integrity_check != 'ok':
-                self.result = RESULT_DB_CORRUPTED
+                result.result = RESULT_DB_CORRUPTED
                 return
 
             if db_hash == SHA_UPDATED:
-                self.result = RESULT_OK
+                result.result = RESULT_OK
             elif db_hash != SHA_ORIGINAL:
-                self.result = RESULT_INCORRECT_OUTPUT
+                result.result = RESULT_INCORRECT_OUTPUT

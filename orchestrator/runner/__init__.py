@@ -8,9 +8,10 @@ from .duckdb import DuckDBRunner
 from .ahead import AheadRunner
 
 
-def get_runner(db, iteration: int, directory: str, args: argparse.Namespace) -> Optional[SqlRunner]:
+def get_runner(db, iteration: int, directory: str, args: argparse.Namespace, hostname: str, results_db: str) \
+        -> Optional[SqlRunner]:
     if db == DB_SQLITE:
-        return SQLiteRunner(directory, args)
+        return SQLiteRunner(directory, args, iteration, hostname, results_db)
     if db == DB_MONETDB:
         return MonetDBRunner(iteration, directory, args)
     if db == DB_DUCKDB:

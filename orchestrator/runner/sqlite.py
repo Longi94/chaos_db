@@ -10,8 +10,8 @@ log = logging.getLogger(__name__)
 
 
 class SQLiteRunner(SqlRunner):
-    def __init__(self, directory: str, args: argparse.Namespace):
-        super(SQLiteRunner, self).__init__(directory, args)
+    def __init__(self, directory: str, args: argparse.Namespace, iteration: int, hostname: str, results_db: str):
+        super(SQLiteRunner, self).__init__(directory, args, iteration, hostname, results_db)
         self.db_file = os.path.join(directory, 'db.sqlite')
         self.db_journal = os.path.join(directory, 'db.sqlite-journal')
         self.serverless = True
@@ -36,9 +36,10 @@ class SQLiteRunner(SqlRunner):
 
         with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
             self.query_process = run_injector(
-                output_file=os.path.join(self.directory, 'output.txt'),
                 input_file=query_file,
-                error_file=os.path.join(self.directory, 'stderr.txt'),
+                database=self.results_db,
+                iteration=self.iteration,
+                hostname=self.hostname,
                 child_command=[os.path.join(self.database_dir, 'bin/sqlite3'), self.db_file],
                 fault=self.fault,
                 inject_space=self.inject_space,
@@ -54,8 +55,3 @@ class SQLiteRunner(SqlRunner):
             os.remove(self.db_file)
         if os.path.exists(self.db_journal):
             os.remove(self.db_journal)
-
-        # remove big output files, infinite loops can cause gigantic files to be generated
-        output_file = os.path.join(self.directory, 'output.txt')
-        if os.path.getsize(output_file) > 1000000:
-            os.remove(output_file)
