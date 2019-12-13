@@ -90,7 +90,11 @@ int main(const int argc, char* argv[])
 
     const auto injector = get_injector(fault_type, args, rng);
 
-    const pid_t pid = process::execute(path, input, command_args);
+    pid_t pid = 0;
+    string stdout;
+    string stderr;
+
+    process::execute(path, input, command_args, stdout, stderr, pid);
     unique_ptr<fault::result> result(new fault::result());
     result->iteration = iteration;
     result->hostname = hostname.c_str();
@@ -134,6 +138,8 @@ int main(const int argc, char* argv[])
         server_thread->join();
     }
 
+    result->stdout = stdout.c_str();
+    result->stderr = stderr.c_str();
     database::save_result(database_name, result);
 
     return 0;

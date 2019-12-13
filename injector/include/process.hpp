@@ -2,10 +2,6 @@
 #include <unistd.h>
 #include <string>
 
-constexpr auto pipe_read = 0;
-constexpr auto pipe_write = 1;
-constexpr auto pipe_error = 2;
-
 namespace chaos
 {
     namespace process
@@ -31,7 +27,9 @@ namespace chaos
          * @param arguments command line arguments for the child process
          * @return the process id of the child process
          */
-        pid_t execute(std::string& path, std::string& input, char** arguments);
+        void execute(std::string& path, std::string& input, char** arguments, std::string& stdout, std::string& stderr, pid_t& pid);
+
+        void read_pipe(int link, std::string& out);
 
         /**
          * Check if a child process is running.

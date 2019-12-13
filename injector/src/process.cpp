@@ -6,6 +6,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <fcntl.h>
+#include <thread>
 
 using namespace std;
 
@@ -53,7 +54,7 @@ namespace chaos
             return 0;
         }
 
-        pid_t execute(string& path, string& input, char** arguments)
+        void execute(string& path, string& input, char** arguments, string& stdout, string& stderr, pid_t& pid)
         {
             cout << "Forking to run:";
             for (char** p = arguments; *p != nullptr; p++)
@@ -62,52 +63,38 @@ namespace chaos
             }
             cout << endl;
 
-            const pid_t pid = fork();
+            int stdout_link[2];
+            int stderr_link[2];
+            pipe(stdout_link);
+            pipe(stderr_link);
+
+            pid = fork();
 
             switch (pid)
             {
             case -1:
-                return -1;
+                return;
             case 0:
                 {
-                    // redirect stdout to file
-                    // const int fdout = open(output.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                    // if (fdout == -1)
-                    // {
-                    //     cerr << "Failed to open fdout " << output << ": " << strerror(errno) << endl;
-                    // }
-                    // else
-                    // {
-                    //     dup2(fdout, pipe_write);
-                    //     close(fdout);
-                    // }
-                    //
-                    // // redirect stderr to file
-                    // if (!error.empty())
-                    // {
-                    //     const int fderr = open(error.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                    //     if (fdout == -1)
-                    //     {
-                    //         cerr << "Failed to open fderr " << error << ": " << strerror(errno) << endl;
-                    //     }
-                    //     else
-                    //     {
-                    //         dup2(fderr, pipe_error);
-                    //         close(fderr);
-                    //     }
-                    // }
+                    dup2(stdout_link[1], STDOUT_FILENO);
+                    close(stdout_link[0]);
+                    close(stdout_link[1]);
+
+                    dup2(stderr_link[1], STDERR_FILENO);
+                    close(stderr_link[0]);
+                    close(stderr_link[1]);
 
                     // pipe file into stdin
                     if (!input.empty())
                     {
                         const int fdin = open(input.c_str(), O_RDONLY);
-                        if (fdout == -1)
+                        if (fdin == -1)
                         {
                             cerr << "Failed to open fdin " << input << ": " << strerror(errno) << endl;
                         }
                         else
                         {
-                            dup2(fdin, pipe_read);
+                            dup2(fdin, STDIN_FILENO);
                             close(fdin);
                         }
                     }
@@ -118,12 +105,34 @@ namespace chaos
                         perror("execl");
                         exit(excl_fail);
                     }
-                    return 0;
+                    return;
                 }
             default:
                 cout << "Child process id from parent: " << pid << endl;
-                return pid;
+
+                close(stdout_link[1]);
+                close(stderr_link[1]);
+                const auto t1 = new thread(&read_pipe, stdout_link[0], ref(stdout));
+                const auto t2 = new thread(&read_pipe, stderr_link[0], ref(stderr));
             }
+        }
+
+        void read_pipe(int link, string& out)
+        {
+            const int buf_size = 4096;
+            char buffer[buf_size];
+            out.clear();
+
+            do
+            {
+                errno = 0;
+                const ssize_t r = read(link, buffer, buf_size);
+                if (r > 0)
+                {
+                    out.append(buffer, r);
+                }
+            }
+            while (errno == EAGAIN || errno == EINTR);
         }
 
         bool is_child_running(const pid_t pid, int& status)
