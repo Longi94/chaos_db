@@ -19,19 +19,19 @@ for exp_name in os.listdir('.'):
         print('Column timeout already exists')
 
     try:
-        results_db.engine.execute('''ALTER TABLE result ADD COLUMN stdout TEXT''')
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN stdout BLOB''')
         print('Added column stdout')
     except OperationalError:
         print('Column stdout already exists')
 
     try:
-        results_db.engine.execute('''ALTER TABLE result ADD COLUMN stderr TEXT''')
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN stderr BLOB''')
         print('Added column stderr')
     except OperationalError:
         print('Column stderr already exists')
 
     try:
-        results_db.engine.execute('''ALTER TABLE result ADD COLUMN inject_stderr TEXT''')
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN inject_stderr BLOB''')
         print('Added column inject_stderr')
     except OperationalError:
         print('Column inject_stderr already exists')
@@ -55,19 +55,19 @@ for exp_name in os.listdir('.'):
             os.remove(os.path.join(iteration_dir, 'output.txt'))
 
         try:
-            with open(os.path.join(iteration_dir, 'inject_stderr.txt'), 'r') as f:
+            with open(os.path.join(iteration_dir, 'inject_stderr.txt'), 'rb') as f:
                 row.inject_stderr = f.read()
         except FileNotFoundError:
             pass
 
         try:
-            with open(os.path.join(iteration_dir, 'output.txt'), 'r') as f:
+            with open(os.path.join(iteration_dir, 'output.txt'), 'rb') as f:
                 row.stdout = f.read()
         except FileNotFoundError:
             pass
 
         try:
-            with open(os.path.join(iteration_dir, 'stderr.txt'), 'r') as f:
+            with open(os.path.join(iteration_dir, 'stderr.txt'), 'rb') as f:
                 row.stderr = f.read()
         except FileNotFoundError:
             pass

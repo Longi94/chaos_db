@@ -35,9 +35,13 @@ class ProcessMonitor(object):
     def evaluate_result(self, result: Result):
         raise NotImplementedError()
 
-    def compare_output(self, expected: str, output: str):
-        with open(expected, 'r') as f:
+    def compare_output(self, expected: str, output: bytes):
+        with open(expected, 'rb') as f:
             expected_str = f.read()
+
+        expected_str = expected_str.replace(b'\r\n', b'\n')
+        output = output.replace(b'\r\n', b'\n')
+
         return expected_str == output
 
 

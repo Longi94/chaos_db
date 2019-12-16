@@ -1,5 +1,5 @@
 from typing import Set, List, Optional
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, BLOB
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -30,8 +30,8 @@ class Result(Base):
     fault_count = Column(Integer)
     max_heap_size = Column(Integer)
     max_stack_size = Column(Integer)
-    stdout = Column(String)
-    stderr = Column(String)
+    stdout = Column(BLOB)
+    stderr = Column(BLOB)
 
 
 class ResultsDatabase(object):

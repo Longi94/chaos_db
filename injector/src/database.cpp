@@ -88,14 +88,14 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
         sqlite3_close(db);
         return;
     }
-    if (sqlite3_bind_text(stmt, 10, result->stdout, -1, SQLITE_TRANSIENT))
+    if (sqlite3_bind_blob(stmt, 10, result->stdout, strlen(result->stdout), SQLITE_TRANSIENT))
     {
         cerr << "Failed to bind stdout: " << sqlite3_errmsg(db) << endl;
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         return;
     }
-    if (sqlite3_bind_text(stmt, 11, result->stderr, -1, SQLITE_TRANSIENT))
+    if (sqlite3_bind_blob(stmt, 11, result->stderr, strlen(result->stderr), SQLITE_TRANSIENT))
     {
         cerr << "Failed to bind stderr: " << sqlite3_errmsg(db) << endl;
         sqlite3_finalize(stmt);
