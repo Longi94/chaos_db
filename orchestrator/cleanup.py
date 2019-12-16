@@ -58,26 +58,20 @@ def clean_exp(exp_name):
             rmtree(iteration_dir)
             continue
 
-        if row.result == RESULT_TIMEOUT:
-            os.remove(os.path.join(iteration_dir, 'output.txt'))
+        if os.path.exists(os.path.join(iteration_dir, 'output.txt')):
+            if row.result == RESULT_TIMEOUT:
+                os.remove(os.path.join(iteration_dir, 'output.txt'))
+            else:
+                with open(os.path.join(iteration_dir, 'output.txt'), 'rb') as f:
+                    row.stdout = f.read()
 
-        try:
+        if os.path.exists(os.path.join(iteration_dir, 'inject_stderr.txt')):
             with open(os.path.join(iteration_dir, 'inject_stderr.txt'), 'rb') as f:
                 row.inject_stderr = f.read()
-        except FileNotFoundError:
-            pass
 
-        try:
-            with open(os.path.join(iteration_dir, 'output.txt'), 'rb') as f:
-                row.stdout = f.read()
-        except FileNotFoundError:
-            pass
-
-        try:
+        if os.path.exists(os.path.join(iteration_dir, 'stderr.txt')):
             with open(os.path.join(iteration_dir, 'stderr.txt'), 'rb') as f:
                 row.stderr = f.read()
-        except FileNotFoundError:
-            pass
 
         results_db.commit()
 
