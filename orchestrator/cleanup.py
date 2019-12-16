@@ -21,27 +21,23 @@ def clean_exp(exp_name):
 
     try:
         results_db.engine.execute('''ALTER TABLE result ADD COLUMN timeout INTEGER''')
-        print('Added column timeout')
     except OperationalError:
-        print('Column timeout already exists')
+        pass
 
     try:
         results_db.engine.execute('''ALTER TABLE result ADD COLUMN stdout BLOB''')
-        print('Added column stdout')
     except OperationalError:
-        print('Column stdout already exists')
+        pass
 
     try:
         results_db.engine.execute('''ALTER TABLE result ADD COLUMN stderr BLOB''')
-        print('Added column stderr')
     except OperationalError:
-        print('Column stderr already exists')
+        pass
 
     try:
         results_db.engine.execute('''ALTER TABLE result ADD COLUMN inject_stderr BLOB''')
-        print('Added column inject_stderr')
     except OperationalError:
-        print('Column inject_stderr already exists')
+        pass
 
     results = results_db.get_results()
 
@@ -50,8 +46,6 @@ def clean_exp(exp_name):
 
         if not os.path.exists(iteration_dir):
             continue
-
-        print(f'Cleaning {iteration_dir}')
 
         if row.result == RESULT_OK:
             # remove dir, everything in there is useless
