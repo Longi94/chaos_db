@@ -43,7 +43,7 @@ class ResultsDatabase(object):
 
     def get_iterations(self) -> Set[int]:
         session = self.Session()
-        return set(session.query(Result.iteration))
+        return set(map(lambda x: x[0], session.query(Result.iteration)))
 
     def get_iteration(self, iteration: int) -> Optional[Result]:
         session = self.Session()
