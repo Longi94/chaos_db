@@ -4,6 +4,7 @@
 #include "cxxopts.hpp"
 #include "server.hpp"
 #include "database.hpp"
+#include "time.hpp"
 #include <iostream>
 #include <fstream>
 #include <random>
@@ -118,8 +119,8 @@ int main(const int argc, char* argv[])
     }
 
     cout << "Injecting fault..." << endl;
+    auto start_ts = time::current_time_millis();
     injector->inject(pid, stop_flag);
-    injector->get_result(result);
 
     if (!stop_flag)
     {
@@ -132,6 +133,10 @@ int main(const int argc, char* argv[])
             }
         }
     }
+
+    injector->get_result(result);
+    const auto runtime = time::current_time_millis() - start_ts;
+    result->runtime = runtime;
 
     if (server_thread != nullptr)
     {

@@ -17,7 +17,7 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
 
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db,
-        "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, stdout, stderr, runtime, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         -1, &stmt, nullptr))
     {
         cerr << "Failed to prepare insert statement: " << sqlite3_errmsg(db) << endl;
@@ -98,6 +98,20 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
     if (sqlite3_bind_blob(stmt, 11, result->stderr, strlen(result->stderr), SQLITE_TRANSIENT))
     {
         cerr << "Failed to bind stderr: " << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return;
+    }
+    if (sqlite3_bind_int64(stmt, 12, result->runtime))
+    {
+        cerr << "Failed to bind runtime: " << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return;
+    }
+    if (sqlite3_bind_int(stmt, 13, result->timeout))
+    {
+        cerr << "Failed to bind timeout: " << sqlite3_errmsg(db) << endl;
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         return;

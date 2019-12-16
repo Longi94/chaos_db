@@ -1,5 +1,5 @@
 from typing import Set, List, Optional
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, BLOB
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, BLOB
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -26,7 +26,7 @@ class Result(Base):
     signaled = Column(Integer)
     term_sig = Column(Integer)
     timeout = Column(Boolean)
-    runtime = Column(Float)
+    runtime = Column(Integer)
     fault_count = Column(Integer)
     max_heap_size = Column(Integer)
     max_stack_size = Column(Integer)

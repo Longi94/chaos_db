@@ -23,6 +23,7 @@ namespace chaos
             int fault_count = 0;
             long max_heap_size = 0;
             long max_stack_size = 0;
+            long runtime = 0;
             int timeout = 0;
             const char* stdout = nullptr;
             const char* stderr = nullptr;
