@@ -15,10 +15,21 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
         return;
     }
 
+    sqlite3_busy_timeout(db, 500);
+
     sqlite3_stmt* stmt = nullptr;
-    if (sqlite3_prepare_v2(db,
-        "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, stdout, stderr, runtime, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        -1, &stmt, nullptr))
+
+    int ret;
+    do
+    {
+        ret = sqlite3_prepare_v2(
+            db,
+            "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, stdout, stderr, runtime, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            -1, &stmt, nullptr);
+    }
+    while (ret == SQLITE_BUSY);
+
+    if (ret)
     {
         cerr << "Failed to prepare insert statement: " << sqlite3_errmsg(db) << endl;
         sqlite3_close(db);
@@ -117,7 +128,13 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
         return;
     }
 
-    if (sqlite3_step(stmt) != SQLITE_DONE)
+    do
+    {
+        ret = sqlite3_step(stmt);
+    }
+    while (ret == SQLITE_BUSY);
+
+    if (ret != SQLITE_DONE)
     {
         cerr << "Failed to commit: " << sqlite3_errmsg(db) << endl;
     }
