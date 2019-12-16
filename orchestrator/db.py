@@ -1,7 +1,8 @@
-from typing import Set, List
+from typing import Set, List, Optional
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 Base = declarative_base()
 
@@ -45,9 +46,13 @@ class ResultsDatabase(object):
         session = self.Session()
         return set(session.query(Result.iteration))
 
-    def get_iteration(self, iteration: int) -> Result:
+    def get_iteration(self, iteration: int) -> Optional[Result]:
         session = self.Session()
-        return session.query(Result).filter(Result.iteration == iteration).one()
+
+        try:
+            return session.query(Result).filter(Result.iteration == iteration).one()
+        except (NoResultFound, MultipleResultsFound):
+            return None
 
     def get_results(self) -> List[Result]:
         session = self.Session()

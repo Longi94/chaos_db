@@ -32,6 +32,7 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     monitor = get_monitor(args.database[0], args.database_path, iteration, experiment_dir)
 
     runner.init_db()
+    db = None
     try:
         if not runner.serverless:
             runner.start_server()
@@ -50,9 +51,10 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
 
         db = ResultsDatabase(db_path)
         result = db.get_iteration(iteration)
-        monitor.end(result)
-        db.commit()
-        db.close()
+
+        if result is not None:
+            monitor.end(result)
+            db.commit()
 
     except Exception as e:
         log.error('Error while running query', exc_info=e)
@@ -64,6 +66,8 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
         return None
     finally:
         runner.clean()
+        if db is not None:
+            db.close()
 
 
 if __name__ == '__main__':
