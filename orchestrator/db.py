@@ -30,7 +30,6 @@ class Result(Base):
     fault_count = Column(Integer)
     max_heap_size = Column(Integer)
     max_stack_size = Column(Integer)
-    detected = Column(Boolean)
     stdout = Column(String)
     stderr = Column(String)
 
