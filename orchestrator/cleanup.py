@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError
 def clean_exp(exp_name):
     if not os.path.isdir(exp_name):
         return
-    print(f'Cleaning {exp_name}')
+    print(f'Cleaning {exp_name}', flush=True)
 
     db = exp_name.split('_')[0]
     db_name = os.path.join(exp_name, 'results.sqlite')
