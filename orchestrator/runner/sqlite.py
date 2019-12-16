@@ -34,21 +34,19 @@ class SQLiteRunner(SqlRunner):
         if query_file is None:
             raise NameError(f'Unknown query: {query}')
 
-        with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
-            self.query_process = run_injector(
-                input_file=query_file,
-                database=self.results_db,
-                iteration=self.iteration,
-                hostname=self.hostname,
-                child_command=[os.path.join(self.database_dir, 'bin/sqlite3'), self.db_file],
-                fault=self.fault,
-                inject_space=self.inject_space,
-                flip_rate=self.flip_rate,
-                random_flip_rate=self.random_flip_rate,
-                mean_runtime=self.mean_runtime,
-                inject_stderr=f,
-                single=self.single
-            )
+        self.query_process = run_injector(
+            input_file=query_file,
+            database=self.results_db,
+            iteration=self.iteration,
+            hostname=self.hostname,
+            child_command=[os.path.join(self.database_dir, 'bin/sqlite3'), self.db_file],
+            fault=self.fault,
+            inject_space=self.inject_space,
+            flip_rate=self.flip_rate,
+            random_flip_rate=self.random_flip_rate,
+            mean_runtime=self.mean_runtime,
+            single=self.single
+        )
 
     def clean(self):
         if os.path.exists(self.db_file):

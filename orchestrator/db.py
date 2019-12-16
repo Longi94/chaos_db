@@ -32,7 +32,6 @@ class Result(Base):
     detected = Column(Boolean)
     stdout = Column(String)
     stderr = Column(String)
-    inject_stderr = Column(String)
 
 
 class ResultsDatabase(object):

@@ -1,6 +1,7 @@
 import subprocess
 import logging
 import os
+import sys
 from queue import Queue
 from typing import List, Any, Optional
 
@@ -50,7 +51,6 @@ def run_injector(
         database: str,
         iteration: int,
         hostname: str,
-        inject_stderr,
         input_file: Optional[str] = None,
         fault: Optional[str] = None,
         inject_space: Optional[str] = None,
@@ -90,6 +90,6 @@ def run_injector(
     command.extend(child_command)
 
     log.info('Running command: ' + ' '.join(command))
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=inject_stderr, preexec_fn=os.setpgrp)
+    p = subprocess.Popen(command, stdout=sys.stdout.buffer, stderr=sys.stderr.buffer, preexec_fn=os.setpgrp)
 
     return p
