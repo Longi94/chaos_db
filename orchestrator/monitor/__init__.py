@@ -6,9 +6,9 @@ from .sqlite import SQLiteMonitor
 from .ahead import AheadMonitor
 
 
-def get_monitor(db: str, database_dir: str, directory: str) -> Optional[ProcessMonitor]:
+def get_monitor(db: str, database_dir: str, iteration: int, directory: str) -> Optional[ProcessMonitor]:
     if db == DB_SQLITE:
-        return SQLiteMonitor(directory, database_dir)
+        return SQLiteMonitor(iteration, directory, database_dir)
     if db == DB_MONETDB:
         return MonetDBMonitor(directory, database_dir)
     if db == DB_DUCKDB:

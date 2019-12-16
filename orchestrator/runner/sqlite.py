@@ -12,8 +12,8 @@ log = logging.getLogger(__name__)
 class SQLiteRunner(SqlRunner):
     def __init__(self, directory: str, args: argparse.Namespace, iteration: int, hostname: str, results_db: str):
         super(SQLiteRunner, self).__init__(directory, args, iteration, hostname, results_db)
-        self.db_file = os.path.join(directory, 'db.sqlite')
-        self.db_journal = os.path.join(directory, 'db.sqlite-journal')
+        self.db_file = os.path.join(directory, f'db.{iteration}.sqlite')
+        self.db_journal = os.path.join(directory, f'db.{iteration}.sqlite-journal')
         self.serverless = True
 
     def init_db(self):

@@ -26,12 +26,10 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
     log.info('Iteration ' + str(iteration))
     print('Iteration ' + str(iteration), flush=True)
 
-    iteration_dir = os.path.join(experiment_dir, str(iteration))
     db_path = os.path.join(experiment_dir, 'results.sqlite')
-    os.makedirs(iteration_dir, exist_ok=True)
 
-    runner = get_runner(args.database[0], iteration, iteration_dir, args, hostname, db_path)
-    monitor = get_monitor(args.database[0], args.database_path, iteration_dir)
+    runner = get_runner(args.database[0], iteration, experiment_dir, args, hostname, db_path)
+    monitor = get_monitor(args.database[0], args.database_path, iteration, experiment_dir)
 
     runner.init_db()
     try:

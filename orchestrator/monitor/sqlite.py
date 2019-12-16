@@ -11,14 +11,14 @@ SHA_UPDATED = 'bd74cffaade77656453c85bcd02952af7b3f0c08'
 
 class SQLiteMonitor(ServerlessProcessMonitor):
 
-    def __init__(self, directory: str, database_dir: str):
-        super().__init__(directory, database_dir, 'sqlite')
+    def __init__(self, iteration: int, directory: str, database_dir: str):
+        super().__init__(iteration, directory, database_dir, 'sqlite')
 
     def evaluate_result(self, result: Result):
         super().evaluate_result(result)
 
         if self.query == TPCH_UPDATES:
-            db_file = os.path.join(self.directory, 'db.sqlite')
+            db_file = os.path.join(self.directory, f'db.{self.iteration}.sqlite')
             integrity_stdout = os.path.join(self.directory, 'integrity_stdout.txt')
             integrity_stderr = os.path.join(self.directory, 'integrity_stderr.txt')
 
