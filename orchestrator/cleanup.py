@@ -1,16 +1,23 @@
 import os
+from multiprocessing import Pool
 from db import ResultsDatabase
 from shutil import rmtree
 from result import *
 from sqlalchemy.exc import OperationalError
 
-for exp_name in os.listdir('.'):
 
+def clean_exp(exp_name):
+    if not os.path.isdir(exp_name):
+        return
     print(f'Cleaning {exp_name}')
 
     db = exp_name.split('_')[0]
+    db_name = os.path.join(exp_name, 'results.sqlite')
 
-    results_db = ResultsDatabase(os.path.join(exp_name, 'results.sqlite'))
+    if not os.path.exists(db_name):
+        return
+
+    results_db = ResultsDatabase(db_name)
 
     try:
         results_db.engine.execute('''ALTER TABLE result ADD COLUMN timeout INTEGER''')
@@ -77,3 +84,8 @@ for exp_name in os.listdir('.'):
         rmtree(iteration_dir)
 
     results_db.close()
+
+
+with Pool(processes=5) as p:
+    for _ in p.imap_unordered(clean_exp, os.listdir('.')):
+        pass
