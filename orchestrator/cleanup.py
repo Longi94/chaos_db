@@ -59,9 +59,7 @@ def clean_exp(exp_name):
             continue
 
         if os.path.exists(os.path.join(iteration_dir, 'output.txt')):
-            if row.result == RESULT_TIMEOUT:
-                os.remove(os.path.join(iteration_dir, 'output.txt'))
-            else:
+            if row.result != RESULT_TIMEOUT:
                 with open(os.path.join(iteration_dir, 'output.txt'), 'rb') as f:
                     row.stdout = f.read()
 
