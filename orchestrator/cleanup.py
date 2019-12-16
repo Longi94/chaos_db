@@ -13,6 +13,12 @@ for exp_name in os.listdir('.'):
     results_db = ResultsDatabase(os.path.join(exp_name, 'results.sqlite'))
 
     try:
+        results_db.engine.execute('''ALTER TABLE result ADD COLUMN timeout INTEGER''')
+        print('Added column timeout')
+    except OperationalError:
+        print('Column timeout already exists')
+
+    try:
         results_db.engine.execute('''ALTER TABLE result ADD COLUMN stdout TEXT''')
         print('Added column stdout')
     except OperationalError:
