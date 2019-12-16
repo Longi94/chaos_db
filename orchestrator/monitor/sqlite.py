@@ -34,7 +34,7 @@ class SQLiteMonitor(ServerlessProcessMonitor):
                 result.result = RESULT_DB_CORRUPTED
                 return
 
-            integrity_check = integrity_check.strip()
+            integrity_check = integrity_check.decode('utf-8').strip()
 
             if integrity_check != 'ok':
                 result.result = RESULT_DB_CORRUPTED
