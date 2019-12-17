@@ -32,7 +32,7 @@ class SQLiteMonitor(ServerlessProcessMonitor):
                 if result.stderr is None or len(result.stderr) == 0:
                     result.stderr = b'[INTEGRITY]:' + integrity_stderr
                 else:
-                    result.stderr += b'[INTEGRITY]:\n' + integrity_stderr
+                    result.stderr += b'\n[INTEGRITY]:' + integrity_stderr
 
             if p.returncode != 0:
                 result.result = RESULT_DB_CORRUPTED
