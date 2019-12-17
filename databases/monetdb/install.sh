@@ -22,7 +22,7 @@ fi
 
 tar xvf ${DIR}/${MONETDB_DIR}.tar.bz2 -C ${DIR}/
 
-mkdir ${DIR}/build
+mkdir -p ${DIR}/build || true
 cd ${DIR}/${MONETDB_DIR}
 ./configure --prefix ${DIR}/build/ --disable-strict --disable-assert --disable-debug --enable-optimize
 make

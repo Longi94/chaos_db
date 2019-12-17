@@ -17,3 +17,6 @@ apt install -y libreadline-dev zlib1g-dev
 
 # AHEAD
 apt install -y libboost-all-dev libsparsehash-dev libffi-dev libncurses5-dev
+
+# monetdb
+apt install -y bison libssl-dev
