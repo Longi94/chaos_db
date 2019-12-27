@@ -87,21 +87,21 @@ namespace chaos
                     result->heap = unique_ptr<memory_map>(new memory_map());
                     result->heap->start = addr_start;
                     result->heap->end = addr_end;
-                    result->heap->size = addr_start - addr_end;
+                    result->heap->size = addr_end - addr_start;
                 }
                 else if (strcmp(map->pathname, "[stack]") == 0)
                 {
                     result->stack = unique_ptr<memory_map>(new memory_map());
                     result->stack->start = addr_start;
                     result->stack->end = addr_end;
-                    result->stack->size = addr_start - addr_end;
+                    result->stack->size = addr_end - addr_start;
                 }
                 else if (strlen(map->pathname) == 0 && map->is_w)
                 {
                     auto anon = unique_ptr<memory_map>(new memory_map());
                     anon->start = addr_start;
                     anon->end = addr_end;
-                    anon->size = addr_start - addr_end;
+                    anon->size = addr_end - addr_start;
                     result->anons->push_back(move(anon));
                 }
                 previous = map;
