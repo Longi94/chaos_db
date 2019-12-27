@@ -37,7 +37,7 @@ class Result(Base):
 class ResultsDatabase(object):
 
     def __init__(self, file, create: bool = True):
-        self.engine = create_engine(f'sqlite:///{file}')
+        self.engine = create_engine(f'sqlite:///{file}', connect_args={'timeout': 60})
         if create:
             Base.metadata.create_all(self.engine)
         self.Session = scoped_session(sessionmaker(bind=self.engine))
