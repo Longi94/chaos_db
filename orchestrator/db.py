@@ -36,9 +36,10 @@ class Result(Base):
 
 class ResultsDatabase(object):
 
-    def __init__(self, file):
+    def __init__(self, file, create: bool = True):
         self.engine = create_engine(f'sqlite:///{file}')
-        Base.metadata.create_all(self.engine)
+        if create:
+            Base.metadata.create_all(self.engine)
         self.Session = scoped_session(sessionmaker(bind=self.engine))
 
     def get_iterations(self) -> Set[int]:

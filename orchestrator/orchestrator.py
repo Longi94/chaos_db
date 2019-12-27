@@ -49,7 +49,7 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
         if not runner.serverless:
             monitor.evaluate_query_process(runner.query_process)
 
-        db = ResultsDatabase(db_path)
+        db = ResultsDatabase(db_path, create=False)
         result = db.get_iteration(iteration)
 
         if result is not None:
