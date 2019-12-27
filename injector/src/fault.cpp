@@ -147,7 +147,7 @@ namespace chaos
                 return 0;
             }
 
-            uniform_int_distribution<long> address_dist(total_size);
+            uniform_int_distribution<long> address_dist(0, total_size);
             auto selected = address_dist(rng_);
 
             if (inject_to_heap_)
