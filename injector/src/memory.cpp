@@ -75,82 +75,62 @@ namespace chaos
             procmaps_struct* previous = nullptr;
             unique_ptr<heap_stack> result(new heap_stack());
 
+            result->anons = unique_ptr<vector<unique_ptr<memory_map>>>(new vector<unique_ptr<memory_map>>());
+
             while ((map = pmparser_next(maps)) != nullptr && previous != map)
             {
+                const auto addr_start = reinterpret_cast<off_t>(map->addr_start);
+                const auto addr_end = reinterpret_cast<off_t>(map->addr_end);
+
                 if (strcmp(map->pathname, "[heap]") == 0)
                 {
-                    result->heap_start = reinterpret_cast<off_t>(map->addr_start);
-                    result->heap_end = reinterpret_cast<off_t>(map->addr_end);
+                    result->heap = unique_ptr<memory_map>(new memory_map());
+                    result->heap->start = addr_start;
+                    result->heap->end = addr_end;
+                    result->heap->size = addr_start - addr_end;
                 }
                 else if (strcmp(map->pathname, "[stack]") == 0)
                 {
-                    result->stack_start = reinterpret_cast<off_t>(map->addr_start);
-                    result->stack_end = reinterpret_cast<off_t>(map->addr_end);
+                    result->stack = unique_ptr<memory_map>(new memory_map());
+                    result->stack->start = addr_start;
+                    result->stack->end = addr_end;
+                    result->stack->size = addr_start - addr_end;
+                }
+                else if (strlen(map->pathname) == 0 && map->is_w)
+                {
+                    auto anon = unique_ptr<memory_map>(new memory_map());
+                    anon->start = addr_start;
+                    anon->end = addr_end;
+                    anon->size = addr_start - addr_end;
+                    result->anons->push_back(move(anon));
                 }
                 previous = map;
             }
-
-            result->heap_size = result->heap_end - result->heap_start;
-            result->stack_size = result->stack_end - result->stack_start;
 
             pmparser_free(maps);
 
             return result;
         }
 
-        off_t get_random_address(const unique_ptr<heap_stack>& memory_info, const space m_space, mt19937& rng) {
-            off_t addr = 0;
-
-            if (memory_info != nullptr)
-            {
-                // cout << "Heap: " << hex << memory_info->heap_start << "-" << memory_info->heap_end << " " <<
-                //     dec << memory_info->heap_end - memory_info->heap_start << endl;
-                //
-                // cout << "Stack: " << hex << memory_info->stack_start << "-" << memory_info->stack_end << " " <<
-                //     dec << memory_info->stack_end - memory_info->stack_start << endl;
-
-                switch (m_space) {
-                    case heap:
-                        {
-                            // cout << "Choosing address from heap." << endl;
-                            uniform_int_distribution<off_t> address_dist(memory_info->heap_start, memory_info->heap_end);
-                            addr = address_dist(rng);
-                            break;
-                        }
-                    case stack:
-                        {
-                            // cout << "Choosing address from stack." << endl;
-                            uniform_int_distribution<off_t> address_dist(memory_info->stack_start, memory_info->stack_end);
-                            addr = address_dist(rng);
-                            break;
-                        }
-                    default:
-                        {
-                            // cout << "Choosing address from stack or heap." << endl;
-                            // Randomly choose an address in heap or stack
-                            uniform_int_distribution<off_t> address_dist(0, memory_info->heap_size + memory_info->stack_size);
-                            const off_t rand_i = address_dist(rng);
-
-                            if (rand_i > memory_info->heap_size)
-                            {
-                                addr = memory_info->stack_start - memory_info->heap_size + rand_i;
-                            }
-                            else
-                            {
-                                addr = memory_info->heap_start + rand_i;
-                            }
-                            break;
-                        }
-                }
-            }
-
-            return addr;
-        }
-
         bool is_in_memory(const off_t address, const unique_ptr<heap_stack>& memory_info)
         {
-            return memory_info->heap_start <= address && address < memory_info->heap_end ||
-                memory_info->stack_start <= address && address < memory_info->heap_end;
+            if (memory_info->heap->start <= address && memory_info->heap->end > address)
+            {
+                return true;
+            }
+            if (memory_info->stack->start <= address && memory_info->stack->end > address)
+            {
+                return true;
+            }
+
+            for (auto& anon : *memory_info->anons)
+            {
+                if (anon->start <= address && anon->end > address)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

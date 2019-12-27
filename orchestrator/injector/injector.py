@@ -53,7 +53,9 @@ def run_injector(
         hostname: str,
         input_file: Optional[str] = None,
         fault: Optional[str] = None,
-        inject_space: Optional[str] = None,
+        inject_to_heap: bool = False,
+        inject_to_anon: bool = False,
+        inject_to_stack: bool = False,
         flip_rate: Optional[float] = None,
         random_flip_rate: bool = False,
         mean_runtime: Optional[float] = None,
@@ -68,8 +70,14 @@ def run_injector(
     if fault is not None:
         command.extend(['-f', fault])
 
-    if inject_space is not None:
-        command.extend(['-s', inject_space])
+    if inject_to_heap:
+        command.append('-x')
+
+    if inject_to_anon:
+        command.append('-y')
+
+    if inject_to_stack:
+        command.append('-z')
 
     if flip_rate is not None:
         command.extend(['--flip-rate', str(flip_rate)])

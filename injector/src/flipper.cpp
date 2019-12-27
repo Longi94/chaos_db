@@ -119,20 +119,7 @@ namespace chaos
 
         double BitFlipper::get_interval(const unique_ptr<memory::heap_stack>& memory_info) const
         {
-            long mem_size;
-
-            switch (inject_space_)
-            {
-            case memory::heap:
-                mem_size = memory_info->heap_size;
-                break;
-            case memory::stack:
-                mem_size = memory_info->stack_size;
-                break;
-            default:
-                mem_size = memory_info->heap_size + memory_info->stack_size;
-                break;
-            }
+            const long mem_size = get_total_memory_size(memory_info);
 
             // cerr << "Mem size: " << mem_size << " bytes" << endl;
             if (mem_size == 0)
@@ -164,10 +151,11 @@ namespace chaos
             const auto byte = new int8_t[1];
             const auto flipped_byte = new int8_t[1];
             uniform_int_distribution<int> mask_dist(0, 7);
+            const auto total_memory_size = get_total_memory_size(memory_info);
 
             for (int i = 0; i < flip_count; ++i)
             {
-                const auto address = get_random_address(memory_info, inject_space_, rng_);
+                const auto address = get_random_address(memory_info, total_memory_size);
                 const auto mask = 1 << mask_dist(rng_);
 
                 if (memory::read_byte(fd, byte, address))

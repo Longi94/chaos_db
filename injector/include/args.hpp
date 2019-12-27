@@ -37,12 +37,5 @@ namespace chaos
          * @return fault_type variable
          */
         fault::fault_type get_fault_type(cxxopts::ParseResult& args);
-
-        /**
-         * Get the inject space from the arguments.
-         * @param args parsed option from cxxopts
-         * @return memory::space variable
-         */
-        memory::space get_memory_space(cxxopts::ParseResult& args);
     }
 }

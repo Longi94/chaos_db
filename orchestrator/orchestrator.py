@@ -90,7 +90,9 @@ if __name__ == '__main__':
         database=args.database[0],
         query=args.query,
         fault=args.fault,
-        inject_space=args.inject_space,
+        inject_to_heap=args.heap,
+        inject_to_anon=args.anon,
+        inject_to_stack=args.stack,
         flip_rate=args.flip_rate,
         random_flip_rate=args.random_flip_rate
     )

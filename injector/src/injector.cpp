@@ -45,9 +45,9 @@ int main(const int argc, char* argv[])
         ("stuck-rate",
          "double: Frequency of stuck bits in a bit/megabytes unit. Required if the fault type is \"stuck\".",
          cxxopts::value<double>())
-        ("s,inject-space",
-         "string: Address space to inject the fault into. Can be \"heap\" or \"stack\". If not provided it will be randomly chosen",
-         cxxopts::value<string>())
+        ("x,heap", "flag: Inject faults into the heap.")
+        ("y,anon", "flag: Inject faults into writable anonymous areas.")
+        ("z,stack", "flag: Inject faults into the stack.")
         ("p,port",
          "integer: Enable inter-process communication using this port. The injector will wait for a message to start and stop the injection.",
          cxxopts::value<int>());
@@ -119,7 +119,7 @@ int main(const int argc, char* argv[])
     }
 
     cout << "Injecting fault..." << endl;
-    auto start_ts = time::current_time_millis();
+    const auto start_ts = time::current_time_millis();
     injector->inject(pid, stop_flag);
 
     if (!stop_flag)

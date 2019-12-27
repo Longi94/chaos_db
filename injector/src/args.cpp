@@ -60,24 +60,5 @@ namespace chaos
 
             return fault::none;
         }
-
-        memory::space get_memory_space(cxxopts::ParseResult& args)
-        {
-            if (!args.count("inject-space"))
-            {
-                return memory::all;
-            }
-
-            const auto inject_space = args["inject-space"].as<string>();
-
-            if (inject_space.compare("heap") == 0) {
-                return memory::heap;
-            }
-            else if (inject_space.compare("stack") == 0) {
-                return memory::stack;
-            }
-
-            return memory::all;
-        }
     }
 }

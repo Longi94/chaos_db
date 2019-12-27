@@ -32,8 +32,10 @@ namespace chaos
 
         FaultInjector::FaultInjector(cxxopts::ParseResult& args, mt19937& rng) : rng_(rng)
         {
-            inject_space_ = args::get_memory_space(args);
             single_fault_ = args.count("single");
+            inject_to_heap_ = args.count("heap");
+            inject_to_anon_ = args.count("anonymous");
+            inject_to_stack_ = args.count("stack");
 
             if (args.count("mean-runtime"))
             {
@@ -100,8 +102,8 @@ namespace chaos
 
                 const auto memory_info = memory::get_heap_and_stack_spaces(pid);
 
-                max_heap_size_ = max(max_heap_size_, memory_info->heap_size);
-                max_stack_size_ = max(max_stack_size_, memory_info->stack_size);
+                max_heap_size_ = max(max_heap_size_, memory_info->heap->size);
+                max_stack_size_ = max(max_stack_size_, memory_info->stack->size);
 
                 f(memory_info, current_ts);
 
@@ -113,6 +115,70 @@ namespace chaos
                 kill(pid, SIGKILL);
                 waitpid(pid, &process_status_, 0);
             }
+        }
+
+        long FaultInjector::get_total_memory_size(const std::unique_ptr<memory::heap_stack>& memory_info) const
+        {
+            long total_size = 0;
+
+            if (inject_to_heap_)
+            {
+                total_size += memory_info->heap->size;
+            }
+            if (inject_to_stack_)
+            {
+                total_size += memory_info->stack->size;
+            }
+            if (inject_to_anon_)
+            {
+                for (const auto& a : *memory_info->anons)
+                {
+                    total_size += a->size;
+                }
+            }
+
+            return total_size;
+        }
+
+        off_t FaultInjector::get_random_address(const unique_ptr<memory::heap_stack>& memory_info, const long total_size)
+        {
+            if (memory_info == nullptr || total_size == 0)
+            {
+                return 0;
+            }
+
+            uniform_int_distribution<long> address_dist(total_size);
+            auto selected = address_dist(rng_);
+
+            if (inject_to_heap_)
+            {
+                if (memory_info->heap->size > selected)
+                {
+                    return memory_info->heap->start + selected;
+                }
+                selected -= memory_info->heap->size;
+            }
+            if (inject_to_stack_)
+            {
+                if (memory_info->stack->size > selected)
+                {
+                    return memory_info->stack->start + selected;
+                }
+                selected -= memory_info->stack->size;
+            }
+            if (inject_to_anon_)
+            {
+                for (const auto& a : *memory_info->anons)
+                {
+                    if (a->size > selected)
+                    {
+                        return a->start + selected;
+                    }
+                    selected -= a->size;
+                }
+            }
+
+            return 0;
         }
     }
 }

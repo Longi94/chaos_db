@@ -36,8 +36,10 @@ namespace chaos
 
         protected:
             std::mt19937 rng_;
-            memory::space inject_space_;
             bool single_fault_;
+            bool inject_to_heap_ = false;
+            bool inject_to_anon_ = false;
+            bool inject_to_stack_ = false;
             int process_status_ = 0;
             int fault_count_ = 0;
             long mean_runtime_;
@@ -62,6 +64,8 @@ namespace chaos
             bool check_timeout(pid_t pid, long& current_timestamp);
             void loop(pid_t pid, long interval, std::atomic_bool& stop_flag,
                       std::function<void(const std::unique_ptr<memory::heap_stack>&, long)> f);
+            long get_total_memory_size(const std::unique_ptr<memory::heap_stack>& memory_info) const;
+            off_t get_random_address(const std::unique_ptr<memory::heap_stack>& memory_info, long total_size);
         };
 
         /**

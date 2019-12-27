@@ -9,7 +9,9 @@ class SqlRunner(object):
         self.iteration = iteration
         self.directory = directory
         self.fault = args.fault
-        self.inject_space = args.inject_space
+        self.inject_to_heap = args.heap
+        self.inject_to_stack = args.stack
+        self.inject_to_anon = args.anon
         self.flip_rate = args.flip_rate
         self.random_flip_rate = args.random_flip_rate
         self.mean_runtime = args.mean_runtime

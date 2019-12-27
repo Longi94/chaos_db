@@ -6,17 +6,19 @@ namespace chaos
 {
     namespace memory
     {
-        struct heap_stack
+        struct memory_map
         {
-            off_t heap_start = 0;
-            off_t heap_end = 0;
-            off_t stack_start = 0;
-            off_t stack_end = 0;
-            long heap_size = 0;
-            long stack_size = 0;
+            off_t start;
+            off_t end;
+            long size;
         };
 
-        enum space { all, heap, stack };
+        struct heap_stack
+        {
+            std::unique_ptr<memory_map> heap = nullptr;
+            std::unique_ptr<memory_map> stack = nullptr;
+            std::unique_ptr<std::vector<std::unique_ptr<memory_map>>> anons = nullptr;
+        };
 
         /**
          * Open the memory file of a process. /proc/<pid>/mem
@@ -49,14 +51,6 @@ namespace chaos
          * @return pointer to the heap_stack struct
          */
         std::unique_ptr<heap_stack> get_heap_and_stack_spaces(int pid);
-
-        /**
-         * Get a random virtual address from the memory space of a process.
-         * @param memory_info memory info of the child process
-         * @param m_space the part of the memory to get the address from
-         * @param rng random number generator
-         */
-        off_t get_random_address(const std::unique_ptr<heap_stack>& memory_info, space m_space, std::mt19937& rng);
 
         /**
          * Check if the address in the memory info.

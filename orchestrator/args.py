@@ -28,8 +28,10 @@ parser.add_argument('-rfr', '--random-flip-rate', default=False, action='store_t
 parser.add_argument('-t', '--threads', required=False, default=1, type=int,
                     help='Run multiple experiments at the same time with this number of threads. For each '
                          'experiment 2 or more processes might be spawned depending on the database.')
-parser.add_argument('-s', '--inject-space', dest='inject_space', type=str, choices=['heap', 'stack'],
-                    required=False, help='Address space to inject the fault into.')
+parser.add_argument('-x', '--heap', default=False, action='store_true', help='Inject faults into the heap.')
+parser.add_argument('-y', '--anon', default=False, action='store_true',
+                    help='Inject faults into writable anonymous areas.')
+parser.add_argument('-z', '--stack', default=False, action='store_true', help='Inject faults into the stack.')
 parser.add_argument('--single', default=False, action='store_true', help='Inject a single fault')
 parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
                     help='The working directory. This directory will contain all experiment output and artifacts.')
