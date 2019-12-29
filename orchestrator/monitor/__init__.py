@@ -10,9 +10,9 @@ def get_monitor(db: str, database_dir: str, iteration: int, directory: str) -> O
     if db == DB_SQLITE:
         return SQLiteMonitor(iteration, directory, database_dir)
     if db == DB_MONETDB:
-        return MonetDBMonitor(directory, database_dir)
+        return MonetDBMonitor(iteration, directory, database_dir)
     if db == DB_DUCKDB:
-        return ServerlessProcessMonitor(directory, database_dir, 'duckdb')
+        return ServerlessProcessMonitor(iteration, directory, database_dir, 'duckdb')
     if db in (AHEAD_CONT_REENC, AHEAD_CONT, AHEAD_EARLY, AHEAD_LATE, AHEAD_NORMAL):
-        return AheadMonitor(directory, database_dir)
+        return AheadMonitor(iteration, directory, database_dir)
     return None

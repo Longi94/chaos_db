@@ -1,5 +1,4 @@
 import argparse
-from typing import Optional
 from db import *
 from .runner import SqlRunner
 from .sqlite import SQLiteRunner
@@ -17,5 +16,5 @@ def get_runner(db, iteration: int, directory: str, args: argparse.Namespace, hos
     if db == DB_DUCKDB:
         return DuckDBRunner(directory, args)
     if db in (AHEAD_CONT_REENC, AHEAD_CONT, AHEAD_EARLY, AHEAD_LATE, AHEAD_NORMAL):
-        return AheadRunner(directory, db, args)
+        return AheadRunner(directory, db, args, iteration, hostname, results_db)
     return None

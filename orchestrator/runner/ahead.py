@@ -12,10 +12,10 @@ log = logging.getLogger(__name__)
 
 
 class AheadRunner(SqlRunner):
-    def __init__(self, directory: str, db_type: str, args: argparse.Namespace):
-        super(AheadRunner, self).__init__(directory, args)
+    def __init__(self, directory: str, db_type: str, args: argparse.Namespace, iteration: int, hostname: str, results_db: str):
+        super(AheadRunner, self).__init__(directory, args, iteration, hostname, results_db)
         self.db_type = db_type
-        self.db_path = os.path.join(directory, 'data')
+        self.db_path = os.path.join(directory, f'data_{iteration}')
         self.serverless = True
 
     def init_db(self):
@@ -50,15 +50,17 @@ class AheadRunner(SqlRunner):
 
         with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
             self.query_process = run_injector(
-                output_file=os.path.join(self.directory, 'output.txt'),
-                error_file=os.path.join(self.directory, 'stderr.txt'),
+                database=self.results_db,
+                iteration=self.iteration,
+                hostname=self.hostname,
                 child_command=[binary_file, '-d', self.db_path],
                 fault=self.fault,
-                inject_space=self.inject_space,
+                inject_to_heap=self.inject_to_heap,
+                inject_to_stack=self.inject_to_stack,
+                inject_to_anon=self.inject_to_anon,
                 flip_rate=self.flip_rate,
                 random_flip_rate=self.random_flip_rate,
                 mean_runtime=self.mean_runtime,
-                inject_stderr=f,
                 single=self.single
             )
 
