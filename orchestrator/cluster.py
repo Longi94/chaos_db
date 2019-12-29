@@ -44,13 +44,13 @@ if __name__ == '__main__':
                 clush_command.append('-m')
                 clush_command.append(str(args.mean_runtime))
 
-            if args.inject_to_heap:
+            if args.heap:
                 clush_command.append('-x')
 
-            if args.inject_to_anon:
+            if args.anon:
                 clush_command.append('-y')
 
-            if args.inject_to_stack:
+            if args.stack:
                 clush_command.append('-z')
 
             if args.random_flip_rate:
