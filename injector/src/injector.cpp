@@ -31,6 +31,7 @@ int main(const int argc, char* argv[])
          "The command the child process should run. This should be the last option as anything after this will be interpreted as the command.",
          cxxopts::value<string>())
         ("d,database", "string: The SQLite database to save the result into.", cxxopts::value<string>())
+        ("save-output", "flag: Save the stdout and stderr of the child process into the database")
         ("a,iteration", "Iteration number", cxxopts::value<int>())
         ("b,hostname", "Host machine name", cxxopts::value<string>())
         ("i,input", "string: File to pipe into stdin of the child process", cxxopts::value<string>()->default_value(""))
@@ -145,7 +146,7 @@ int main(const int argc, char* argv[])
 
     result->stdout = stdout.c_str();
     result->stderr = stderr.c_str();
-    database::save_result(database_name, result);
+    database::save_result(database_name, result, args.count("save-output") > 0);
 
     return 0;
 }

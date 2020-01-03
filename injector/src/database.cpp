@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& result)
+void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& result, const bool save_output)
 {
     sqlite3* db;
 
@@ -22,10 +22,20 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
     int ret;
     do
     {
-        ret = sqlite3_prepare_v2(
-            db,
-            "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, stdout, stderr, runtime, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            -1, &stmt, nullptr);
+        if (save_output)
+        {
+            ret = sqlite3_prepare_v2(
+                db,
+                "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, runtime, timeout, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                -1, &stmt, nullptr);
+        }
+        else
+        {
+            ret = sqlite3_prepare_v2(
+                db,
+                "INSERT INTO result (iteration, hostname, exited, return_code, signaled, term_sig, fault_count, max_heap_size, max_stack_size, runtime, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                -1, &stmt, nullptr);
+        }
     }
     while (ret == SQLITE_BUSY);
 
@@ -99,33 +109,37 @@ void chaos::database::save_result(string& db_name, unique_ptr<fault::result>& re
         sqlite3_close(db);
         return;
     }
-    if (sqlite3_bind_blob(stmt, 10, result->stdout, strlen(result->stdout), SQLITE_TRANSIENT))
-    {
-        cerr << "Failed to bind stdout: " << sqlite3_errmsg(db) << endl;
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
-        return;
-    }
-    if (sqlite3_bind_blob(stmt, 11, result->stderr, strlen(result->stderr), SQLITE_TRANSIENT))
-    {
-        cerr << "Failed to bind stderr: " << sqlite3_errmsg(db) << endl;
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
-        return;
-    }
-    if (sqlite3_bind_int64(stmt, 12, result->runtime))
+    if (sqlite3_bind_int64(stmt, 10, result->runtime))
     {
         cerr << "Failed to bind runtime: " << sqlite3_errmsg(db) << endl;
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         return;
     }
-    if (sqlite3_bind_int(stmt, 13, result->timeout))
+    if (sqlite3_bind_int(stmt, 11, result->timeout))
     {
         cerr << "Failed to bind timeout: " << sqlite3_errmsg(db) << endl;
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         return;
+    }
+
+    if (save_output)
+    {
+        if (sqlite3_bind_blob(stmt, 12, result->stdout, strlen(result->stdout), SQLITE_TRANSIENT))
+        {
+            cerr << "Failed to bind stdout: " << sqlite3_errmsg(db) << endl;
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            return;
+        }
+        if (sqlite3_bind_blob(stmt, 13, result->stderr, strlen(result->stderr), SQLITE_TRANSIENT))
+        {
+            cerr << "Failed to bind stderr: " << sqlite3_errmsg(db) << endl;
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            return;
+        }
     }
 
     do

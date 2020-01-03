@@ -60,7 +60,8 @@ def run_injector(
         random_flip_rate: bool = False,
         mean_runtime: Optional[float] = None,
         single: bool = False,
-        port: Optional[int] = None
+        port: Optional[int] = None,
+        save_output: bool = True
 ) -> subprocess.Popen:
     command = [INJECTOR_PATH, '-d', database, '-a', str(iteration), '-b', hostname]
 
@@ -93,6 +94,9 @@ def run_injector(
 
     if port is not None:
         command.extend(['-p', str(port)])
+
+    if save_output:
+        command.append('--save-output')
 
     command.append('-c')
     command.extend(child_command)

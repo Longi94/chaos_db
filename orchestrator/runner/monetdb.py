@@ -71,7 +71,8 @@ class MonetDBRunner(SqlRunner):
             random_flip_rate=self.random_flip_rate,
             mean_runtime=self.mean_runtime,
             single=self.single,
-            port=self.injector_port
+            port=self.injector_port,
+            save_output=False
         )
 
         test_query = [
