@@ -39,18 +39,32 @@ def run(iteration: int, args: argparse.Namespace, experiment_dir: str, existing_
 
             monitor.start(args.query)
             runner.run_query(args.query)
+
+            stdout, stderr = runner.query_process.communicate()
+            runner.finish_query()
+
+            if len(stdout) == 0:
+                stdout = None
+            if len(stderr) == 0:
+                stderr = None
+
+            runner.server_process.wait()
+
+            monitor.evaluate_query_process(runner.query_process)
+
+            db = ResultsDatabase(db_path, create=False)
+            result = db.get_iteration(iteration)
+            result.stdout = stdout
+            result.stderr = stderr
         else:
             monitor.start(args.query)
             runner.run_query(args.query)
 
-        runner.query_process.wait()
-        runner.finish_query()
+            runner.query_process.wait()
+            runner.finish_query()
 
-        if not runner.serverless:
-            monitor.evaluate_query_process(runner.query_process)
-
-        db = ResultsDatabase(db_path, create=False)
-        result = db.get_iteration(iteration)
+            db = ResultsDatabase(db_path, create=False)
+            result = db.get_iteration(iteration)
 
         if result is not None:
             monitor.end(result)

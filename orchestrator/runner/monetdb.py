@@ -25,8 +25,8 @@ def init_mserver5_port_pool(size: int):
 
 class MonetDBRunner(SqlRunner):
 
-    def __init__(self, iteration: int, directory: str, args: argparse.Namespace):
-        super().__init__(directory, args)
+    def __init__(self, directory: str, args: argparse.Namespace, iteration: int, hostname: str, results_db: str):
+        super().__init__(directory, args, iteration, hostname, results_db)
         self.db_name = f'data_{iteration}'
         self.db_path = os.path.join(directory, self.db_name)
         self.injector_port = None
@@ -44,34 +44,35 @@ class MonetDBRunner(SqlRunner):
         self.injector_client = InjectorClient(self.injector_port)
 
     def start_server(self):
-        with open(os.path.join(self.directory, 'inject_stderr.txt'), 'w') as f:
-            self.server_process = run_injector(
-                output_file=os.path.join(self.directory, 'server.log'),
-                error_file=os.path.join(self.directory, 'server_err.log'),
-                child_command=[
-                    os.path.join(self.database_dir, 'build/bin/mserver5'),
-                    f'--dbpath={self.db_path}',
-                    '--daemon=yes',
-                    '--set',
-                    'gdk_mmap_minsize=1000000000000',  # force monetdb to use malloc instead of mmap
-                    '--set',
-                    'gdk_mmap_minsize_persistent=1000000000000',
-                    '--set',
-                    'gdk_mmap_minsize_transient=1000000000000',
-                    '--set',
-                    'sql_optimizer=sequential_pipe',  # disable parallelism to avoid non deterministic output
-                    '--set',
-                    f'mapi_port={self.server_port}'
-                ],
-                fault=self.fault,
-                inject_space=self.inject_space,
-                flip_rate=self.flip_rate,
-                random_flip_rate=self.random_flip_rate,
-                mean_runtime=self.mean_runtime,
-                inject_stderr=f,
-                single=self.single,
-                port=self.injector_port
-            )
+        self.server_process = run_injector(
+            database=self.results_db,
+            iteration=self.iteration,
+            hostname=self.hostname,
+            child_command=[
+                os.path.join(self.database_dir, 'build/bin/mserver5'),
+                f'--dbpath={self.db_path}',
+                '--daemon=yes',
+                '--set',
+                'gdk_mmap_minsize=1000000000000',  # force monetdb to use malloc instead of mmap
+                '--set',
+                'gdk_mmap_minsize_persistent=1000000000000',
+                '--set',
+                'gdk_mmap_minsize_transient=1000000000000',
+                '--set',
+                'sql_optimizer=sequential_pipe',  # disable parallelism to avoid non deterministic output
+                '--set',
+                f'mapi_port={self.server_port}'
+            ],
+            fault=self.fault,
+            inject_to_heap=self.inject_to_heap,
+            inject_to_stack=self.inject_to_stack,
+            inject_to_anon=self.inject_to_anon,
+            flip_rate=self.flip_rate,
+            random_flip_rate=self.random_flip_rate,
+            mean_runtime=self.mean_runtime,
+            single=self.single,
+            port=self.injector_port
+        )
 
         test_query = [
             os.path.join(self.database_dir, 'build/bin/mclient'),
@@ -123,12 +124,9 @@ class MonetDBRunner(SqlRunner):
 
         log.info(f'Running query: {" ".join(query_command)}')
 
-        with open(os.path.join(self.directory, 'output.txt'), 'w') as output_file:
-            with open(os.path.join(self.directory, 'stderr.txt'), 'w') as error_file:
-                self.query_process = subprocess.Popen(query_command, stdout=output_file, stderr=error_file,
-                                                      preexec_fn=os.setpgrp)
-
-                self.injector_client.send_start()
+        self.query_process = subprocess.Popen(query_command, preexec_fn=os.setpgrp, stdout=subprocess.PIPE,
+                                              stderr=subprocess.PIPE)
+        self.injector_client.send_start()
 
     def finish_query(self):
         self.injector_client.send_stop()
