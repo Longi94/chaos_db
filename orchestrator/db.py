@@ -26,6 +26,7 @@ class Result(Base):
     signaled = Column(Integer)
     term_sig = Column(Integer)
     timeout = Column(Boolean)
+    db_corrupted = Column(Boolean, default=False)
     runtime = Column(Integer)
     fault_count = Column(Integer)
     max_heap_size = Column(Integer)

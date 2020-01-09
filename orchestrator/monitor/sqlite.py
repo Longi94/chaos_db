@@ -21,6 +21,12 @@ class SQLiteMonitor(ServerlessProcessMonitor):
             db_file = os.path.join(self.directory, f'db.{self.iteration}.sqlite')
             db_hash = subprocess.check_output(['sha1sum', db_file]).decode('utf-8').split(' ')[0]
 
+            if db_hash == SHA_UPDATED:
+                result.result = RESULT_OK
+                return
+            elif db_hash != SHA_ORIGINAL and (result.result is None or result.result < 0):
+                result.result = RESULT_INCORRECT_OUTPUT
+
             # check for corruption
             p = subprocess.Popen(
                 [os.path.join(self.database_dir, 'bin/sqlite3'), db_file, 'pragma integrity_check'],
@@ -35,16 +41,11 @@ class SQLiteMonitor(ServerlessProcessMonitor):
                     result.stderr += b'\n[INTEGRITY]:' + integrity_stderr
 
             if p.returncode != 0:
-                result.result = RESULT_DB_CORRUPTED
+                result.db_corrupted = True
                 return
 
             integrity_check = integrity_check.decode('utf-8').strip()
 
             if integrity_check != 'ok':
-                result.result = RESULT_DB_CORRUPTED
+                result.db_corrupted = True
                 return
-
-            if db_hash == SHA_UPDATED:
-                result.result = RESULT_OK
-            elif db_hash != SHA_ORIGINAL:
-                result.result = RESULT_INCORRECT_OUTPUT
