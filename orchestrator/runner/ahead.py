@@ -53,7 +53,7 @@ class AheadRunner(SqlRunner):
                 database=self.results_db,
                 iteration=self.iteration,
                 hostname=self.hostname,
-                child_command=[binary_file, '-d', self.db_path],
+                child_command=[binary_file, '--dbpath', self.db_path],
                 fault=self.fault,
                 inject_to_heap=self.inject_to_heap,
                 inject_to_stack=self.inject_to_stack,
