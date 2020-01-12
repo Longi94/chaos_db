@@ -79,6 +79,11 @@ namespace chaos
 
             while ((map = pmparser_next(maps)) != nullptr && previous != map)
             {
+                if (!map->is_r || !map->is_w)
+                {
+                    continue;
+                }
+
                 const auto addr_start = reinterpret_cast<off_t>(map->addr_start);
                 const auto addr_end = reinterpret_cast<off_t>(map->addr_end);
 
