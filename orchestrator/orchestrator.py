@@ -94,7 +94,7 @@ if __name__ == '__main__':
     if args.fault == 'flip' and args.flip_rate is None and not args.single:
         parser.error('--flip-rate is required when --fault is set to flip and --single is not given')
 
-    check_injector()
+    check_injector(args.debug)
     init_pool(args.threads)
 
     if args.database[0] == DB_MONETDB:

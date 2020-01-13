@@ -44,7 +44,8 @@ class DuckDBRunner(SqlRunner):
                 random_flip_rate=self.random_flip_rate,
                 mean_runtime=self.mean_runtime,
                 inject_stderr=f,
-                single=self.single
+                single=self.single,
+                debug=self.debug
             )
 
     def clean(self):

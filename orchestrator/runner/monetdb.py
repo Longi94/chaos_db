@@ -72,7 +72,8 @@ class MonetDBRunner(SqlRunner):
             mean_runtime=self.mean_runtime,
             single=self.single,
             port=self.injector_port,
-            save_output=False
+            save_output=False,
+            debug=self.debug
         )
 
         test_query = [

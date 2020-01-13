@@ -20,6 +20,7 @@ class SqlRunner(object):
         self.serverless = False
         self.server_process = None
         self.query_process = None
+        self.debug = args.debug
 
     def init_db(self):
         """

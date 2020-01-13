@@ -8,6 +8,7 @@ from typing import List, Any, Optional
 log = logging.getLogger(__name__)
 
 INJECTOR_PATH = './build/release/injector/injector'
+INJECTOR_PATH_DEBUG = './build/debug/injector/injector'
 
 _port_pool: Optional[Queue] = None
 
@@ -37,11 +38,11 @@ def release_port(port: int):
     _port_pool.put(port)
 
 
-def check_injector():
+def check_injector(debug: bool = False):
     """
     Stops execution if the injector was not found.
     """
-    if not os.path.exists(INJECTOR_PATH):
+    if not os.path.exists(INJECTOR_PATH_DEBUG if debug else INJECTOR_PATH):
         log.error('injector not found')
         exit(1)
 
@@ -61,9 +62,10 @@ def run_injector(
         mean_runtime: Optional[float] = None,
         single: bool = False,
         port: Optional[int] = None,
-        save_output: bool = True
+        save_output: bool = True,
+        debug: bool = False
 ) -> subprocess.Popen:
-    command = [INJECTOR_PATH, '-d', database, '-a', str(iteration), '-b', hostname]
+    command = [INJECTOR_PATH_DEBUG if debug else INJECTOR_PATH, '-d', database, '-a', str(iteration), '-b', hostname]
 
     if input_file is not None:
         command.extend(['-i', input_file])

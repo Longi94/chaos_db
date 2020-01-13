@@ -33,5 +33,6 @@ parser.add_argument('-y', '--anon', default=False, action='store_true',
                     help='Inject faults into writable anonymous areas.')
 parser.add_argument('-z', '--stack', default=False, action='store_true', help='Inject faults into the stack.')
 parser.add_argument('--single', default=False, action='store_true', help='Inject a single fault')
+parser.add_argument('--debug', default=False, action='store_true', help='Use the debug build of the injector.')
 parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
                     help='The working directory. This directory will contain all experiment output and artifacts.')
