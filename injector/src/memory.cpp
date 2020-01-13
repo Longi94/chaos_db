@@ -81,6 +81,7 @@ namespace chaos
             {
                 if (!map->is_r || !map->is_w)
                 {
+                    previous = map;
                     continue;
                 }
 
