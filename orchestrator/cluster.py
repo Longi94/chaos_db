@@ -21,7 +21,8 @@ if __name__ == '__main__':
                 inject_to_anon=args.anon,
                 inject_to_stack=args.stack,
                 flip_rate=val,
-                random_flip_rate=args.random_flip_rate
+                random_flip_rate=args.random_flip_rate,
+                suffix=args.suffix
             )
 
             clush_command = ['clush', '-v', '-w', args.nodes, 'cd', 'chaos_db', '&&', 'PYTHONPATH=./orchestrator',
@@ -55,6 +56,10 @@ if __name__ == '__main__':
 
             if args.random_flip_rate:
                 clush_command.append('-rfr')
+
+            if args.suffix:
+                clush_command.append('--suffix')
+                clush_command.append(args.suffix)
 
             print(f'Running command: {" ".join(clush_command)}', flush=True)
 

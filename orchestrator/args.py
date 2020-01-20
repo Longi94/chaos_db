@@ -36,3 +36,4 @@ parser.add_argument('--single', default=False, action='store_true', help='Inject
 parser.add_argument('--debug', default=False, action='store_true', help='Use the debug build of the injector.')
 parser.add_argument('-w', '--working-dir', dest='working_directory', type=str, required=True,
                     help='The working directory. This directory will contain all experiment output and artifacts.')
+parser.add_argument('--suffix', type=str, help='Suffix to append to database name when creating an experiment folder.')

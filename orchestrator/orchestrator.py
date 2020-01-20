@@ -108,7 +108,8 @@ if __name__ == '__main__':
         inject_to_anon=args.anon,
         inject_to_stack=args.stack,
         flip_rate=args.flip_rate,
-        random_flip_rate=args.random_flip_rate
+        random_flip_rate=args.random_flip_rate,
+        suffix=args.suffix
     )
     experiment_dir = os.path.join(args.working_directory, experiment_dir)
 

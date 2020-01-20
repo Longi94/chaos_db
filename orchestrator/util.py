@@ -16,9 +16,14 @@ def get_dir_name(
         random_flip_rate: bool,
         inject_to_heap: bool = False,
         inject_to_anon: bool = False,
-        inject_to_stack: bool = False
+        inject_to_stack: bool = False,
+        suffix: str = None
 ) -> str:
-    name = f'{database}_{query}'
+
+    if suffix:
+        name = f'{database}_{suffix}_{query}'
+    else:
+        name = f'{database}_{query}'
 
     if fault is not None:
         name += f'_{fault}'
