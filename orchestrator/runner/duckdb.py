@@ -38,7 +38,7 @@ class DuckDBRunner(SqlRunner):
                 database=self.results_db,
                 iteration=self.iteration,
                 hostname=self.hostname,
-                child_command=[os.path.join(self.database_dir, 'build/release/tools/shell/shell'), self.db_file],
+                child_command=[os.path.join(self.database_dir, 'examples/wrapper/build/wrapper'), self.db_file],
                 fault=self.fault,
                 inject_to_heap=self.inject_to_heap,
                 inject_to_stack=self.inject_to_stack,
