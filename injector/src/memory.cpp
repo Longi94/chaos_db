@@ -76,6 +76,8 @@ namespace chaos
             unique_ptr<heap_stack> result(new heap_stack());
 
             result->anons = unique_ptr<vector<unique_ptr<memory_map>>>(new vector<unique_ptr<memory_map>>());
+            result->heap = unique_ptr<memory_map>(new memory_map());
+            result->stack = unique_ptr<memory_map>(new memory_map());
 
             while ((map = pmparser_next(maps)) != nullptr && previous != map)
             {
@@ -90,14 +92,12 @@ namespace chaos
 
                 if (strcmp(map->pathname, "[heap]") == 0)
                 {
-                    result->heap = unique_ptr<memory_map>(new memory_map());
                     result->heap->start = addr_start;
                     result->heap->end = addr_end;
                     result->heap->size = addr_end - addr_start;
                 }
                 else if (strcmp(map->pathname, "[stack]") == 0)
                 {
-                    result->stack = unique_ptr<memory_map>(new memory_map());
                     result->stack->start = addr_start;
                     result->stack->end = addr_end;
                     result->stack->size = addr_end - addr_start;

@@ -8,9 +8,9 @@ namespace chaos
     {
         struct memory_map
         {
-            off_t start;
-            off_t end;
-            long size;
+            off_t start = 0;
+            off_t end = 0;
+            long size = 0;
         };
 
         struct heap_stack

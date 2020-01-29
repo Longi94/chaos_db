@@ -140,7 +140,8 @@ namespace chaos
             return total_size;
         }
 
-        off_t FaultInjector::get_random_address(const unique_ptr<memory::heap_stack>& memory_info, const long total_size)
+        off_t FaultInjector::get_random_address(const unique_ptr<memory::heap_stack>& memory_info,
+                                                const long total_size)
         {
             if (memory_info == nullptr || total_size == 0)
             {
